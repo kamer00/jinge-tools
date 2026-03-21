@@ -182,6 +182,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border)}
 
+
 /* ── 查規格 MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal-overlay.hidden{display:none}
@@ -314,7 +315,6 @@ const SPECS = {
   },
   bar_sq: {
     'SS400': [6.35,7.94,9.5,12.7,15.9,19.05,22.2,25.4,31.75,38.1,44.4,50.8],
-    'SS400_BK': [25.4,31.75,44.4,50.8,60,65,70,75,80,100],
     'S45C':  [12.7,15.9,19.05,22.2,25.4,31.75,38.1,44.5,50.8],
     'default_sq': [25.4,31.75,44.4,50.8,60,65,70,75,80,100],
   },
@@ -475,8 +475,10 @@ function getSpecArr(matCode, shape) {
   const grp = SPECS[shape];
   if(!grp) return null;
   const key = shape.replace('bar_','');
+  // 不鏽鋼、鋁合金、銅合金：無內建規格，回傳 null（modal 顯示「無規格資料」）
+  const noSpec = ['SUS304','A6061','A7075','C3604','BC6','PBC3','ALBC3','HBrass'];
+  if(noSpec.includes(matCode)) return null;
   if(matCode==='SS400'||matCode==='ST52'||matCode==='STKM13A') return grp['SS400']||grp['default_'+key];
-  if(matCode==='SS400_BK') return grp['SS400_BK']||grp['default_sq']||[];
   if(matCode==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key];
   if(matCode==='S45C_B'||matCode==='S50C') return grp['S45C_B']||grp['default_'+key];
   if(matCode==='S20C') return grp['S20C']||grp['default_'+key];
@@ -621,8 +623,35 @@ function autoFillUnitPrice() {
 // 各形狀對應材質清單
 const SHAPE_MATS = {
   plate:   [['SS400|7.85','SS400'],['S45C_B|7.85','S45C'],['S50C|7.85','S50C'],['SCM440|7.85','SCM440']],
-  bar_rnd: [['SS400|7.85','SS400　光圓鐵'],['S45C_L|7.85','S45C　光中碳'],['S45C_B|7.85','S45C　黑中碳'],['S20C|7.85','S20C　黑皮鐵'],['SCM440|7.85','SCM440　紅十字'],['SCM415|7.85','SCM415　綠十字'],['SNCM439|7.85','SNCM439　藍十字'],['SUS304|7.93','SUS304　不鏽鋼'],['A6061|2.70','A6061　鋁合金'],['C3604|8.50','C3604　黃銅（易切削）'],['BC6|8.83','BC6　青銅'],['PBC3|8.80','PBC3　磷青銅'],['ALBC3|7.60','ALBC3　鋁青銅'],['HBrass|8.50','高張力黃銅']],
-  bar_sq:  [['SS400|7.85','SS400　光鐵四角'],['SS400_BK|7.85','SS400　黑鐵四角'],['S45C_L|7.85','S45C　光中四角']],
+  // bar_rnd 使用群組格式：{group:'群組名', items:[...]}
+  bar_rnd: [
+    {group:'碳鋼', items:[
+      ['SS400|7.85','SS400　光圓鐵'],
+      ['S45C_L|7.85','S45C　光中碳'],
+      ['S45C_B|7.85','S45C　黑中碳'],
+      ['S20C|7.85','S20C　黑皮鐵'],
+    ]},
+    {group:'合金鋼', items:[
+      ['SCM440|7.85','SCM440　紅十字'],
+      ['SCM415|7.85','SCM415　綠十字'],
+      ['SNCM439|7.85','SNCM439　藍十字'],
+    ]},
+    {group:'不鏽鋼', items:[
+      ['SUS304|7.93','SUS304　不鏽鋼'],
+    ]},
+    {group:'鋁合金', items:[
+      ['A6061|2.70','A6061　鋁合金（通用）'],
+      ['A7075|2.81','A7075　鋁合金（高強度）'],
+    ]},
+    {group:'銅合金', items:[
+      ['C3604|8.50','C3604　黃銅（易切削）'],
+      ['BC6|8.83','BC6　青銅'],
+      ['PBC3|8.80','PBC3　磷青銅'],
+      ['ALBC3|7.60','ALBC3　鋁青銅'],
+      ['HBrass|8.50','高張力黃銅'],
+    ]},
+  ],
+  bar_sq:  [['SS400|7.85','SS400　光鐵四角'],['S45C_L|7.85','S45C　光中四角'],['S45C_B|7.85','S45C　黑四角']],
   bar_hex: [['SS400|7.85','SS400　光鐵六角'],['S45C_L|7.85','S45C　光中六角']],
   pipe:    null,  // 管料在 renderDims 裡有獨立的材質切換
   prod_pipe: null,
@@ -634,21 +663,53 @@ function updateMatOptions(shape) {
   const wrap = document.getElementById('mat-section');
   const mats = SHAPE_MATS[shape];
   if(!mats) {
-    // 成品管/硬鉻軸不需要材質
     if(wrap) wrap.style.display = 'none';
     return;
   }
   if(wrap) wrap.style.display = '';
+  sel.style.display = '';
   const cur = sel.value;
   sel.innerHTML = '';
-  mats.forEach(([v,t]) => {
-    const o = document.createElement('option');
-    o.value = v; o.textContent = t;
-    if(v === cur) o.selected = true;
-    sel.appendChild(o);
-  });
-  // 若目前選的材質不在新清單，自動選第一個
-  if(!mats.find(([v])=>v===cur)) sel.value = mats[0][0];
+  const isGrouped = mats.length > 0 && mats[0].group !== undefined;
+  if(isGrouped) {
+    let allItems = [];
+    mats.forEach(({group, items}, gi) => {
+      // 分隔線 option（第一組不加）
+      if(gi > 0) {
+        const sep = document.createElement('option');
+        sep.disabled = true;
+        sep.textContent = '── ' + group + ' ──';
+        sep.style.color = '#666';
+        sel.appendChild(sep);
+      } else {
+        const sep = document.createElement('option');
+        sep.disabled = true;
+        sep.textContent = '── ' + group + ' ──';
+        sep.style.color = '#666';
+        sel.appendChild(sep);
+      }
+      items.forEach(([v,t]) => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = '  ' + t;
+        if(v === cur) o.selected = true;
+        sel.appendChild(o);
+        allItems.push([v,t]);
+      });
+    });
+    if(!allItems.find(([v])=>v===cur)) {
+      // 選第一個有效 option
+      const firstValid = sel.querySelector('option:not([disabled])');
+      if(firstValid) sel.value = firstValid.value;
+    }
+  } else {
+    mats.forEach(([v,t]) => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = t;
+      if(v === cur) o.selected = true;
+      sel.appendChild(o);
+    });
+    if(!mats.find(([v])=>v===cur)) sel.value = mats[0][0];
+  }
   onMatChange();
 }
 
@@ -698,17 +759,15 @@ function getSpecsForMat(shape) {
   if(!grp) return [];
   const key = shape.replace('bar_','');
   const mc = matCode;
+  // 不鏽鋼、鋁合金、銅合金：無內建規格
+  const noSpec = ['SUS304','A6061','A7075','C3604','BC6','PBC3','ALBC3','HBrass'];
+  if(noSpec.includes(mc)) return [];
   if(mc==='SS400'||mc==='ST52') return grp['SS400']||grp['default_'+key]||[];
-  if(mc==='SS400_BK') return grp['SS400_BK']||grp['default_sq']||[];
   if(mc==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key]||[];
-  if(mc==='S45C_B'||mc==='S50C') {
-    if(shape==='bar_sq'||shape==='bar_hex') return [];
-    return grp['S45C_B']||grp['default_'+key]||[];
-  }
+  if(mc==='S45C_B'||mc==='S50C') return grp['S45C_B']||grp['default_'+key]||[];
   if(mc==='S20C') return grp['S20C']||grp['default_'+key]||[];
   if(mc==='SCM440') return grp['SCM440']||grp['default_'+key]||[];
-  if(mc==='SCM415') return grp['SCM415']||grp['default_'+key]||[];
-  if(mc==='SNCM439') return [];
+  if(mc==='SCM415'||mc==='SNCM439') return grp['SCM415']||grp['default_'+key]||[];
   return grp['default_'+key]||[];
 }
 
@@ -742,11 +801,7 @@ function renderDims() {
 
   } else if(currentShape==='bar_rnd') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const specs = getSpecsForMat('bar_rnd');
-    const dInput = specs.length > 0
-      ? mkSpecSel('dim-D', specs, 'Ø', autoFillUnitPrice)
-      : mkInput('dim-D','0.1');
-    const df=mkField('Ø（徑）',dInput); df.style.flex='1';
+    const df=mkField('Ø（徑）',mk('input',{type:'number',id:'dim-D',placeholder:'mm',min:0,step:0.1,onchange:'autoFillUnitPrice()'})); df.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
     g.appendChild(df); g.appendChild(x1); g.appendChild(lf);
@@ -754,9 +809,8 @@ function renderDims() {
 
   } else if(currentShape==='bar_sq') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const specsA = getSpecsForMat('bar_sq');
-    const aInput = specsA.length > 0 ? mkSpecSel('dim-A', specsA, '□', autoFillUnitPrice) : mkInput('dim-A','0.1');
-    const af=mkField('A（邊長）',aInput); af.style.flex='1';
+    const aSel=mkSpecSel('dim-A', getSpecsForMat('bar_sq'), '□', autoFillUnitPrice);
+    const af=mkField('A（邊長）',aSel); af.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
     g.appendChild(af); g.appendChild(x1); g.appendChild(lf);
@@ -764,9 +818,8 @@ function renderDims() {
 
   } else if(currentShape==='bar_hex') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const specsS = getSpecsForMat('bar_hex');
-    const sInput = specsS.length > 0 ? mkSpecSel('dim-S', specsS, '⬡', autoFillUnitPrice) : mkInput('dim-S','0.1');
-    const sf=mkField('S（對邊）',sInput); sf.style.flex='1';
+    const sSel=mkSpecSel('dim-S', getSpecsForMat('bar_hex'), '⬡', autoFillUnitPrice);
+    const sf=mkField('S（對邊）',sSel); sf.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
     g.appendChild(sf); g.appendChild(x1); g.appendChild(lf);
@@ -925,7 +978,7 @@ function updateProdPipeHint() {
 function calculate() {
   const matVal = document.getElementById('mat').value.split('|');
   const matName = matVal[0];
-  let matDisplay = matName.replace('S45C_L','S45C 光中碳').replace('S45C_B','S45C 黑中碳').replace('SS400_BK','SS400 黑鐵四角');
+  let matDisplay = matName.replace('S45C_L','S45C 光中碳').replace('S45C_B','S45C 黑中碳');
   // 板材種類顯示
   if(currentShape==='plate') {
     const ptSel = document.getElementById('plate-type-sel');
@@ -1170,8 +1223,8 @@ function renderLookup() {
     matWrap.style.display = ['plate','prod_pipe','shaft'].includes(shape) ? 'none' : '';
     // 依形狀給對應材質選單
     const matsByShape = {
-      bar_rnd: [['SS400','SS400'],['S45C_L','S45C 光中碳'],['S45C_B','S45C 黑中碳'],['S20C','S20C'],['SCM440','SCM440'],['SCM415','SCM415']],
-      bar_sq:  [['SS400','SS400 光鐵四角'],['SS400_BK','SS400 黑鐵四角'],['S45C_L','S45C 光中四角']],
+      bar_rnd: [['SS400','SS400'],['S45C_L','S45C 光中碳'],['S45C_B','S45C 黑中碳'],['S20C','S20C'],['SCM440','SCM440'],['SCM415','SCM415'],['SNCM439','SNCM439']],
+      bar_sq:  [['SS400','SS400'],['S45C_L','S45C 光中四角'],['S45C_B','S45C 黑四角']],
       bar_hex: [['SS400','SS400'],['S45C_L','S45C 光中六角']],
     };
     const mats = matsByShape[shape];
