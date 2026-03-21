@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>軸心整修 vs 製新</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--border:#30363d;
+  --blue:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#e3b341;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;padding:28px 16px 64px;}
+.wrap{max-width:640px;margin:0 auto;}
+
+.hdr{text-align:center;margin-bottom:24px;}
+.hdr-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);padding:4px 14px;border-radius:20px;margin-bottom:12px;}
+.hdr h1{font-size:26px;font-weight:900;background:linear-gradient(135deg,#e6edf3 30%,#58a6ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.hdr p{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+.input-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px;}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.fg{display:flex;flex-direction:column;gap:7px;}
+label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;}
+input[type=number]{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;padding:10px 14px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12);}
+input[type=number]::-webkit-inner-spin-button{opacity:0;}
+.hint{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+.mat-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.mat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.mat-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Noto Sans TC',sans-serif;padding:10px 8px;cursor:pointer;transition:all .15s;text-align:center;}
+.mat-btn:hover{border-color:var(--blue);color:var(--blue);}
+.mat-btn.active{background:rgba(88,166,255,.1);border-color:var(--blue);color:var(--text);font-weight:700;}
+.mat-btn .mn{display:block;font-size:13px;font-weight:700;margin-bottom:3px;}
+.mat-btn .ms{display:block;font-size:10px;color:var(--text3);}
+.mat-btn.active .ms{color:var(--blue);}
+
+.empty{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text3);font-size:13px;letter-spacing:1px;}
+
+.fix-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px;}
+.fix-title{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+
+.fix-item{border-radius:10px;padding:14px 18px;margin-bottom:10px;border:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.fix-item:last-child{margin-bottom:0;}
+.fix-item.warn{border-color:rgba(248,81,73,.5);background:rgba(248,81,73,.06);}
+.fix-item.ok{border-color:rgba(63,185,80,.35);background:rgba(63,185,80,.05);}
+.fix-item.ref{border-color:var(--border);opacity:.6;}
+.fix-item.new-item{opacity:1;border-color:var(--border);background:var(--s2);flex-wrap:wrap;gap:10px;}
+
+.fi-left{flex:1;min-width:0;}
+.fi-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.fi-sub{font-size:11px;color:var(--text2);}
+.fix-item.warn .fi-name{color:var(--red);}
+.fix-item.ok .fi-name{color:var(--green);}
+.fix-item.ref .fi-name{color:var(--text2);}
+
+.fi-right{text-align:right;flex-shrink:0;}
+.fi-price{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:900;}
+.fix-item.warn .fi-price{color:var(--red);}
+.fix-item.ok .fi-price{color:var(--green);}
+.fix-item.ref .fi-price{color:var(--text3);}
+.fi-diff{font-size:11px;margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.fi-diff.over{color:var(--red);}
+.fi-diff.save{color:var(--green);}
+.warn-icon{font-size:22px;flex-shrink:0;}
+
+.new-detail{width:100%;display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding-left:34px;margin-top:4px;}
+.new-detail-label{font-size:11px;color:var(--text3);}
+.new-detail-val{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace;text-align:right;}
+
+.notes{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:0 10px 10px 0;padding:14px 20px;}
+.notes-title{font-size:11px;font-weight:700;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.notes li{font-size:12px;color:var(--text2);padding-left:14px;position:relative;line-height:1.7;list-style:none;}
+.notes li::before{content:'▸';position:absolute;left:0;color:var(--yellow);}
+
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:pop .25s ease;}
+@media(max-width:480px){.hdr h1{font-size:22px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-tag">勁格科技 內部工具</div>
+  <h1>軸心整修 vs 製新</h1>
+  <p>研磨電鍍費用 vs 製新成本，避免整修比製新還貴</p>
+</div>
+
+<div class="input-card">
+  <div class="input-grid">
+    <div class="fg">
+      <label>直徑 (mm)</label>
+      <input type="number" id="dia" placeholder="100" min="1" oninput="run()">
+      <span class="hint">Ø20 ~ Ø300</span>
+    </div>
+    <div class="fg">
+      <label>長度 (mm)</label>
+      <input type="number" id="len" placeholder="1000" min="1" oninput="run()">
+      <span class="hint">單位 mm</span>
+    </div>
+  </div>
+  <div class="mat-label">製新方式</div>
+  <div class="mat-row">
+    <button class="mat-btn active" data-mat="chrome" onclick="setMat(this)">
+      <span class="mn">硬鉻軸</span><span class="ms">直接加工</span>
+    </button>
+    <button class="mat-btn" data-mat="s45c" onclick="setMat(this)">
+      <span class="mn">跑流程 S45C</span><span class="ms">含研+電</span>
+    </button>
+    <button class="mat-btn" data-mat="s45c_qt" onclick="setMat(this)">
+      <span class="mn">S45C+QT</span><span class="ms">含研+電+調質</span>
+    </button>
+    <button class="mat-btn" data-mat="scm_qt" onclick="setMat(this)">
+      <span class="mn">SCM440+QT</span><span class="ms">含研+電+調質</span>
+    </button>
+  </div>
+  <div id="newDetail" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;">製新成本</span>
+      <span id="newTotal" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:900;color:var(--text);"></span>
+    </div>
+    <div id="newRows"></div>
+  </div>
+</div>
+
+<div id="out"><div class="empty">請輸入直徑與長度</div></div>
+
+<div class="notes" style="margin-top:14px;">
+  <div class="notes-title">⚠ 說明</div>
+  <ul>
+    <li>整修費用 = 純研磨＋電鍍，無其他工序</li>
+    <li>1研1電 @7元/in²，最低NT$650｜2研1電 @11.4元/in²，最低NT$1,250</li>
+    <li>硬鉻軸：材料查階梯單價，無研+電｜跑流程：重量計料，含研+電 @5.5元/in²</li>
+    <li>SCM440 材料單價：D＜50→33元/kg，D≧50→30元/kg</li>
+    <li>D＞100 且 L＞2000：整修不適用</li>
+    <li>僅供內部參考，實際費用以廠商確認為準</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const MAT_TABLE=[
+  [20,194],[22,219],[22.4,235],[25,255],[25.4,275],[28,296],
+  [30,326],[32,377],[35,451],[35.5,445],[36,449],[38,474],
+  [38.1,479],[40,539],[45,612],[50,785],[50.8,836],[55,918],
+  [56,954],[60,1081],[63,1224],[65,1387],[70,1734],[71,1977],
+  [75,1938],[80,2244],[85,2550],[90,2856],[95,3162],[100,3775]
+];
+function matPricePerM(D){
+  let p=MAT_TABLE[0][1];
+  for(let[d,v] of MAT_TABLE){if(D>=d)p=v; else break;}
+  return p;
+}
+function latheChromeShaft(D){
+  let v=150;
+  if(D>28)v+=30;if(D>36)v+=20;if(D>45)v+=50;if(D>50.8)v+=50;
+  if(D>56)v+=50;if(D>65)v+=50;if(D>75)v+=50;if(D>85)v+=50;if(D>95)v+=50;
+  return v;
+}
+function flowMill(D){
+  // 跑流程銑床：D7公式 150+IF(D>120,50)+IF(D>180,100)+IF(D>200,100)
+  let v=150;
+  if(D>120)v+=50;if(D>180)v+=100;if(D>200)v+=100;
+  return v;
+}
+function millFee(D){
+  let v=30;
+  if(D>28)v+=10;if(D>36)v+=10;if(D>56)v+=30;if(D>65)v+=20;
+  if(D>75)v+=20;if(D>85)v+=20;if(D>95)v+=10;
+  if(D>120)v+=50;if(D>150)v+=100;if(D>175)v+=100;if(D>245)v+=100;
+  return v;
+}
+function lenAdj(D,L){
+  if(L<=999)return 0;
+  let v=50;
+  if(D>38)v+=50;if(D>45)v+=50;if(D>56)v+=50;
+  if(D>65)v+=50;if(D>70)v+=50;if(D>80)v+=50;if(D>90)v+=100;
+  return v;
+}
+function wt(D,L,extra){
+  const od=D+extra;
+  return 0.785*od*od*(L+5)*0.00785/1000*1.02;
+}
+function s45cKg(D){return D<50?28:23;}
+function scm4Kg(D){return D<50?33:30;}
+
+function calcNew(D,L,mat){
+  let rows=[];
+  let matFee=0,latheFee=0,mill=millFee(D),lenA=lenAdj(D,L),qtFee=0,plateFee=0;
+
+  if(mat==='chrome'){
+    // 硬鉻軸直接加工，無研+電
+    const mp=matPricePerM(D);
+    matFee=L*mp/1000;
+    latheFee=latheChromeShaft(D);
+    rows=[['材料費',matFee],['車床費',latheFee],['銑床費',mill],['長度加價',lenA]];
+    const total=matFee+latheFee+mill+lenA;
+    return{total,rows};
+  }
+
+  // 跑流程共用：外圓切削車床
+  const latheArea=Math.PI*D*L/645*2;
+  const latheAdjFee=(D>99?800:0)+(D>149?500:0)+(D>199?500:0)+(D>249?500:0);
+  // 研+電 @5.5元/in²
+  const area=Math.PI*D*L/645;
+  plateFee=area*(D>250?6.5:5.5);
+
+  if(mat==='s45c'){
+    // 跑流程S45C：重量計料，無QT
+    const w=wt(D,L,5);
+    matFee=w*s45cKg(D);
+    latheFee=latheArea+latheAdjFee+latheChromeShaft(D)+lenA;
+    mill=flowMill(D);
+    rows=[['材料費',matFee],['車床費（含外圓切削）',latheFee],['銑床費',mill],['研+電費(@5.5)',plateFee]];
+    return{total:matFee+latheFee+mill+plateFee,rows};
+  } else {
+    const extra=mat==='scm_qt'?10:5;
+    const w=wt(D,L,extra);
+    const kg=mat==='scm_qt'?scm4Kg(D):s45cKg(D);
+    matFee=w*kg;
+    latheFee=latheArea+latheAdjFee+latheChromeShaft(D)+lenA;
+    mill=flowMill(D);
+    qtFee=w*13.5;
+    rows=[['材料費',matFee],['車床費（含外圓切削）',latheFee],['銑床費',mill],['研+電費(@5.5)',plateFee],['調質費(QT)',qtFee]];
+    return{total:matFee+latheFee+mill+plateFee+qtFee,rows};
+  }
+}
+
+function plateArea(D,L){return Math.PI*D*L/645;}
+const REPAIR_SPECS=[
+  {key:'r1e1',  name:'1研1電',unitPrice:7,   min:650, main:true},
+  {key:'r2e1',  name:'2研1電',unitPrice:11.4,min:1250,main:true},
+  {key:'polish',name:'拋光',  unitPrice:1.35,min:200, main:false},
+];
+function calcRepair(D,L,spec){
+  const area=plateArea(D,L);
+  return Math.max(area*spec.unitPrice,spec.min);
+}
+
+function nt(n){return 'NT$\u00a0'+Math.round(n).toLocaleString('zh-TW');}
+function ff(n,d=2){return n.toFixed(d);}
+
+let currentMat='chrome';
+function setMat(btn){
+  document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMat=btn.dataset.mat;
+  run();
+}
+
+function run(){
+  const D=parseFloat(document.getElementById('dia').value);
+  const L=parseFloat(document.getElementById('len').value);
+  const out=document.getElementById('out');
+  if(!D||!L){
+    out.innerHTML='<div class="empty">請輸入直徑與長度</div>';
+    document.getElementById('newDetail').style.display='none';
+    return;
+  }
+
+  const noFix=D>100&&L>2000;
+  const nw=calcNew(D,L,currentMat);
+  const matName={'chrome':'硬鉻軸','s45c':'跑流程 S45C','s45c_qt':'S45C+QT','scm_qt':'SCM440+QT'}[currentMat];
+
+  const repairHTML=REPAIR_SPECS.map(spec=>{
+    const fee=calcRepair(D,L,spec);
+    if(!spec.main){
+      return `<div class="fix-item ref">
+        <div class="fi-left"><div class="fi-name">${spec.name}</div>
+        <div class="fi-sub">@${spec.unitPrice}元/in²，最低${nt(spec.min)}｜參考</div></div>
+        <div class="fi-right"><div class="fi-price">${nt(fee)}</div></div>
+      </div>`;
+    }
+    if(noFix){
+      return `<div class="fix-item warn">
+        <span class="warn-icon">⛔</span>
+        <div class="fi-left"><div class="fi-name">${spec.name}</div>
+        <div class="fi-sub">D＞100 且 L＞2000，整修不適用</div></div>
+        <div class="fi-right"><div class="fi-price">—</div></div>
+      </div>`;
+    }
+    const over=fee>nw.total;
+    const diff=Math.abs(fee-nw.total);
+    return `<div class="fix-item ${over?'warn':'ok'}">
+      <span class="warn-icon">${over?'⚠️':'✅'}</span>
+      <div class="fi-left"><div class="fi-name">${spec.name}</div>
+      <div class="fi-sub">@${spec.unitPrice}元/in²，最低${nt(spec.min)}</div></div>
+      <div class="fi-right">
+        <div class="fi-price">${nt(fee)}</div>
+        <div class="fi-diff ${over?'over':'save'}">${over?'比製新貴':'比製新省'} ${nt(diff)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const newDetailHTML=nw.rows.map(([l,v])=>`
+    <div class="new-detail-label">${l}</div>
+    <div class="new-detail-val">${nt(v)}</div>`).join('');
+
+  // 製新明細顯示在輸入卡片內
+  document.getElementById('newDetail').style.display = 'block';
+  document.getElementById('newTotal').textContent = nt(nw.total);
+  document.getElementById('newRows').innerHTML = nw.rows.map(([l,v])=>`
+    <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
+      <span style="color:var(--text3);">${l}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text2);">${nt(v)}</span>
+    </div>`).join('');
+
+  out.innerHTML=`<div class="anim">
+    <div class="fix-card">
+      <div class="fix-title">整修費用比較</div>
+      ${repairHTML}
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>

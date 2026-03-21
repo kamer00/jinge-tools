@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>銑床加工計算機</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--border:#30363d;
+  --blue:#58a6ff;--green:#3fb950;--yellow:#e3b341;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;padding:28px 16px 64px;}
+.wrap{max-width:640px;margin:0 auto;}
+
+.hdr{text-align:center;margin-bottom:24px;}
+.hdr-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);padding:4px 14px;border-radius:20px;margin-bottom:12px;}
+.hdr h1{font-size:26px;font-weight:900;background:linear-gradient(135deg,#e6edf3 30%,#58a6ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.hdr p{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;}
+.sec-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block;}
+
+/* 按鈕群組 */
+.btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.sel-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;padding:7px 10px;cursor:pointer;transition:all .15s;flex:1;text-align:center;}
+.sel-btn:hover{border-color:var(--blue);color:var(--blue);}
+.sel-btn.active{background:rgba(88,166,255,.1);border-color:var(--blue);color:var(--text);font-weight:700;}
+
+/* 輸入三欄 */
+.input-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:0;}
+.fg{display:flex;flex-direction:column;gap:6px;}
+label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;}
+input[type=number]{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:7px 8px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12);}
+input[type=number]::-webkit-inner-spin-button{opacity:0;}
+.hint{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+/* 計算明細 */
+.detail-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.dr:last-child{border-bottom:none;}
+.dl{color:var(--text2);}
+.dv{font-family:'JetBrains Mono',monospace;font-weight:700;}
+.dr.editable .dv{display:flex;align-items:center;gap:8px;}
+
+/* 可編輯基本單價 */
+.edit-input{background:var(--s2);border:1px solid rgba(88,166,255,.4);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:4px 10px;outline:none;width:100px;text-align:right;}
+.edit-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(88,166,255,.15);}
+.edit-hint{font-size:10px;color:var(--text3);}
+
+/* 合計 */
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:rgba(63,185,80,.08);border:2px solid var(--green);border-radius:10px;margin-top:4px;}
+.total-label{font-size:14px;font-weight:700;}
+.total-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:900;color:var(--green);}
+
+.empty{text-align:center;color:var(--text3);font-size:13px;padding:28px 0;letter-spacing:1px;}
+
+/* 備註 */
+.notes{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:0 10px 10px 0;padding:14px 20px;}
+.notes-title{font-size:11px;font-weight:700;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.notes li{font-size:12px;color:var(--text2);padding-left:14px;position:relative;line-height:1.7;list-style:none;}
+.notes li::before{content:'▸';position:absolute;left:0;color:var(--yellow);}
+
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:pop .2s ease;}
+@media(max-width:460px){.input-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-tag">勁格科技 內部工具</div>
+  <h1>銑床加工計算機</h1>
+  <p>(長×寬 + 寬×高 + 高×長) × 2 ÷ 645 × 單價</p>
+</div>
+
+<!-- 選擇 + 輸入 -->
+<div class="card">
+  <span class="sec-label">工件類型</span>
+  <div class="btn-group" id="typeGroup">
+    <button class="sel-btn active" data-type="six" onclick="setType(this)">銑六面</button>
+    <button class="sel-btn" data-type="i" onclick="setType(this)">I接頭 / LA</button>
+    <button class="sel-btn" data-type="y" onclick="setType(this)">Y接頭</button>
+  </div>
+
+  <span class="sec-label">材質</span>
+  <div class="btn-group" id="matGroup">
+    <button class="sel-btn active" data-mat="normal" onclick="setMat(this)">一般料</button>
+    <button class="sel-btn" data-mat="qt" onclick="setMat(this)">調質<br>特殊料</button>
+    <button class="sel-btn" data-mat="sus" onclick="setMat(this)">白鐵（SUS）</button>
+  </div>
+
+  <span class="sec-label">工件尺寸（mm）</span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <input type="number" id="dimL" placeholder="長" min="1" oninput="run()" style="flex:1;">
+    <span style="font-size:18px;color:var(--text3);">×</span>
+    <input type="number" id="dimW" placeholder="寬" min="1" oninput="run()" style="flex:1;">
+    <span style="font-size:18px;color:var(--text3);">×</span>
+    <input type="number" id="dimH" placeholder="高" min="1" oninput="run()" style="flex:1;">
+  </div>
+</div>
+
+<!-- 計算結果 -->
+<div id="out"><div class="detail-card"><div class="empty">請輸入工件尺寸</div></div></div>
+
+<div class="notes">
+  <div class="notes-title">⚠ 說明</div>
+  <ul>
+    <li>銑六面尺寸係數：≤450→×1.0｜450~600→×1.25｜≥600→×1.35</li>
+    <li>I/Y接頭尺寸係數：≤450→×1.0｜450~600→×1.5｜>600→×1.8</li>
+    <li>材質係數：一般→×1｜調質/特殊→×2｜白鐵→×3.5</li>
+    <li>基本單價可手動修改，修改後自動重新計算</li>
+  </ul>
+</div>
+
+</div>
+<script>
+// 工件設定
+const TYPE_CONFIG = {
+  six: { name:'銑六面',   unitPrice:0.9, minPrice:100 },
+  i:   { name:'I接頭/LA', unitPrice:2.5, minPrice:200 },
+  y:   { name:'Y接頭',    unitPrice:4.3, minPrice:250 },
+};
+const MAT_CONFIG = {
+  normal: { name:'一般料',       mult:1   },
+  qt:     { name:'調質/特殊料',  mult:2   },
+  sus:    { name:'白鐵（SUS）',  mult:3.5 },
+};
+
+let currentType = 'six';
+let currentMat  = 'normal';
+let customBase  = null; // 使用者覆蓋的基本單價
+
+function setType(btn){
+  document.querySelectorAll('#typeGroup .sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentType = btn.dataset.type;
+  customBase = null;
+  run();
+}
+function setMat(btn){
+  document.querySelectorAll('#matGroup .sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMat = btn.dataset.mat;
+  run();
+}
+function onBaseEdit(val){
+  const n = parseFloat(val);
+  customBase = isNaN(n) ? null : n;
+  run(true); // skipBaseReset
+}
+
+function nt(n){ return 'NT$\u00a0' + Math.round(n).toLocaleString('zh-TW'); }
+function ff(n,d=2){ return n.toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+function run(skipBaseReset=false){
+  const L = parseFloat(document.getElementById('dimL').value);
+  const W = parseFloat(document.getElementById('dimW').value);
+  const H = parseFloat(document.getElementById('dimH').value);
+  const out = document.getElementById('out');
+
+  if(!L||!W||!H){
+    out.innerHTML='<div class="detail-card"><div class="empty">請輸入工件尺寸</div></div>';
+    if(!skipBaseReset) customBase=null;
+    return;
+  }
+
+  const tc = TYPE_CONFIG[currentType];
+  const mc = MAT_CONFIG[currentMat];
+
+  // 六面積
+  const areaMM2 = (L*W*2 + W*H*2 + H*L*2);
+  const areaIN2 = areaMM2 / 645;
+
+  // 單價（預設 tc.unitPrice，可手動覆蓋）
+  if(!skipBaseReset) customBase = null;
+  const effectiveUnit = (customBase !== null) ? customBase : tc.unitPrice;
+
+  // 計算值 & 基本單價
+  const calcVal   = areaIN2 * effectiveUnit;
+  const basePrice = Math.max(calcVal, tc.minPrice);
+
+  // 尺寸係數
+  const maxDim = Math.max(L, W, H);
+  let sizeCoeff, sizeLabel;
+  if(currentType === 'six'){
+    if(maxDim <= 450)       { sizeCoeff=1.0;  sizeLabel='≤450mm → ×1.0'; }
+    else if(maxDim < 600)   { sizeCoeff=1.25; sizeLabel='450~600mm → ×1.25'; }
+    else                    { sizeCoeff=1.35; sizeLabel='≥600mm → ×1.35'; }
+  } else {
+    if(maxDim <= 450)       { sizeCoeff=1.0;  sizeLabel='≤450mm → ×1.0'; }
+    else if(maxDim <= 600)  { sizeCoeff=1.5;  sizeLabel='450~600mm → ×1.5'; }
+    else                    { sizeCoeff=1.8;  sizeLabel='>600mm → ×1.8'; }
+  }
+
+  // 材質係數
+  const matCoeff = mc.mult;
+
+  // 最終金額
+  const final = basePrice * sizeCoeff * matCoeff;
+
+  out.innerHTML=`<div class="detail-card anim">
+    <div class="total-row" style="margin-bottom:12px;">
+      <span class="total-label">💰 加工費</span>
+      <span class="total-val">${nt(final)}</span>
+    </div>
+    <div class="dr"><span class="dl">六面積</span><span class="dv">${ff(areaMM2,0)} mm²　/　${ff(areaIN2,3)} in²</span></div>
+    <div class="dr">
+      <span class="dl">單價（元/in²）</span>
+      <span class="dv" style="display:flex;align-items:center;gap:8px;">
+        <input class="edit-input" type="number" id="baseInput" step="0.1"
+          value="${effectiveUnit}"
+          oninput="onBaseEdit(this.value)" style="width:80px;text-align:right;">
+        <span style="font-size:10px;color:${customBase!==null?'var(--blue)':'var(--text3)'};">${customBase!==null?'已修改':'可修改'}</span>
+      </span>
+    </div>
+    <div class="dr"><span class="dl">計算值</span><span class="dv">${nt(calcVal)}</span></div>
+    <div class="dr"><span class="dl">最低單價保護</span><span class="dv">${nt(tc.minPrice)}</span></div>
+    <div class="dr"><span class="dl">基本單價</span><span class="dv">${nt(basePrice)}</span></div>
+    <div class="dr"><span class="dl">尺寸係數</span><span class="dv">${sizeLabel}</span></div>
+    <div class="dr"><span class="dl">材質係數（${mc.name}）</span><span class="dv">× ${matCoeff}</span></div>
+  </div>`;
+}
+</script>
+</body>
+</html>

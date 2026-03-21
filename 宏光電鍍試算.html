@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宏光電鍍 費用試算</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3352;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e8eaf0;
+    --text2: #8b90a8;
+    --text3: #4f546e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(245,158,11,0.06) 0%, transparent 60%);
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 36px; animation: fadeDown 0.6s ease; }
+  .header-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; color: var(--accent2);
+    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: 30px; font-weight: 900; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #e8eaf0 0%, #60a5fa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 8px;
+  }
+  .header p { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); letter-spacing: 1px; }
+
+  /* Card */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text2); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-blue { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .dot-green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+
+  /* Form */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+
+  label {
+    font-size: 11px; font-weight: 700; color: var(--text2);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  label .req { color: var(--accent); }
+  label .sub { color: var(--text3); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; }
+
+  select, input[type="number"] {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 500;
+    padding: 11px 14px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+    appearance: none; -webkit-appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b90a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 40px; cursor: pointer;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  }
+  select option { background: #1a1d27; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { opacity: 0; }
+  .input-hint { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+  /* 製程選擇區 */
+  .process-section { margin-top: 6px; }
+  .process-label {
+    font-size: 11px; font-weight: 700; color: var(--text2);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .process-label .sub { color: var(--text3); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+  .process-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text2);
+    font-family: 'Noto Sans TC', sans-serif; font-size: 13px; font-weight: 500;
+    padding: 10px 8px; cursor: pointer;
+    transition: all 0.15s; text-align: center; user-select: none;
+  }
+  .process-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .process-btn.active {
+    background: rgba(59,130,246,0.15); border-color: var(--accent);
+    color: #fff; font-weight: 700;
+  }
+  .process-btn .p-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .process-btn .p-label { display: block; font-size: 12px; }
+  .process-btn .p-sub { display: block; font-size: 10px; color: var(--text3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .process-btn.active .p-sub { color: var(--accent2); }
+
+  /* 電鍍子選項 */
+  .cr-panel {
+    margin-top: 12px; padding: 14px 16px;
+    background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px; display: none;
+  }
+  .cr-panel.show { display: block; }
+  .cr-panel label { color: var(--accent2); }
+
+  /* 結果區 */
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 16px;
+  }
+  .process-result { margin-bottom: 16px; }
+  .process-result:last-child { margin-bottom: 0; }
+  .process-result-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text2); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .process-badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 20px;
+    background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);
+    color: var(--accent2); letter-spacing: 0;
+  }
+  .result-rows { display: flex; flex-direction: column; gap: 8px; }
+  .result-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 13px; background: var(--surface2);
+    border-radius: 8px; border: 1px solid var(--border);
+  }
+  .result-row.highlight {
+    background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.35);
+  }
+  .result-row .r-label { font-size: 13px; color: var(--text2); }
+  .result-row .r-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); }
+  .result-row.highlight .r-val { color: var(--accent2); }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  .total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px; margin-top: 6px;
+    background: rgba(16,185,129,0.08); border: 2px solid var(--green);
+    border-radius: 12px;
+  }
+  .total-row .t-label { font-size: 15px; font-weight: 700; }
+  .total-row .t-val {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700;
+    color: var(--green); text-shadow: 0 0 20px rgba(16,185,129,0.4);
+  }
+
+  .estimate-row {
+    padding: 14px 16px; border-radius: 10px;
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+    color: var(--red); font-size: 13px; font-weight: 700;
+  }
+  .empty-result {
+    padding: 28px 0; text-align: center; color: var(--text3);
+    font-size: 13px; letter-spacing: 1px;
+  }
+
+  /* Notes */
+  .notes {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+  }
+  .notes-title { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .notes ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .notes li { font-size: 12px; color: var(--text2); padding-left: 16px; position: relative; line-height: 1.6; }
+  .notes li::before { content: '▸'; position: absolute; left: 0; color: var(--gold); }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+  @media (max-width: 520px) {
+    .form-grid, .form-grid.three { grid-template-columns: 1fr 1fr; }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    .header h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-tag">億益企業 宏光電鍍</div>
+    <h1>電鍍費用試算系統</h1>
+    <p>直徑 × 電鍍長度 × π ÷ 645 × 英吋單價 → MAX(計算值, 基本價)</p>
+  </div>
+
+  <!-- 基本資料 -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>工件基本資料</div>
+
+    <div class="form-grid" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>工件類型 <span class="req">*</span></label>
+        <select id="workType" onchange="onWorkTypeChange()">
+          <option value="">— 請選擇 —</option>
+          <option value="shaft">心軸 / 活塞桿</option>
+          <option value="cylinder">油缸</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>數量</label>
+        <input type="number" id="qty" value="1" min="1" oninput="calculate()">
+        <span class="input-hint">件數</span>
+      </div>
+    </div>
+
+    <div class="form-grid three">
+      <div class="form-group">
+        <label>外徑 <span class="req">*</span></label>
+        <input type="number" id="diameter" placeholder="mm" min="1" oninput="calculate()">
+        <span class="input-hint">單位：mm</span>
+      </div>
+      <div class="form-group">
+        <label>加工長度 <span class="req">*</span></label>
+        <input type="number" id="length" placeholder="mm" min="1" oninput="calculate()">
+        <span class="input-hint">單位：mm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 製程選擇 -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-blue"></span>選擇製程 <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">（可複選，各自獨立計費）</span></div>
+
+    <div class="process-grid">
+      <button class="process-btn" data-process="plate" onclick="toggleProcess(this)">
+        <span class="p-icon">🔵</span>
+        <span class="p-label">電鍍</span>
+        <span class="p-sub">CR硬鉻</span>
+      </button>
+      <button class="process-btn" data-process="polish" onclick="toggleProcess(this)">
+        <span class="p-icon">✨</span>
+        <span class="p-label">拋光</span>
+        <span class="p-sub">鏡面處理</span>
+      </button>
+      <button class="process-btn" data-process="strip" onclick="toggleProcess(this)">
+        <span class="p-icon">⚡</span>
+        <span class="p-label">純退電</span>
+        <span class="p-sub">去除舊鍍層</span>
+      </button>
+      <button class="process-btn" data-process="replate" onclick="toggleProcess(this)">
+        <span class="p-icon">🔄</span>
+        <span class="p-label">退電再電</span>
+        <span class="p-sub">退除後重鍍</span>
+      </button>
+    </div>
+
+    <!-- 電鍍子選項 -->
+    <div class="cr-panel" id="crPanel">
+      <div class="form-group">
+        <label style="color:var(--accent2)">CR 條數 <span class="req">*</span></label>
+        <select id="crType" onchange="calculate()">
+          <option value="">— 請選擇 CR 條數 —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 退電再電子選項 -->
+    <div class="cr-panel" id="replatePanel">
+      <div class="form-group">
+        <label style="color:var(--accent2)">退電再電 CR 條數 <span class="req">*</span></label>
+        <select id="crTypeReplate" onchange="calculate()">
+          <option value="">— 請選擇 CR 條數 —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結果 -->
+  <div class="result-card">
+    <div class="card-title"><span class="dot dot-green"></span>計算結果</div>
+    <div id="resultArea">
+      <div class="empty-result">請填入工件資料並選擇製程</div>
+    </div>
+  </div>
+
+  <!-- 備註 -->
+  <div class="notes">
+    <div class="notes-title">⚠ 注意事項</div>
+    <ul>
+      <li>心軸/活塞桿 Ø250以上，請直接聯絡廠商估價</li>
+      <li>油缸 Ø300以上、外徑Ø500以上 或 長度3000mm以上，請估價</li>
+      <li>油缸著為底無通，請先估價</li>
+      <li>CR(15/20/25條)：Ø80＜直徑≦120 且 電鍍長度＞2000mm，請估價</li>
+      <li>退電再電：按電鍍規格計算（單價 +1 元/in²），與純電鍍分開計費</li>
+      <li>特殊工件、加工，價格另議｜價格自 2022.10.26 起適用</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+const CR_SHAFT = [
+  { label:'CR(4-6條)', val:'cr4_6' },
+  { label:'CR(6-8條)', val:'cr6_8' },
+  { label:'CR(15條)',  val:'cr15'  },
+  { label:'CR(20條)',  val:'cr20'  },
+  { label:'CR(25條)',  val:'cr25'  },
+];
+const CR_CYLINDER = [
+  { label:'CR(4條)',   val:'cr4'   },
+  { label:'CR(6-8條)', val:'cr6_8' },
+  { label:'CR(10條)',  val:'cr10'  },
+  { label:'CR(20條)',  val:'cr20'  },
+];
+
+let activeProcesses = new Set();
+
+function toggleProcess(btn) {
+  const proc = btn.dataset.process;
+  // 互斥規則
+  // 純退電 與 退電再電 互斥
+  if (proc === 'strip' && activeProcesses.has('replate')) {
+    activeProcesses.delete('replate');
+    document.querySelector('[data-process="replate"]').classList.remove('active');
+    document.getElementById('replatePanel').classList.remove('show');
+  }
+  if (proc === 'replate' && activeProcesses.has('strip')) {
+    activeProcesses.delete('strip');
+    document.querySelector('[data-process="strip"]').classList.remove('active');
+  }
+  // 拋光 與 電鍍 互斥
+  if (proc === 'polish' && activeProcesses.has('plate')) {
+    activeProcesses.delete('plate');
+    document.querySelector('[data-process="plate"]').classList.remove('active');
+    document.getElementById('crPanel').classList.remove('show');
+  }
+  if (proc === 'plate' && activeProcesses.has('polish')) {
+    activeProcesses.delete('polish');
+    document.querySelector('[data-process="polish"]').classList.remove('active');
+  }
+  if (activeProcesses.has(proc)) {
+    activeProcesses.delete(proc);
+    btn.classList.remove('active');
+  } else {
+    activeProcesses.add(proc);
+    btn.classList.add('active');
+  }
+  // 顯示電鍍CR選項
+  document.getElementById('crPanel').classList.toggle('show', activeProcesses.has('plate'));
+  document.getElementById('replatePanel').classList.toggle('show', activeProcesses.has('replate'));
+  calculate();
+}
+
+function populateCR(selId, type) {
+  const sel = document.getElementById(selId);
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— 請選擇 CR 條數 —</option>';
+  const opts = type === 'shaft' ? CR_SHAFT : CR_CYLINDER;
+  opts.forEach(o => {
+    sel.innerHTML += `<option value="${o.val}"${prev===o.val?' selected':''}>${o.label}</option>`;
+  });
+}
+
+function onWorkTypeChange() {
+  const type = document.getElementById('workType').value;
+  if (type) {
+    populateCR('crType', type);
+    populateCR('crTypeReplate', type);
+  } else {
+    ['crType','crTypeReplate'].forEach(id => {
+      document.getElementById(id).innerHTML = '<option value="">— 請先選工件類型 —</option>';
+    });
+  }
+  calculate();
+}
+
+// 電鍍單價查詢
+function getPlatingInfo(type, cr, dia, len) {
+  if (!type || !cr || !dia || !len) return null;
+  if (type === 'shaft') {
+    if (dia > 250) return 'estimate';
+    if (cr==='cr4_6') return { unitPrice:3.5,  basePrice:300  };
+    if (cr==='cr6_8') return { unitPrice:4.2,  basePrice:400  };
+    if (cr==='cr15') {
+      if (dia<=80)  return { unitPrice:5.4, basePrice:500 };
+      if (dia<=120) return len>2000 ? 'estimate' : { unitPrice:8.4, basePrice:500 };
+      return 'estimate';
+    }
+    if (cr==='cr20') {
+      if (dia<=80)  return { unitPrice:6.3, basePrice:1000 };
+      if (dia<=120) return len>2000 ? 'estimate' : { unitPrice:9.2, basePrice:1000 };
+      return 'estimate';
+    }
+    if (cr==='cr25') {
+      if (dia<=80)  return { unitPrice:7.2, basePrice:1200 };
+      if (dia<=120) return len>2000 ? 'estimate' : { unitPrice:10, basePrice:1200 };
+      return 'estimate';
+    }
+  }
+  if (type === 'cylinder') {
+    if (dia>300 || dia>=500 || len>=3000) return 'estimate';
+    if (cr==='cr4')   return { unitPrice:3.5, basePrice:380  };
+    if (cr==='cr6_8') return { unitPrice:4.2, basePrice:550  };
+    if (cr==='cr10')  return { unitPrice:4.5, basePrice:720  };
+    if (cr==='cr20')  return { unitPrice:6.3, basePrice:1000 };
+  }
+  return null;
+}
+
+// 拋光單價
+function getPolishInfo(type) {
+  if (type==='shaft')    return { unitPrice:1.5,  basePrice:120 };
+  if (type==='cylinder') return { unitPrice:1.35, basePrice:200 };
+  return null;
+}
+
+// 純退電單價（替換電鍍單價，不過無需CR，直接 @ 1.6）
+function getStripInfo() {
+  return { unitPrice:1.6, basePrice:0 };
+}
+
+function fmt(n) {
+  return 'NT$ ' + Math.round(n).toLocaleString('zh-TW');
+}
+function fmtF(n, d=2) {
+  return n.toLocaleString('zh-TW', { minimumFractionDigits:d, maximumFractionDigits:d });
+}
+
+function calcFee(areaIN2, info) {
+  const calc = areaIN2 * info.unitPrice;
+  return Math.max(calc, info.basePrice);
+}
+
+function makeRows(rows) {
+  return rows.map(([label, val, hi]) =>
+    `<div class="result-row${hi?' highlight':''}">
+      <span class="r-label">${label}</span>
+      <span class="r-val">${val}</span>
+    </div>`
+  ).join('');
+}
+
+function calculate() {
+  const type = document.getElementById('workType').value;
+  const dia  = parseFloat(document.getElementById('diameter').value);
+  const len  = parseFloat(document.getElementById('length').value);
+  const qty  = parseInt(document.getElementById('qty').value) || 1;
+  const area = document.getElementById('resultArea');
+
+  if (!type || !dia || !len || activeProcesses.size === 0) {
+    area.innerHTML = '<div class="empty-result">請填入工件資料並選擇製程</div>';
+    return;
+  }
+
+  const areaMM2 = dia * Math.PI * len;
+  const areaIN2 = areaMM2 / 645;
+
+  let sections = [];
+  let grandTotal = 0;
+  let hasEstimate = false;
+
+  // ── 電鍍 ──────────────────────────────────────────
+  if (activeProcesses.has('plate')) {
+    const cr = document.getElementById('crType').value;
+    if (!cr) {
+      sections.push(`<div class="process-result">
+        <div class="process-result-title">🔵 電鍍 <span class="process-badge">請選擇 CR 條數</span></div>
+      </div>`);
+    } else {
+      const info = getPlatingInfo(type, cr, dia, len);
+      if (info === 'estimate') {
+        hasEstimate = true;
+        sections.push(`<div class="process-result">
+          <div class="process-result-title">🔵 電鍍</div>
+          <div class="estimate-row">⚠ 超出試算範圍，請聯絡廠商估價</div>
+        </div>`);
+      } else if (info) {
+        const fee = calcFee(areaIN2, info);
+        grandTotal += fee;
+        const crLabel = document.getElementById('crType').options[document.getElementById('crType').selectedIndex].text;
+        sections.push(`<div class="process-result">
+          <div class="process-result-title">🔵 電鍍 <span class="process-badge">${crLabel}</span></div>
+          <div class="result-rows">${makeRows([
+            ['側面積', `${fmtF(areaMM2)} mm²　/　${fmtF(areaIN2,3)} in²`, false],
+            ['英吋單價', `${info.unitPrice} 元/in²`, false],
+            ['計算金額', fmt(areaIN2 * info.unitPrice), false],
+            ['基本價', fmt(info.basePrice), false],
+            ['電鍍費小計', fmt(fee), true],
+          ])}</div>
+        </div>`);
+      }
+    }
+  }
+
+  // ── 拋光 ──────────────────────────────────────────
+  if (activeProcesses.has('polish')) {
+    const info = getPolishInfo(type);
+    if (info) {
+      const fee = calcFee(areaIN2, info);
+      grandTotal += fee;
+      sections.push(`<div class="process-result">
+        <div class="process-result-title">✨ 拋光</div>
+        <div class="result-rows">${makeRows([
+          ['側面積', `${fmtF(areaIN2,3)} in²`, false],
+          ['英吋單價', `${info.unitPrice} 元/in²`, false],
+          ['計算金額', fmt(areaIN2 * info.unitPrice), false],
+          ['基本價', fmt(info.basePrice), false],
+          ['拋光費小計', fmt(fee), true],
+        ])}</div>
+      </div>`);
+    }
+  }
+
+  // ── 純退電 ──────────────────────────────────────────
+  if (activeProcesses.has('strip')) {
+    const info = getStripInfo();
+    const fee = calcFee(areaIN2, info);
+    grandTotal += fee;
+    sections.push(`<div class="process-result">
+      <div class="process-result-title">⚡ 純退電</div>
+      <div class="result-rows">${makeRows([
+        ['側面積', `${fmtF(areaIN2,3)} in²`, false],
+        ['英吋單價', `${info.unitPrice} 元/in²`, false],
+        ['退電費小計', fmt(fee), true],
+      ])}</div>
+    </div>`);
+  }
+
+  // ── 退電再電 ──────────────────────────────────────────
+  if (activeProcesses.has('replate')) {
+    const cr = document.getElementById('crTypeReplate').value;
+    if (!cr) {
+      sections.push(`<div class="process-result">
+        <div class="process-result-title">🔄 退電再電 <span class="process-badge">請選擇 CR 條數</span></div>
+      </div>`);
+    } else {
+      const baseInfo = getPlatingInfo(type, cr, dia, len);
+      if (baseInfo === 'estimate') {
+        hasEstimate = true;
+        sections.push(`<div class="process-result">
+          <div class="process-result-title">🔄 退電再電</div>
+          <div class="estimate-row">⚠ 超出試算範圍，請聯絡廠商估價</div>
+        </div>`);
+      } else if (baseInfo) {
+        const replateUnit = baseInfo.unitPrice + 1;
+        const fee = calcFee(areaIN2, { unitPrice: replateUnit, basePrice: baseInfo.basePrice });
+        grandTotal += fee;
+        const crLabel = document.getElementById('crTypeReplate').options[document.getElementById('crTypeReplate').selectedIndex].text;
+        sections.push(`<div class="process-result">
+          <div class="process-result-title">🔄 退電再電 <span class="process-badge">${crLabel}</span></div>
+          <div class="result-rows">${makeRows([
+            ['側面積', `${fmtF(areaIN2,3)} in²`, false],
+            [`英吋單價（電鍍 ${baseInfo.unitPrice} + 退電 1）`, `${replateUnit} 元/in²`, false],
+            ['計算金額', fmt(areaIN2 * replateUnit), false],
+            ['基本價', fmt(baseInfo.basePrice), false],
+            ['退電再電費小計', fmt(fee), true],
+          ])}</div>
+        </div>`);
+      }
+    }
+  }
+
+  // 分隔線
+  const sectionHTML = sections.join('<div class="divider"></div>');
+
+  // 合計
+  const totalHTML = hasEstimate ? '' : `
+    <div class="divider"></div>
+    <div class="total-row">
+      <span class="t-label">💰 合計（× ${qty} 件）</span>
+      <span class="t-val">${fmt(grandTotal * qty)}</span>
+    </div>`;
+
+  area.innerHTML = sectionHTML + totalHTML;
+}
+</script>
+</body>
+</html>
