@@ -44,28 +44,28 @@
 
   /* ── 標頭 ── */
   .header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    text-align: center;
     flex-shrink: 0;
+    padding-bottom: 4px;
   }
   .header-tag {
+    display: inline-block;
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px; letter-spacing: 2.5px; color: var(--accent2);
     background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);
     padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
-    white-space: nowrap;
+    margin-bottom: 8px;
   }
   .header h1 {
-    font-size: 20px; font-weight: 900; letter-spacing: -0.3px;
+    font-size: 24px; font-weight: 900; letter-spacing: -0.5px;
     background: linear-gradient(135deg, #e8eaf0 0%, #60a5fa 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; white-space: nowrap;
+    background-clip: text;
   }
   .header-formula {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px; color: var(--text3); letter-spacing: 0.5px;
-    margin-left: auto; white-space: nowrap;
+    margin-top: 4px;
   }
 
   /* ── 主體兩欄 ── */
@@ -144,12 +144,12 @@
   .input-hint { font-size: 10px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
 
   /* ── 製程按鈕（單選） ── */
-  .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
   .process-btn {
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 9px; color: var(--text2);
-    font-family: 'Noto Sans TC', sans-serif; font-size: 12px; font-weight: 500;
-    padding: 9px 6px; cursor: pointer;
+    border-radius: 8px; color: var(--text2);
+    font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
+    padding: 8px 4px; cursor: pointer;
     transition: all 0.15s; text-align: center; user-select: none;
   }
   .process-btn:hover { border-color: var(--accent2); color: var(--accent2); }
@@ -157,7 +157,7 @@
     background: rgba(59,130,246,0.15); border-color: var(--accent);
     color: #fff; font-weight: 700;
   }
-  .process-btn .p-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+  .process-btn .p-icon { display: none; }
   .process-btn .p-label { display: block; font-size: 12px; }
   .process-btn .p-sub { display: block; font-size: 9px; color: var(--text3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
   .process-btn.active .p-sub { color: var(--accent2); }
