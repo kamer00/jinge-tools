@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>膛孔拋光計算機</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--border:#30363d;
+  --blue:#58a6ff;--green:#3fb950;--yellow:#e3b341;--purple:#bc8cff;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;padding:28px 16px 64px;}
+.wrap{max-width:640px;margin:0 auto;}
+
+.hdr{text-align:center;margin-bottom:24px;}
+.hdr-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);padding:4px 14px;border-radius:20px;margin-bottom:12px;}
+.hdr h1{font-size:26px;font-weight:900;background:linear-gradient(135deg,#e6edf3 30%,#58a6ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.hdr p{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;}
+.sec-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block;}
+
+.btn-group{display:flex;gap:6px;margin-bottom:10px;}
+.sel-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;padding:8px 12px;cursor:pointer;transition:all .15s;flex:1;text-align:center;}
+.sel-btn:hover{border-color:var(--blue);color:var(--blue);}
+.sel-btn.active{background:rgba(88,166,255,.1);border-color:var(--blue);color:var(--text);font-weight:700;}
+
+input[type=number]{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:7px 8px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12);}
+input[type=number]::-webkit-inner-spin-button{opacity:0;}
+
+/* 比較兩欄 */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.vendor-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.vendor-card.cheaper{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 4px 16px rgba(63,185,80,.08);}
+
+.v-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.v-name{font-size:13px;font-weight:700;}
+.v-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+.badge-green{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3);}
+.badge-gray{background:rgba(139,148,158,.1);color:var(--text3);border:1px solid var(--border);}
+
+.v-total{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:900;color:var(--green);margin-bottom:12px;}
+.vendor-card:not(.cheaper) .v-total{color:var(--text2);}
+
+.dr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.dr:last-child{border-bottom:none;}
+.dl{color:var(--text2);}
+.dv{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;}
+
+.empty{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:36px;text-align:center;color:var(--text3);font-size:13px;letter-spacing:1px;margin-bottom:10px;}
+
+.notes{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:0 10px 10px 0;padding:14px 20px;}
+.notes-title{font-size:11px;font-weight:700;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.notes li{font-size:12px;color:var(--text2);padding-left:14px;position:relative;line-height:1.7;list-style:none;}
+.notes li::before{content:'▸';position:absolute;left:0;color:var(--yellow);}
+
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:pop .2s ease;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-tag">勁格科技 內部工具</div>
+  <h1>膛孔 / 拋光 計算機</h1>
+  <p>管徑 × 長度 × 3.14 ÷ 645 × 單價 → MAX(計算值, 最低單價)</p>
+</div>
+
+<div class="card">
+  <span class="sec-label">工序</span>
+  <div class="btn-group" id="typeGroup">
+    <button class="sel-btn active" data-type="bore" onclick="setType(this)">膛孔</button>
+    <button class="sel-btn" data-type="polish" onclick="setType(this)">拋光</button>
+  </div>
+
+  <span class="sec-label">工件尺寸（mm）</span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <input type="number" id="dia" placeholder="管徑" min="1" oninput="run()" style="flex:1;">
+    <span style="font-size:18px;color:var(--text3);">×</span>
+    <input type="number" id="len" placeholder="長度" min="1" oninput="run()" style="flex:1;">
+  </div>
+</div>
+
+<div id="out"><div class="empty">請輸入管徑與長度</div></div>
+
+<div class="notes">
+  <div class="notes-title">⚠ 說明</div>
+  <ul>
+    <li>膛孔：利峰 @2.5元/in²，最低NT$400｜益川 @1.2元/in²，最低NT$300</li>
+    <li>拋光：利峰 @2.0元/in²，最低NT$400｜益川 @1.2元/in²，最低NT$300</li>
+    <li>益川適用孔徑：Ø20~Ø160mm，超出範圍請找利峰</li>
+    <li>兩家同時顯示，綠框為較便宜選項</li>
+  </ul>
+</div>
+
+</div>
+<script>
+const SPECS = {
+  bore:   { name:'膛孔', vendors: [
+    { name:'利峰', unitPrice:2.5, min:400, minDia:null, maxDia:null },
+    { name:'益川', unitPrice:1.2, min:300, minDia:20,   maxDia:160  },
+  ]},
+  polish: { name:'拋光', vendors: [
+    { name:'利峰', unitPrice:2.0, min:400, minDia:null, maxDia:null },
+    { name:'益川', unitPrice:1.2, min:300, minDia:20,   maxDia:160  },
+  ]},
+};
+
+let currentType = 'bore';
+
+function setType(btn){
+  document.querySelectorAll('#typeGroup .sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentType = btn.dataset.type;
+  run();
+}
+
+function nt(n){ return 'NT$\u00a0' + Math.round(n).toLocaleString('zh-TW'); }
+function ff(n,d=3){ return n.toFixed(d); }
+
+function calcFee(dia, len, vendor){
+  const area = dia * 3.14 * len / 645;
+  const calc = area * vendor.unitPrice;
+  const fee  = Math.max(calc, vendor.min);
+  return { area, calc, fee };
+}
+
+function run(){
+  const dia = parseFloat(document.getElementById('dia').value);
+  const len = parseFloat(document.getElementById('len').value);
+  const out = document.getElementById('out');
+
+  if(!dia || !len){
+    out.innerHTML = '<div class="empty">請輸入管徑與長度</div>';
+    return;
+  }
+
+  const spec = SPECS[currentType];
+  const results = spec.vendors.map(v => ({ ...v, ...calcFee(dia, len, v) }));
+  const validResults = results.map((r,i) => ({
+    i, outOfRange: (r.minDia && dia < r.minDia) || (r.maxDia && dia > r.maxDia), fee: r.fee
+  })).filter(r => !r.outOfRange);
+  const cheaperIdx = validResults.length === 0 ? -1
+    : validResults.reduce((a,b) => a.fee <= b.fee ? a : b).i;
+
+  const cardsHTML = results.map((r, i) => {
+    const outOfRange = (r.minDia && dia < r.minDia) || (r.maxDia && dia > r.maxDia);
+    const isCheaper = !outOfRange && i === cheaperIdx;
+    if(outOfRange){
+      return `<div class="vendor-card" style="opacity:.5;">
+        <div class="v-head">
+          <span class="v-name">${r.name}</span>
+          <span class="v-badge badge-gray">不適用</span>
+        </div>
+        <div style="color:var(--red);font-size:13px;padding:12px 0;text-align:center;">
+          適用孔徑 Ø${r.minDia}~Ø${r.maxDia}mm<br>超出範圍
+        </div>
+      </div>`;
+    }
+    return `<div class="vendor-card${isCheaper?' cheaper':''}">
+      <div class="v-head">
+        <span class="v-name">${r.name}</span>
+        <span class="v-badge ${isCheaper?'badge-green':'badge-gray'}">${isCheaper?'較便宜':'—'}</span>
+      </div>
+      <div class="v-total">${nt(r.fee)}</div>
+      <div class="dr"><span class="dl">側面積</span><span class="dv">${ff(r.area)} in²</span></div>
+      <div class="dr"><span class="dl">單價</span><span class="dv">${r.unitPrice} 元/in²</span></div>
+      <div class="dr"><span class="dl">計算值</span><span class="dv">${nt(r.calc)}</span></div>
+      <div class="dr"><span class="dl">最低單價</span><span class="dv">${nt(r.min)}</span></div>
+    </div>`;
+  }).join('');
+
+  out.innerHTML = `<div class="compare-grid anim">${cardsHTML}</div>`;
+}
+</script>
+</body>
+</html>
