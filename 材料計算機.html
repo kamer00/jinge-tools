@@ -316,7 +316,7 @@ const SPECS = {
     'SS400': [5,6,6.35,7.94,9.5,10,11.1,12,12.7,14,14.3,15,15.9,16,17,18,19.05,20,22,22.2,23,24,25,25.4,26,27,28,28.5,30,31.7,32,33,34,34.93,35,36,38.1,40,41.2,42,44.5,45,46,47.6,48,50,50.8,53.9,55,57.1,60,63.5,65,69.85,70,75,76.2,80,82.5,85,88.9,90,95,100,101.6],
     'S45C_L': [8,9,10,11,12,12.7,13,14,15,16,17,18,19,20,22,23,24,25,25.4,26,28,30,32,35,36,38,40,42,45,46,48,50,50.8,55,60,65,70,75,80,85,90,95,100],
     'S45C_B': [22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560],
-    'S20C':  [25,30,32,35,38,40,45,50,55,60,65,70,145,150,160,170,180],
+    'S20C':  [25,30,32,35,38,40,45,50,55,60,65,70,145,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420],
     'SCM440':[13,14,16,19,20,22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260],
     'SCM415':[16,19,22,26,28,30,32,34,36,38,40,42,44,46,48,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330],
     'default_rnd':[22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560],
@@ -635,7 +635,7 @@ const SHAPE_MATS = {
   // bar_rnd 使用群組格式：{group:'群組名', items:[...]}
   bar_rnd: [
     {group:'碳鋼', items:[
-      ['SS400|7.85','SS400　光圓鐵'],
+      ['SS400|7.85','S15C/SS400　光圓鐵'],
       ['S45C_L|7.85','S45C　光中碳'],
       ['S45C_B|7.85','S45C　黑中碳'],
       ['S20C|7.85','S20C　黑皮鐵'],
@@ -922,12 +922,32 @@ function renderDims() {
     area.appendChild(hintDiv);
 
   } else if(currentShape==='shaft') {
+    const shaftFilterMap = {
+      s45c: s => s.jy_s45c || s.yi_s45c,
+      scm:  s => s.jy_scm,
+      hf:   s => s.jy_hf,
+      sus:  s => s.jy_sus || s.yi_sus,
+    };
+    function rebuildShaftDia(mat) {
+      const sel = document.getElementById('dim-SH_DIA');
+      if(!sel) return;
+      const filterFn = shaftFilterMap[mat] || shaftFilterMap.s45c;
+      sel.innerHTML = '';
+      SHAFT_PRICES.forEach((s,i) => {
+        if(filterFn(s)) {
+          sel.appendChild(mk('option',{value:i},'Ø'+s.dia));
+        }
+      });
+    }
     const diaSel = mk('select',{id:'dim-SH_DIA',style:selStyle});
-    SHAFT_PRICES.forEach((s,i)=>diaSel.appendChild(mk('option',{value:i},'Ø'+s.dia)));
+    SHAFT_PRICES.forEach((s,i) => {
+      if(s.jy_s45c||s.yi_s45c) diaSel.appendChild(mk('option',{value:i},'Ø'+s.dia));
+    });
     const matSel = mk('select',{id:'dim-SH_MAT',style:selStyle});
     [['s45c','S45C 硬鉻'],['scm','SCM440+QT'],['hf','高週波'],['sus','SUS304']].forEach(([v,t])=>{
       matSel.appendChild(mk('option',{value:v},t));
     });
+    matSel.onchange = function() { rebuildShaftDia(this.value); };
     const g=mk('div',{className:'dim-grid',style:'gap:8px'});
     g.appendChild(mkField('外徑 Ø（mm）',diaSel));
     g.appendChild(mkField('材質',matSel));
@@ -1230,16 +1250,16 @@ function renderLookup() {
       matSel.onchange = renderLookup;
     }
   } else {
-    matWrap.style.display = ['plate','prod_pipe','shaft'].includes(shape) ? 'none' : '';
+    matWrap.style.display = ['plate','prod_pipe'].includes(shape) ? 'none' : '';
     // 依形狀給對應材質選單
     const matsByShape = {
       bar_rnd: [
         ['SS400','SS400'],['S45C_L','S45C 光中碳'],['S45C_B','S45C 黑中碳'],
         ['S20C','S20C'],['SCM440','SCM440'],['SCM415','SCM415'],
-
       ],
       bar_sq:  [['SS400','SS400'],['S45C_L','S45C 光中四角'],['S45C_B','S45C 黑四角']],
       bar_hex: [['SS400','SS400'],['S45C_L','S45C 光中六角']],
+      shaft:   [['s45c','S45C 硬鉻'],['scm','SCM440+QT'],['hf','高週波'],['sus','SUS304']],
     };
     const mats = matsByShape[shape];
     if(mats) {
@@ -1262,7 +1282,11 @@ function renderLookup() {
     else { specs=PIPE_SPEC; titleText='STKM13A 管料 Ø內×Ø外（mm）（建興）'; }
   }
   else if(shape==='prod_pipe') { specs=STKM_PRICES; titleText='STKM13C 鋼管規格 Ø內×Ø外（mm）'; }
-  else if(shape==='shaft') { specs=SHAFT_PRICES; titleText='硬鉻軸心外徑（mm）'; }
+  else if(shape==='shaft') {
+    specs=SHAFT_PRICES;
+    const shaftMatNames = {s45c:'S45C 硬鉻', scm:'SCM440+QT', hf:'高週波', sus:'SUS304'};
+    titleText='硬鉻軸心 '+( shaftMatNames[mat]||'S45C 硬鉻')+' 外徑（mm）';
+  }
   else {
     const arr = getSpecArr(mat, shape);
     specs = arr||[];
@@ -1293,7 +1317,22 @@ function renderLookup() {
   } else if(shape==='prod_pipe') {
     tags.innerHTML = specs.map((p,i)=>'<span class="spec-tag" onclick="applyProdPipe('+i+')">Ø'+p.id+'×Ø'+p.od+'</span>').join('');
   } else if(shape==='shaft') {
-    tags.innerHTML = specs.filter(s=>s.yi_s45c||s.jy_s45c).map((s,i)=>'<span class="spec-tag" onclick="applyShaft('+i+')">Ø'+s.dia+'</span>').join('');
+    const shaftMat = matSel.value || 's45c';
+    const shaftFilterMap = {
+      s45c: s => s.jy_s45c || s.yi_s45c,
+      scm:  s => s.jy_scm,
+      hf:   s => s.jy_hf,
+      sus:  s => s.jy_sus || s.yi_sus,
+    };
+    const filterFn = shaftFilterMap[shaftMat] || shaftFilterMap.s45c;
+    const filteredShaft = specs.map((s,i)=>({s,i})).filter(({s})=>filterFn(s));
+    if(filteredShaft.length === 0) {
+      tags.innerHTML = '<div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px">此材質無內建規格資料</div>';
+      countEl.textContent = '';
+    } else {
+      countEl.textContent = '共 '+filteredShaft.length+' 種規格';
+      tags.innerHTML = filteredShaft.map(({s,i})=>'<span class="spec-tag" onclick="applyShaft('+i+')">Ø'+s.dia+'</span>').join('');
+    }
   } else {
     if(!specs || specs.length === 0) {
       tags.innerHTML = '<div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px">此材質無內建規格資料，請手動輸入尺寸</div>';
@@ -1380,7 +1419,7 @@ renderDims();
         <div class="field" id="lookup-mat-wrap">
           <label>材質</label>
           <select id="lookup-mat" onchange="renderLookup()">
-            <option value="SS400">SS400</option>
+            <option value="SS400">S15C/SS400</option>
             <option value="S45C_L">S45C 光中碳</option>
             <option value="S45C_B">S45C 黑中碳</option>
             <option value="S20C">S20C</option>
