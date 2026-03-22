@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
 /* 按鈕群組 */
 .btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.sel-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;padding:7px 10px;cursor:pointer;transition:all .15s;flex:1;text-align:center;}
+.sel-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;padding:7px 10px;cursor:pointer;transition:all .15s;flex:1;text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center;}
 .sel-btn:hover{border-color:var(--blue);color:var(--blue);}
 .sel-btn.active{background:rgba(88,166,255,.1);border-color:var(--blue);color:var(--text);font-weight:700;}
 
@@ -41,7 +41,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 .input-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:0;}
 .fg{display:flex;flex-direction:column;gap:6px;}
 label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;}
-input[type=number]{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:7px 8px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+input[type=number]{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;padding:10px 8px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
 input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12);}
 input[type=number]::-webkit-inner-spin-button{opacity:0;}
 .hint{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
