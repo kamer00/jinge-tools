@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#1a0d1a">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>宏光電鍍 費用試算</title>
+<title>電鍍費用計算機｜勁格科技</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -42,34 +42,32 @@
     height: 100vh;
     max-width: 960px;
     margin: 0 auto;
-    padding: 16px 16px 12px;
-    gap: 12px;
+    padding: 10px 16px 8px;
+    gap: 8px;
   }
 
   /* ── 標頭 ── */
   .header {
     text-align: center;
     flex-shrink: 0;
-    padding-bottom: 4px;
+    padding: 16px 0 4px;
   }
   .header-tag {
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 2.5px; color: var(--accent2);
-    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);
-    padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
-    margin-bottom: 8px;
+    font-size: 11px; letter-spacing: 3px; color: var(--text2);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 5px 18px; border-radius: 20px; text-transform: uppercase;
+    margin-bottom: 14px;
   }
   .header h1 {
-    font-size: 24px; font-weight: 900; letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #e8eaf0 0%, #60a5fa 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 28px; font-weight: 900; letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 8px;
   }
   .header-formula {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; color: var(--text3); letter-spacing: 0.5px;
-    margin-top: 4px;
+    font-size: 11px; color: var(--text3); letter-spacing: 0.5px;
   }
 
   /* ── 主體兩欄 ── */
@@ -87,6 +85,7 @@
     flex-direction: column;
     gap: 10px;
     min-height: 0;
+    overflow-y: auto;
   }
 
   /* ── 右欄 ── */
@@ -101,12 +100,12 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 16px 18px;
+    padding: 12px 16px;
     flex-shrink: 0;
   }
   .card-title {
     font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--text2); margin-bottom: 14px;
+    color: var(--text2); margin-bottom: 10px;
     display: flex; align-items: center; gap: 8px;
   }
   .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -115,7 +114,7 @@
   .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
 
   /* ── 表單 ── */
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
   .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
   .form-row:last-child { margin-bottom: 0; }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
@@ -130,7 +129,7 @@
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 8px; color: var(--text);
     font-family: 'Noto Sans TC', sans-serif; font-size: 14px; font-weight: 500;
-    padding: 8px 11px; outline: none;
+    padding: 6px 11px; outline: none;
     transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
     appearance: none; -webkit-appearance: none;
   }
@@ -153,7 +152,7 @@
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 8px; color: var(--text2);
     font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
-    padding: 8px 4px; cursor: pointer;
+    padding: 6px 4px; cursor: pointer;
     transition: all 0.15s; text-align: center; user-select: none;
   }
   .process-btn:hover { border-color: var(--accent2); color: var(--accent2); }
@@ -168,11 +167,37 @@
 
   /* ── CR 選項 ── */
   .cr-panel {
-    margin-top: 10px; padding: 11px 13px;
+    margin-top: 10px; padding: 10px 12px;
     background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);
     border-radius: 9px; display: none;
   }
   .cr-panel.show { display: block; }
+  .cr-label {
+    font-size: 10px; font-weight: 700; color: var(--accent2);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .cr-label .req { color: var(--accent); }
+
+  /* 桌面：按鈕組 */
+  .cr-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cr-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--text2);
+    font-family: 'Noto Sans TC', sans-serif; font-size: 12px; font-weight: 500;
+    padding: 6px 11px; cursor: pointer;
+    transition: all 0.15s; user-select: none; white-space: nowrap;
+  }
+  .cr-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .cr-btn.active {
+    background: rgba(59,130,246,0.2); border-color: var(--accent);
+    color: #fff; font-weight: 700;
+  }
+  /* 手機：下拉選單 */
+  .cr-select-wrap { display: none; }
+  @media (max-width: 680px) {
+    .cr-grid { display: none; }
+    .cr-select-wrap { display: block; }
+  }
 
   /* ── 結果卡（右欄佔滿） ── */
   .result-card {
@@ -280,8 +305,8 @@
 
   <!-- 標頭 -->
   <div class="header">
-    <div class="header-tag">億益 · 宏光電鍍</div>
-    <h1>電鍍費用試算</h1>
+    <div class="header-tag">勁格科技　內部工具</div>
+    <h1>電鍍費用計算機</h1>
     <div class="header-formula">π × D × L ÷ 645 × 單價 → MAX(計算值, 基本價)</div>
   </div>
 
@@ -346,9 +371,12 @@
 
         <!-- CR 選項（電鍍 / 退電再電共用） -->
         <div class="cr-panel" id="crPanel">
-          <div class="form-group">
-            <label style="color:var(--accent2)">CR 條數 <span class="req">*</span></label>
-            <select id="crType" onchange="calculate()">
+          <div class="cr-label">CR 條數 <span class="req">*</span></div>
+          <!-- 桌面：按鈕 -->
+          <div class="cr-grid" id="crGrid"></div>
+          <!-- 手機：下拉 -->
+          <div class="cr-select-wrap">
+            <select id="crSelect" onchange="onCRSelectChange()">
               <option value="">— 請選擇 CR 條數 —</option>
             </select>
           </div>
@@ -399,11 +427,12 @@ const CR_CYLINDER = [
   { label:'CR(20條)',  val:'cr20'  },
 ];
 
-let activeProcess = null; // 單選
+let activeProcess = null;
+let activeCR = null;
+let activeCRLabel = '';
 
 function selectProcess(btn) {
   const proc = btn.dataset.process;
-  // 若點同一個 → 取消
   if (activeProcess === proc) {
     activeProcess = null;
     btn.classList.remove('active');
@@ -417,14 +446,46 @@ function selectProcess(btn) {
   calculate();
 }
 
+function selectCR(btn) {
+  const val = btn.dataset.val;
+  if (activeCR === val) {
+    activeCR = null; activeCRLabel = '';
+    btn.classList.remove('active');
+  } else {
+    document.querySelectorAll('.cr-btn').forEach(b => b.classList.remove('active'));
+    activeCR = val;
+    activeCRLabel = btn.textContent.trim();
+    btn.classList.add('active');
+  }
+  calculate();
+}
+
+function onCRSelectChange() {
+  const sel = document.getElementById('crSelect');
+  activeCR = sel.value;
+  activeCRLabel = sel.options[sel.selectedIndex].text;
+  calculate();
+}
+
 function populateCR(type) {
-  const sel = document.getElementById('crType');
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">— 請選擇 CR 條數 —</option>';
   const opts = type === 'shaft' ? CR_SHAFT : CR_CYLINDER;
-  opts.forEach(o => {
-    sel.innerHTML += `<option value="${o.val}"${prev===o.val?' selected':''}>${o.label}</option>`;
-  });
+  const prevVal = activeCR;
+  activeCR = null; activeCRLabel = '';
+
+  // 按鈕組
+  const grid = document.getElementById('crGrid');
+  grid.innerHTML = opts.map(o =>
+    `<button class="cr-btn${prevVal===o.val?' active':''}" data-val="${o.val}" onclick="selectCR(this)">${o.label}</button>`
+  ).join('');
+
+  // 下拉選單
+  const sel = document.getElementById('crSelect');
+  sel.innerHTML = '<option value="">— 請選擇 CR 條數 —</option>' +
+    opts.map(o => `<option value="${o.val}"${prevVal===o.val?' selected':''}>${o.label}</option>`).join('');
+
+  // 恢復選取狀態
+  const match = opts.find(o => o.val === prevVal);
+  if (match) { activeCR = match.val; activeCRLabel = match.label; }
 }
 
 function onWorkTypeChange() {
@@ -438,7 +499,9 @@ function onWorkTypeChange() {
   if (type) {
     populateCR(type);
   } else {
-    document.getElementById('crType').innerHTML = '<option value="">— 請先選工件類型 —</option>';
+    activeCR = null; activeCRLabel = '';
+    document.getElementById('crGrid').innerHTML = '';
+    document.getElementById('crSelect').innerHTML = '<option value="">— 請先選工件類型 —</option>';
   }
   calculate();
 }
@@ -517,7 +580,7 @@ function calculate() {
 
   // ── 電鍍 ──
   if (activeProcess === 'plate') {
-    const cr = document.getElementById('crType').value;
+    const cr = activeCR;
     if (!cr) {
       html = `<div class="process-result">
         <div class="process-result-title">🔵 電鍍 <span class="process-badge">請選擇 CR 條數</span></div>
@@ -533,9 +596,8 @@ function calculate() {
       } else if (info) {
         const fee = calcFee(areaIN2, info);
         total = fee;
-        const crLabel = document.getElementById('crType').options[document.getElementById('crType').selectedIndex].text;
         html = `<div class="process-result">
-          <div class="process-result-title">🔵 電鍍 <span class="process-badge">${crLabel}</span></div>
+          <div class="process-result-title">🔵 電鍍 <span class="process-badge">${activeCRLabel}</span></div>
           <div class="result-rows">${makeRows([
             ['側面積', `${fmtF(areaMM2)} mm²  /  ${fmtF(areaIN2,3)} in²`, false],
             ['英吋單價', `${info.unitPrice} 元/in²`, false],
@@ -581,7 +643,7 @@ function calculate() {
 
   // ── 退電再電 ──
   if (activeProcess === 'replate') {
-    const cr = document.getElementById('crType').value;
+    const cr = activeCR;
     if (!cr) {
       html = `<div class="process-result">
         <div class="process-result-title">🔄 退電再電 <span class="process-badge">請選擇 CR 條數</span></div>
@@ -598,9 +660,8 @@ function calculate() {
         const replateUnit = baseInfo.unitPrice + 1;
         const fee = calcFee(areaIN2, { unitPrice: replateUnit, basePrice: baseInfo.basePrice });
         total = fee;
-        const crLabel = document.getElementById('crType').options[document.getElementById('crType').selectedIndex].text;
         html = `<div class="process-result">
-          <div class="process-result-title">🔄 退電再電 <span class="process-badge">${crLabel}</span></div>
+          <div class="process-result-title">🔄 退電再電 <span class="process-badge">${activeCRLabel}</span></div>
           <div class="result-rows">${makeRows([
             ['側面積', `${fmtF(areaMM2)} mm²  /  ${fmtF(areaIN2,3)} in²`, false],
             [`英吋單價（電鍍 ${baseInfo.unitPrice} + 退電 1）`, `${replateUnit} 元/in²`, false],
