@@ -842,7 +842,9 @@ function renderDims() {
 
   } else if(currentShape==='bar_rnd') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const df=mkField('Ø（徑）',mk('input',{type:'number',id:'dim-D',placeholder:'mm',min:0,step:0.1,onchange:'autoFillUnitPrice()'})); df.style.flex='1';
+    const specsD = getSpecsForMat('bar_rnd');
+    const dInput = specsD.length > 0 ? mkSpecSel('dim-D', specsD, 'Ø', autoFillUnitPrice) : mkInput('dim-D','0.1');
+    const df=mkField('Ø（徑）',dInput); df.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
     g.appendChild(df); g.appendChild(x1); g.appendChild(lf);
