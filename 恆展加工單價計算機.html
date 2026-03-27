@@ -120,12 +120,13 @@
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
     transition: all 0.15s ease;
     text-align: center;
     line-height: 1.2;
+    letter-spacing: -0.5px;
   }
   .dia-btn .phi-sym {
     display: block;
@@ -167,16 +168,21 @@
   }
   .stroke-input:focus { border-color: var(--accent); }
   .stroke-input::placeholder { color: #505870; font-size: 16px; }
-  .unit-badge {
-    padding: 13px 16px;
-    background: #111420;
-    border: 1.5px solid var(--border);
+  .enter-btn {
+    padding: 13px 18px;
+    background: var(--accent);
+    border: none;
     border-radius: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    color: var(--muted);
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    cursor: pointer;
     white-space: nowrap;
+    transition: background 0.15s;
+    letter-spacing: 1px;
   }
+  .enter-btn:active { background: var(--accent2); }
 
   /* 結果卡片 */
   .result-card { max-width: 520px; margin: 0 auto 20px; display: none; }
@@ -267,12 +273,12 @@
 
   <div class="section-label">Step 2 · 內徑 (mm)</div>
   <div class="dia-row">
-    <button class="dia-btn active" id="dia-32" onclick="selectDia(32)"><span class="phi-sym">φ</span>32</button>
-    <button class="dia-btn" id="dia-40" onclick="selectDia(40)"><span class="phi-sym">φ</span>40</button>
-    <button class="dia-btn" id="dia-50" onclick="selectDia(50)"><span class="phi-sym">φ</span>50</button>
-    <button class="dia-btn" id="dia-63" onclick="selectDia(63)"><span class="phi-sym">φ</span>63</button>
-    <button class="dia-btn" id="dia-80" onclick="selectDia(80)"><span class="phi-sym">φ</span>80</button>
-    <button class="dia-btn" id="dia-100" onclick="selectDia(100)"><span class="phi-sym">φ</span>100</button>
+    <button class="dia-btn active" id="dia-32" onclick="selectDia(32)">Ø32</button>
+    <button class="dia-btn" id="dia-40" onclick="selectDia(40)">Ø40</button>
+    <button class="dia-btn" id="dia-50" onclick="selectDia(50)">Ø50</button>
+    <button class="dia-btn" id="dia-63" onclick="selectDia(63)">Ø63</button>
+    <button class="dia-btn" id="dia-80" onclick="selectDia(80)">Ø80</button>
+    <button class="dia-btn" id="dia-100" onclick="selectDia(100)">Ø100</button>
   </div>
 
   <div class="section-label">Step 3 · 行程長度</div>
@@ -280,9 +286,11 @@
     <div class="input-group">
       <label>輸入行程 (mm)</label>
       <input type="number" class="stroke-input" id="stroke-input"
-        placeholder="例：150" min="5" max="999" oninput="calculate()">
+        placeholder="例：150" min="5" max="999"
+        oninput="calculate()"
+        onkeydown="if(event.key==='Enter'){confirmInput();}">
     </div>
-    <div class="unit-badge">mm</div>
+    <button class="enter-btn" onclick="confirmInput()">ENTER</button>
   </div>
 </div>
 
@@ -292,7 +300,7 @@
       <div class="section-label" style="margin-bottom:0">計算結果</div>
       <div class="result-params">
         <span id="param-type" class="highlight">SD</span> ·
-        φ<span id="param-dia" class="highlight">32</span> ·
+        Ø<span id="param-dia" class="highlight">32</span> ·
         <span id="param-stroke" class="highlight">-</span>mm
       </div>
     </div>
@@ -365,7 +373,18 @@ const LA_LATHE = {
 const LA_DRILL_MIN = {32:180, 40:200, 50:210, 63:250, 80:300, 100:350};
 const LA_MILL_MIN  = {32:180, 40:200, 50:220, 63:280, 80:320, 100:350};
 
-// ── 狀態 ─────────────────────────────────────────────────────────────────────
+// ── 確認輸入：收鍵盤 + 捲動到結果 ───────────────────────────────────────────
+function confirmInput() {
+  const input = document.getElementById('stroke-input');
+  input.blur(); // 收鍵盤
+  calculate();
+  setTimeout(() => {
+    const result = document.getElementById('result-card');
+    if (result && result.classList.contains('visible')) {
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 100);
+}
 let state = { type: 'SD', dia: 32 };
 
 function selectType(t) {
