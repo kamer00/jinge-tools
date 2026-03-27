@@ -9,14 +9,14 @@
 
   :root {
     --bg: #0e0f13;
-    --surface: #16181f;
-    --border: #2a2d38;
-    --accent: #d4a017;
-    --accent2: #f0c040;
-    --text: #e8eaf0;
-    --muted: #6b7280;
-    --green: #22c55e;
-    --blue: #60a5fa;
+    --surface: #1a1d28;
+    --border: #404660;
+    --accent: #f0c040;
+    --accent2: #fde68a;
+    --text: #f0f2ff;
+    --muted: #b0b8d0;
+    --green: #4ade80;
+    --blue: #93c5fd;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,19 +37,19 @@
   }
   .header-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 4px;
     color: var(--accent);
     text-transform: uppercase;
     margin-bottom: 8px;
   }
   .header h1 {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 700;
     letter-spacing: 1px;
   }
   .header .subtitle {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--muted);
     margin-top: 6px;
     font-family: 'JetBrains Mono', monospace;
@@ -59,166 +59,171 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 20px;
+    padding: 22px;
     max-width: 520px;
     margin: 0 auto 20px;
   }
 
   .section-label {
-    font-size: 10px;
-    letter-spacing: 3px;
+    font-size: 12px;
+    letter-spacing: 2px;
     color: var(--accent);
     text-transform: uppercase;
     font-family: 'JetBrains Mono', monospace;
     margin-bottom: 14px;
   }
 
+  /* 型別按鈕 */
   .type-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 22px;
   }
   .type-btn {
-    padding: 14px;
+    padding: 16px;
     border: 2px solid var(--border);
     border-radius: 8px;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-    transition: all 0.15s ease;
-  }
-  .type-btn .type-desc {
-    display: block;
-    font-size: 10px;
-    font-weight: 400;
-    color: var(--muted);
-    margin-top: 4px;
     font-family: 'Noto Sans TC', sans-serif;
+    transition: all 0.15s ease;
+    letter-spacing: 1px;
   }
   .type-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .type-btn.active { border-color: var(--accent); background: rgba(212,160,23,0.1); color: var(--accent2); }
-  .type-btn.active .type-desc { color: var(--accent); }
+  .type-btn.active {
+    border-color: var(--accent);
+    background: rgba(240,192,64,0.15);
+    color: var(--accent2);
+  }
 
+  /* 內徑按鈕 */
   .dia-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 6px;
-    margin-bottom: 20px;
+    gap: 7px;
+    margin-bottom: 22px;
   }
   .dia-btn {
-    padding: 10px 4px;
+    padding: 12px 4px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
     transition: all 0.15s ease;
     text-align: center;
+    line-height: 1.2;
   }
-  .dia-btn .phi {
-    font-size: 9px;
+  .dia-btn .phi-sym {
     display: block;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 300;
+    font-style: italic;
+    font-size: 11px;
+    font-family: Georgia, serif;
+    font-weight: 400;
+    color: var(--muted);
     margin-bottom: 2px;
+    letter-spacing: 0;
   }
   .dia-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .dia-btn.active { border-color: var(--accent); background: rgba(212,160,23,0.1); color: var(--accent2); }
-  .dia-btn.active .phi { color: var(--accent); }
+  .dia-btn:hover .phi-sym { color: var(--accent); }
+  .dia-btn.active { border-color: var(--accent); background: rgba(240,192,64,0.15); color: var(--accent2); }
+  .dia-btn.active .phi-sym { color: var(--accent); }
 
+  /* 行程輸入 */
   .input-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
   .input-group { flex: 1; }
   .input-group label {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     letter-spacing: 1px;
   }
   .stroke-input {
     width: 100%;
-    padding: 12px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    padding: 13px 14px;
+    background: #111420;
+    border: 1.5px solid var(--border);
     border-radius: 6px;
     color: var(--text);
-    font-size: 18px;
+    font-size: 22px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
     outline: none;
     transition: border-color 0.15s;
   }
   .stroke-input:focus { border-color: var(--accent); }
-  .stroke-input::placeholder { color: var(--muted); font-size: 14px; }
+  .stroke-input::placeholder { color: #505870; font-size: 16px; }
   .unit-badge {
-    padding: 12px 14px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    padding: 13px 16px;
+    background: #111420;
+    border: 1.5px solid var(--border);
     border-radius: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
     white-space: nowrap;
   }
 
+  /* 結果卡片 */
   .result-card { max-width: 520px; margin: 0 auto 20px; display: none; }
   .result-card.visible { display: block; }
 
-  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .result-params { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .result-params { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); }
   .result-params .highlight { color: var(--accent2); font-weight: 600; }
 
   .price-table { width: 100%; border-collapse: collapse; }
   .price-table tr { border-bottom: 1px solid var(--border); }
   .price-table tr:last-child { border-bottom: none; }
-  .price-table td { padding: 13px 0; font-size: 14px; }
-  .price-table td:first-child { color: var(--muted); font-size: 13px; }
+  .price-table td { padding: 15px 0; font-size: 17px; }
+  .price-table td:first-child { color: var(--muted); font-size: 16px; }
   .price-table td:last-child {
     text-align: right;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 19px;
     color: var(--text);
   }
   .op-badge {
     display: inline-block;
-    padding: 2px 7px;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 11px;
-    margin-left: 6px;
+    font-size: 12px;
+    margin-left: 7px;
     font-family: 'JetBrains Mono', monospace;
   }
-  .badge-lathe { background: rgba(96,165,250,0.15); color: var(--blue); }
-  .badge-drill { background: rgba(34,197,94,0.15); color: var(--green); }
-  .badge-mill  { background: rgba(212,160,23,0.15); color: var(--accent); }
+  .badge-lathe { background: rgba(147,197,253,0.18); color: var(--blue); }
+  .badge-drill { background: rgba(74,222,128,0.18); color: var(--green); }
+  .badge-mill  { background: rgba(240,192,64,0.18); color: var(--accent); }
 
-  .total-row td { padding-top: 16px !important; border-top: 1px solid var(--border) !important; }
-  .total-row td:first-child { font-weight: 700; color: var(--text) !important; font-size: 14px !important; }
-  .total-row td:last-child { font-size: 22px !important; color: var(--accent2) !important; }
+  .total-row td { padding-top: 18px !important; border-top: 1px solid var(--border) !important; }
+  .total-row td:first-child { font-weight: 700; color: var(--text) !important; font-size: 17px !important; }
+  .total-row td:last-child { font-size: 26px !important; color: var(--accent2) !important; }
 
-  .min-note { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+  .min-note { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
 
   .warning-note {
-    font-size: 11px;
-    color: var(--accent);
+    font-size: 13px;
+    color: var(--accent2);
     margin-top: 12px;
-    padding: 8px 12px;
-    background: rgba(212,160,23,0.08);
-    border-left: 2px solid var(--accent);
+    padding: 10px 14px;
+    background: rgba(240,192,64,0.1);
+    border-left: 3px solid var(--accent);
     border-radius: 0 4px 4px 0;
   }
 
   .notice {
     max-width: 520px;
     margin: 0 auto;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
     text-align: center;
     padding: 12px;
@@ -234,7 +239,7 @@
     text-align: center;
     padding: 32px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 15px;
   }
 </style>
 </head>
@@ -249,22 +254,18 @@
 <div class="card">
   <div class="section-label">Step 1 · 型別</div>
   <div class="type-row">
-    <button class="type-btn active" id="btn-sd" onclick="selectType('SD')">
-      SD <span class="type-desc">標準型（Standard）</span>
-    </button>
-    <button class="type-btn" id="btn-la" onclick="selectType('LA')">
-      LA <span class="type-desc">長行程型（Long Arm）</span>
-    </button>
+    <button class="type-btn active" id="btn-sd" onclick="selectType('SD')">SD型</button>
+    <button class="type-btn" id="btn-la" onclick="selectType('LA')">LA型</button>
   </div>
 
-  <div class="section-label">Step 2 · 內徑 (φ mm)</div>
+  <div class="section-label">Step 2 · 內徑 (mm)</div>
   <div class="dia-row">
-    <button class="dia-btn active" id="dia-32" onclick="selectDia(32)"><span class="phi">φ</span>32</button>
-    <button class="dia-btn" id="dia-40" onclick="selectDia(40)"><span class="phi">φ</span>40</button>
-    <button class="dia-btn" id="dia-50" onclick="selectDia(50)"><span class="phi">φ</span>50</button>
-    <button class="dia-btn" id="dia-63" onclick="selectDia(63)"><span class="phi">φ</span>63</button>
-    <button class="dia-btn" id="dia-80" onclick="selectDia(80)"><span class="phi">φ</span>80</button>
-    <button class="dia-btn" id="dia-100" onclick="selectDia(100)"><span class="phi">φ</span>100</button>
+    <button class="dia-btn active" id="dia-32" onclick="selectDia(32)"><span class="phi-sym">φ</span>32</button>
+    <button class="dia-btn" id="dia-40" onclick="selectDia(40)"><span class="phi-sym">φ</span>40</button>
+    <button class="dia-btn" id="dia-50" onclick="selectDia(50)"><span class="phi-sym">φ</span>50</button>
+    <button class="dia-btn" id="dia-63" onclick="selectDia(63)"><span class="phi-sym">φ</span>63</button>
+    <button class="dia-btn" id="dia-80" onclick="selectDia(80)"><span class="phi-sym">φ</span>80</button>
+    <button class="dia-btn" id="dia-100" onclick="selectDia(100)"><span class="phi-sym">φ</span>100</button>
   </div>
 
   <div class="section-label">Step 3 · 行程長度</div>
