@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>恆展加工單價計算機</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0e0f13;
+    --surface: #16181f;
+    --border: #2a2d38;
+    --accent: #d4a017;
+    --accent2: #f0c040;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --green: #22c55e;
+    --blue: #60a5fa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .header .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 520px;
+    margin: 0 auto 20px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 14px;
+  }
+
+  .type-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .type-btn {
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s ease;
+  }
+  .type-btn .type-desc {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .type-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .type-btn.active { border-color: var(--accent); background: rgba(212,160,23,0.1); color: var(--accent2); }
+  .type-btn.active .type-desc { color: var(--accent); }
+
+  .dia-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .dia-btn {
+    padding: 10px 4px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s ease;
+    text-align: center;
+  }
+  .dia-btn .phi {
+    font-size: 9px;
+    display: block;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 300;
+    margin-bottom: 2px;
+  }
+  .dia-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .dia-btn.active { border-color: var(--accent); background: rgba(212,160,23,0.1); color: var(--accent2); }
+  .dia-btn.active .phi { color: var(--accent); }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
+  .input-group { flex: 1; }
+  .input-group label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .stroke-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .stroke-input:focus { border-color: var(--accent); }
+  .stroke-input::placeholder { color: var(--muted); font-size: 14px; }
+  .unit-badge {
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .result-card { max-width: 520px; margin: 0 auto 20px; display: none; }
+  .result-card.visible { display: block; }
+
+  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .result-params { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+  .result-params .highlight { color: var(--accent2); font-weight: 600; }
+
+  .price-table { width: 100%; border-collapse: collapse; }
+  .price-table tr { border-bottom: 1px solid var(--border); }
+  .price-table tr:last-child { border-bottom: none; }
+  .price-table td { padding: 13px 0; font-size: 14px; }
+  .price-table td:first-child { color: var(--muted); font-size: 13px; }
+  .price-table td:last-child {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .op-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-lathe { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .badge-drill { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-mill  { background: rgba(212,160,23,0.15); color: var(--accent); }
+
+  .total-row td { padding-top: 16px !important; border-top: 1px solid var(--border) !important; }
+  .total-row td:first-child { font-weight: 700; color: var(--text) !important; font-size: 14px !important; }
+  .total-row td:last-child { font-size: 22px !important; color: var(--accent2) !important; }
+
+  .min-note { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+  .warning-note {
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(212,160,23,0.08);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .notice {
+    max-width: 520px;
+    margin: 0 auto;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding: 12px;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    line-height: 1.8;
+  }
+  .notice span { color: var(--accent); }
+
+  .empty-state {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Heng Zhan Pricing Tool</div>
+  <h1>恆展加工單價計算機</h1>
+  <div class="subtitle">115年2月報價 · SD型 / LA型</div>
+</div>
+
+<div class="card">
+  <div class="section-label">Step 1 · 型別</div>
+  <div class="type-row">
+    <button class="type-btn active" id="btn-sd" onclick="selectType('SD')">
+      SD <span class="type-desc">標準型（Standard）</span>
+    </button>
+    <button class="type-btn" id="btn-la" onclick="selectType('LA')">
+      LA <span class="type-desc">長行程型（Long Arm）</span>
+    </button>
+  </div>
+
+  <div class="section-label">Step 2 · 內徑 (φ mm)</div>
+  <div class="dia-row">
+    <button class="dia-btn active" id="dia-32" onclick="selectDia(32)"><span class="phi">φ</span>32</button>
+    <button class="dia-btn" id="dia-40" onclick="selectDia(40)"><span class="phi">φ</span>40</button>
+    <button class="dia-btn" id="dia-50" onclick="selectDia(50)"><span class="phi">φ</span>50</button>
+    <button class="dia-btn" id="dia-63" onclick="selectDia(63)"><span class="phi">φ</span>63</button>
+    <button class="dia-btn" id="dia-80" onclick="selectDia(80)"><span class="phi">φ</span>80</button>
+    <button class="dia-btn" id="dia-100" onclick="selectDia(100)"><span class="phi">φ</span>100</button>
+  </div>
+
+  <div class="section-label">Step 3 · 行程長度</div>
+  <div class="input-row">
+    <div class="input-group">
+      <label>輸入行程 (mm)</label>
+      <input type="number" class="stroke-input" id="stroke-input"
+        placeholder="例：150" min="5" max="999" oninput="calculate()">
+    </div>
+    <div class="unit-badge">mm</div>
+  </div>
+</div>
+
+<div class="result-card" id="result-card">
+  <div class="card">
+    <div class="result-header">
+      <div class="section-label" style="margin-bottom:0">計算結果</div>
+      <div class="result-params">
+        <span id="param-type" class="highlight">SD</span> ·
+        φ<span id="param-dia" class="highlight">32</span> ·
+        <span id="param-stroke" class="highlight">-</span>mm
+      </div>
+    </div>
+    <table class="price-table">
+      <tbody>
+        <tr>
+          <td>車床<span class="op-badge badge-lathe">LATHE</span></td>
+          <td id="price-lathe">-</td>
+        </tr>
+        <tr id="row-mill">
+          <td>銑床<span class="op-badge badge-mill">MILL</span>
+            <div class="min-note" id="mill-note"></div>
+          </td>
+          <td id="price-mill">-</td>
+        </tr>
+        <tr>
+          <td>鑽孔<span class="op-badge badge-drill">DRILL</span>
+            <div class="min-note" id="drill-note"></div>
+          </td>
+          <td id="price-drill">-</td>
+        </tr>
+        <tr class="total-row">
+          <td>合計</td>
+          <td id="price-total">-</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="warning-note" id="extrapolate-note" style="display:none">
+      ⚠ 行程超出報價表範圍，價格為外插估算值，請向廠商確認
+    </div>
+  </div>
+</div>
+
+<div class="empty-state" id="empty-state">請完成選擇並輸入行程</div>
+
+<div class="notice">
+  資料來源：恆展 115年2月報價單 ·
+  <span>以修正版 Excel 為準，更新於 115年3月</span>
+</div>
+
+<script>
+// ── 資料：同步自修正版 Excel（115年3月更新）─────────────────────────────
+const SD_LATHE = {
+  32:  {5:130,10:145,15:160,20:175,25:190,30:205,35:225,40:245,45:265,50:285,55:310,60:335,65:360,70:385,75:410,80:435,85:465,90:495,95:525,100:555,105:615,110:635,115:675,120:715,125:765,130:815,135:865,140:915,145:965,150:1015},
+  40:  {5:150,10:165,15:180,20:195,25:210,30:225,35:240,40:260,45:280,50:300,55:325,60:350,65:375,70:400,75:425,80:450,85:480,90:510,95:540,100:570,105:610,110:650,115:700,120:750,125:800,130:850,135:930,140:1010,145:1090,150:1170,155:1250,160:1350,165:1450,170:1550,175:1650},
+  50:  {5:165,10:180,15:195,20:210,25:230,30:250,35:270,40:290,45:310,50:330,55:355,60:380,65:405,70:430,75:460,80:490,85:520,90:550,95:580,100:620,105:660,110:700,115:750,120:800,125:850,130:900,135:980,140:1060,145:1140,150:1220,155:1300,160:1400,165:1500,170:1600,175:1700,180:1800},
+  63:  {5:215,10:230,15:250,20:270,25:290,30:320,35:350,40:380,45:410,50:440,55:470,60:500,65:530,70:560,75:590,80:620,85:650,90:680,95:710,100:750,105:790,110:830,115:870,120:910,125:950,130:1000,135:1080,140:1160,145:1240,150:1320,155:1420,160:1520,165:1620,170:1740,175:1860,180:1980,185:2080,190:2180,195:2280,200:2380},
+  80:  {5:300,10:320,15:340,20:360,25:380,30:405,35:430,40:455,45:480,50:505,55:530,60:560,65:590,70:610,75:640,80:670,85:705,90:740,95:780,100:820,105:870,110:920,115:980,120:1040,125:1110,130:1180,135:1260,140:1340,145:1420,150:1500},
+  100: {5:350,10:390,15:430,20:470,25:510,30:550,35:590,40:630,45:670,50:710,55:760,60:810,65:860,70:910,75:970,80:1030,85:1090,90:1150,95:1210,100:1280,105:1350,110:1420,115:1490,120:1560,125:1630},
+};
+
+const SD_DRILL = {
+  32:  {5:115,10:120,15:140,20:145,25:150,30:155,35:165,40:175,45:185,50:195,55:210,60:225,65:240,70:255,75:270,80:285,85:300,90:315,95:330,100:345,105:365,110:385,115:405,120:425,125:445,130:465,135:485,140:505,145:525,150:545},
+  40:  {5:130,10:135,15:140,20:145,25:150,30:155,35:165,40:175,45:185,50:195,55:220,60:235,65:250,70:265,75:285,80:300,85:315,90:330,95:345,100:350,105:380,110:400,115:420,120:440,125:460,130:480,135:500,140:520,145:550,150:580,155:620,160:650,165:680,170:710,175:740},
+  50:  {5:140,10:145,15:150,20:160,25:170,30:180,35:190,40:200,45:210,50:220,55:235,60:250,65:265,70:280,75:305,80:325,85:345,90:365,95:380,100:395,105:410,110:420,115:440,120:460,125:480,130:500,135:525,140:550,145:575,150:600,155:640,160:680,165:720,170:760,175:800,180:840},
+  63:  {5:150,10:160,15:180,20:200,25:220,30:240,35:260,40:280,45:300,50:320,55:340,60:360,65:380,70:400,75:420,80:440,85:460,90:480,95:500,100:520,105:540,110:560,115:580,120:600,125:620,130:640,135:660,140:680,145:700,150:720,155:750,160:780,165:810,170:840,175:870,180:900,185:930,190:960,195:990,200:1020},
+  80:  {5:190,10:210,15:230,20:250,25:270,30:290,35:310,40:330,45:350,50:370,55:390,60:410,65:430,70:450,75:470,80:490,85:510,90:530,95:550,100:570,105:600,110:630,115:660,120:690,125:720,130:750,135:780,140:810,145:840,150:870},
+  100: {5:240,10:260,15:280,20:300,25:320,30:340,35:360,40:380,45:400,50:420,55:440,60:460,65:480,70:510,75:540,80:570,85:600,90:630,95:670,100:710,105:750,110:790,115:830,120:870,125:910},
+};
+
+const LA_LATHE = {
+  32:  {5:160,10:180,15:200,20:220,25:250,30:270,35:290,40:310,45:330,50:350,55:370,60:390,65:410,70:430,75:450,80:470,85:490,90:520,95:530,100:560,105:600,110:640,115:680,120:750,125:830,130:910,135:990,140:1070,145:1150,150:1230},
+  40:  {5:170,10:190,15:210,20:230,25:250,30:270,35:290,40:310,45:335,50:360,55:385,60:410,65:435,70:460,75:485,80:510,85:535,90:560,95:585,100:610,105:650,110:700,115:750,120:800,125:860,130:940,135:1020,140:1100,145:1180,150:1260,155:1340,160:1420,165:1520,170:1620,175:1720},
+  50:  {5:190,10:210,15:230,20:250,25:270,30:290,35:310,40:330,45:355,50:380,55:405,60:430,65:455,70:480,75:505,80:530,85:560,90:590,95:620,100:650,105:700,110:750,115:810,120:870,125:940,130:1010,135:1080,140:1160,145:1250,150:1340,155:1430,160:1530,165:1630,170:1730,175:1830,180:1930},
+  63:  {5:250,10:270,15:290,20:310,25:330,30:350,35:370,40:390,45:410,50:430,55:460,60:480,65:510,70:540,75:570,80:600,85:630,90:660,95:700,100:740,105:780,110:830,115:880,120:930,125:990,130:1070,135:1150,140:1230,145:1310,150:1390},
+  80:  {5:320,10:340,15:360,20:380,25:410,30:440,35:470,40:500,45:530,50:560,55:590,60:620,65:650,70:680,75:710,80:750,85:790,90:840,95:880,100:920,105:970,110:1020,115:1080,120:1140,125:1210,130:1280,135:1360,140:1440,145:1530,150:1620},
+  100: {5:400,10:430,15:460,20:490,25:520,30:550,35:580,40:610,45:650,50:690,55:740,60:790,65:850,70:910,75:970,80:1030,85:1090,90:1150,95:1210,100:1270,105:1340,110:1410,115:1490,120:1570,125:1650,130:1730,135:1810,140:1890,145:1970,150:2025},
+};
+
+const LA_DRILL_MIN = {32:180, 40:200, 50:210, 63:250, 80:300, 100:350};
+const LA_MILL_MIN  = {32:180, 40:200, 50:220, 63:280, 80:320, 100:350};
+
+// ── 狀態 ─────────────────────────────────────────────────────────────────────
+let state = { type: 'SD', dia: 32 };
+
+function selectType(t) {
+  state.type = t;
+  document.getElementById('btn-sd').classList.toggle('active', t === 'SD');
+  document.getElementById('btn-la').classList.toggle('active', t === 'LA');
+  calculate();
+}
+
+function selectDia(d) {
+  state.dia = d;
+  [32,40,50,63,80,100].forEach(v =>
+    document.getElementById('dia-'+v).classList.toggle('active', v === d)
+  );
+  calculate();
+}
+
+// ── 線性插值 ──────────────────────────────────────────────────────────────────
+function interp(table, stroke) {
+  const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
+  if (!keys.length) return {val:0, extrapolated:false};
+  if (stroke <= keys[0]) return {val:table[keys[0]], extrapolated: stroke < keys[0]};
+  if (stroke >= keys[keys.length-1]) {
+    const n = keys.length, k1 = keys[n-2], k2 = keys[n-1];
+    const slope = (table[k2]-table[k1])/(k2-k1);
+    return {val: Math.round(table[k2]+(stroke-k2)*slope), extrapolated:true};
+  }
+  let lo = keys[0], hi = keys[1];
+  for (let i=0; i<keys.length-1; i++) {
+    if (keys[i]<=stroke && stroke<=keys[i+1]) { lo=keys[i]; hi=keys[i+1]; break; }
+  }
+  const t = (stroke-lo)/(hi-lo);
+  return {val: Math.round(table[lo]+t*(table[hi]-table[lo])), extrapolated:false};
+}
+
+// ── 計算與渲染 ────────────────────────────────────────────────────────────────
+function calculate() {
+  const strokeVal = parseFloat(document.getElementById('stroke-input').value);
+  const resultCard = document.getElementById('result-card');
+  const emptyState = document.getElementById('empty-state');
+
+  if (!strokeVal || strokeVal <= 0) {
+    resultCard.classList.remove('visible');
+    emptyState.style.display = 'block';
+    return;
+  }
+
+  resultCard.classList.add('visible');
+  emptyState.style.display = 'none';
+
+  const {type, dia} = state;
+  let lathePrice, drillPrice, millPrice = null, extrapolated = false;
+
+  if (type === 'SD') {
+    const lr = interp(SD_LATHE[dia], strokeVal);
+    const dr = interp(SD_DRILL[dia], strokeVal);
+    lathePrice = lr.val;
+    drillPrice = dr.val;
+    if (lr.extrapolated || dr.extrapolated) extrapolated = true;
+    document.getElementById('row-mill').style.display = 'none';
+    document.getElementById('drill-note').textContent = '';
+  } else {
+    const lr = interp(LA_LATHE[dia], strokeVal);
+    lathePrice = lr.val;
+    if (lr.extrapolated) extrapolated = true;
+    drillPrice = LA_DRILL_MIN[dia];
+    document.getElementById('drill-note').textContent = `底價 ${drillPrice}，長行程請向廠商確認`;
+    millPrice = LA_MILL_MIN[dia];
+    document.getElementById('mill-note').textContent = `底價 ${millPrice}，長行程請向廠商確認`;
+    document.getElementById('row-mill').style.display = '';
+  }
+
+  const total = lathePrice + drillPrice + (millPrice || 0);
+
+  document.getElementById('param-type').textContent   = type;
+  document.getElementById('param-dia').textContent    = dia;
+  document.getElementById('param-stroke').textContent = strokeVal;
+  document.getElementById('price-lathe').textContent  = `$ ${lathePrice.toLocaleString()}`;
+  document.getElementById('price-drill').textContent  = `$ ${drillPrice.toLocaleString()}`;
+  if (millPrice !== null)
+    document.getElementById('price-mill').textContent = `$ ${millPrice.toLocaleString()}`;
+  document.getElementById('price-total').textContent  = `$ ${total.toLocaleString()}`;
+  document.getElementById('extrapolate-note').style.display = extrapolated ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
