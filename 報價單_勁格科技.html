@@ -553,23 +553,27 @@ const DEFAULT_PROCESSES = ["銑床", "車床", "鑽孔", "研磨", "電鍍", "�
 const DEFAULT_ITEMS = ["前蓋", "管", "後蓋", "活塞", "桿", "油封", "防塵套"];
 const STORAGE_KEY = "jg_quotes_v2";
 
+// 初始化鎖：防止 addProcess / addItem 觸發的 calc() 污染 autosave
+let _initializing = true;
+
 window.onload = () => {
   loadOptions();
-  document.getElementById('docDate').valueAsDate = new Date();
-  DEFAULT_PROCESSES.forEach(p => addProcess(p));
-  DEFAULT_ITEMS.forEach(i => addItem(i));
-  updateFileName();
+  _initializing = true;
 
-  // 偵測自動備份
   const saved = getAutosave();
   if (saved) {
-    setTimeout(() => {
-      if (confirm(`偵測到上次未儲存的編輯備份\n備份時間：${saved.ts}\n\n是否還原？`)) {
-        restoreState(saved.data);
-        showToast(`↩ 已還原至 ${saved.ts} 的備份`);
-      }
-    }, 500);
+    // 有備份 → 直接還原，不詢問
+    restoreState(saved.data);
+    showToast(`↩ 已還原上次工作狀態（${saved.ts}）`);
+  } else {
+    // 第一次開啟，沒有備份 → 載入預設值
+    document.getElementById('docDate').valueAsDate = new Date();
+    DEFAULT_PROCESSES.forEach(p => addProcess(p));
+    DEFAULT_ITEMS.forEach(i => addItem(i));
+    updateFileName();
   }
+
+  _initializing = false;
 };
 
 window.onbeforeprint = () => {
@@ -1007,6 +1011,7 @@ const AUTOSAVE_KEY = 'jg_autosave_v2';
 let _autosaveTimer = null;
 
 function triggerAutosave() {
+  if (_initializing) return; // 初始化期間不存，避免空白預設值覆蓋備份
   clearTimeout(_autosaveTimer);
   _autosaveTimer = setTimeout(() => {
     try {
