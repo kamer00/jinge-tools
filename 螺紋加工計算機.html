@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>螺紋加工計算機</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap');
+
+:root {
+  --bg:    #0d1117;
+  --surf:  #161b22;
+  --card:  #1c2330;
+  --line:  #253047;
+  --acc:   #3b82f6;
+  --acc2:  #60a5fa;
+  --txt:   #c9d1d9;
+  --dim:   #586988;
+  --hi:    #f0f6ff;
+  --warn:  #f97316;
+  --red:   #ef4444;
+  --ok:    #22c55e;
+  --mono:  'JetBrains Mono', monospace;
+  --sans:  'Noto Sans TC', sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--txt); font-family:var(--sans); font-size:13px; }
+
+/* ── 全頁容器 ── */
+.wrap { max-width:900px; margin:0 auto; }
+
+/* Header */
+header {
+  background:var(--surf); border-bottom:1px solid var(--line);
+  padding:10px 14px; display:flex; align-items:center; gap:10px;
+  position:sticky; top:0; z-index:10;
+}
+.header-inner { max-width:900px; margin:0 auto; width:100%; display:flex; align-items:center; gap:10px; }
+.logo { width:32px;height:32px; background:var(--acc); border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;flex-shrink:0; }
+header h1 { font-size:14px;font-weight:700;color:var(--hi);flex:1; }
+.back { font-size:11px;color:var(--dim);text-decoration:none;
+  padding:4px 8px;border:1px solid var(--line);border-radius:4px; }
+
+/* Input panel */
+.input-wrap { padding:10px 12px;background:var(--surf);border-bottom:1px solid var(--line); }
+.row2 { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px; }
+label { display:block;font-size:10px;color:var(--dim);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:3px; }
+select,input {
+  width:100%;background:var(--card);border:1px solid var(--line);border-radius:4px;
+  color:var(--hi);font-family:var(--mono);font-size:12px;padding:6px 8px;
+  outline:none;-webkit-appearance:none;
+}
+select:focus,input:focus { border-color:var(--acc); }
+.mb8 { margin-bottom:8px; }
+.presets { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px; }
+.pb { background:var(--card);border:1px solid var(--line);color:var(--dim);
+  border-radius:3px;padding:3px 7px;font-family:var(--mono);font-size:10px;cursor:pointer; }
+.pb:hover { border-color:var(--acc);color:var(--acc2); }
+.btn-calc { width:100%;background:var(--acc);color:#fff;border:none;border-radius:4px;
+  padding:10px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer; }
+.btn-calc:active { opacity:.85; }
+
+/* Results */
+#results { display:none; }
+#results.show { display:block; }
+
+/* Pills summary */
+.pills { display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;
+  background:var(--surf);border-bottom:1px solid var(--line); }
+.pill { background:var(--card);border:1px solid var(--line);border-radius:3px;
+  padding:3px 8px;font-family:var(--mono);font-size:11px; }
+.pill b { color:var(--acc2); }
+
+/* Section */
+.sec { margin:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden; }
+.sec-h { background:var(--surf);border-bottom:1px solid var(--line);padding:7px 12px;
+  display:flex;align-items:center;gap:8px; }
+.sec-n { width:20px;height:20px;background:var(--acc);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;flex-shrink:0; }
+.sec-h h2 { font-size:12px;font-weight:700;color:var(--hi); }
+
+/* PC: 雙欄排版 */
+@media (min-width:640px) {
+  .input-wrap { padding:14px 20px; }
+  .pills { padding:10px 20px; gap:8px; }
+  .results-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto;
+    gap:0;
+    padding:0 8px;
+  }
+  /* ① 數據表格：左欄，跨兩行 */
+  .sec-data { grid-column:1; grid-row:1/3; margin:10px 6px 10px 10px; }
+  /* ② 機台設定：右欄上 */
+  .sec-setup { grid-column:2; grid-row:1; margin:10px 10px 5px 6px; }
+  /* ③ 操作防呆：右欄下 */
+  .sec-safety { grid-column:2; grid-row:2; margin:5px 10px 10px 6px; }
+  .sec { margin:0; }
+  td:first-child { width:46%; }
+}
+
+/* Table */
+table { width:100%;border-collapse:collapse; }
+tr { border-bottom:1px solid rgba(37,48,71,.6); }
+tr:last-child { border-bottom:none; }
+td { padding:7px 12px;vertical-align:middle;line-height:1.3; }
+td:first-child { color:var(--dim);font-size:11px;width:44%; }
+.v  { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--hi); }
+.va { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--acc2); }
+.vw { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--warn); }
+.vr { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--red); }
+.vo { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--ok); }
+.sub td { background:rgba(37,48,71,.5);padding:4px 12px;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">JG</div>
+    <h1>螺紋加工計算機</h1>
+    <a href="/" class="back">← 首頁</a>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="input-wrap">
+  <div class="mb8">
+    <label>螺紋體系</label>
+    <select id="sys" onchange="onSys()">
+      <option value="metric">公制 Metric 60° — ISO 965</option>
+      <option value="un">英制 UN/UNC/UNF 60° — ANSI B1.1</option>
+      <option value="pt">PT 管用錐螺紋 55° — JIS B0203</option>
+      <option value="pf">PF 管用平行螺紋 55° — JIS B0202</option>
+      <option value="ps">PS 管用平行螺紋-配件 55° — JIS B0202</option>
+      <option value="nptf">NPTF 美規錐管螺紋 60° — ASME B1.20.3</option>
+    </select>
+  </div>
+  <div class="row2">
+    <div><label id="lD">公稱直徑 mm</label><input id="D" placeholder="如 40" /></div>
+    <div><label id="lP">螺距 P (mm)</label><input id="P" placeholder="如 3.0" /></div>
+  </div>
+  <div class="presets" id="presets"></div>
+  <button class="btn-calc" onclick="calc()">▶ 計算</button>
+</div>
+
+<div id="results">
+  <div class="pills" id="pills"></div>
+  <div class="results-grid">
+    <div class="sec sec-data">
+      <div class="sec-h"><div class="sec-n">①</div><h2>數據表格</h2></div>
+      <table id="t1"></table>
+    </div>
+    <div class="sec sec-setup">
+      <div class="sec-h"><div class="sec-n">②</div><h2>機台設定</h2></div>
+      <table id="t2"></table>
+    </div>
+    <div class="sec sec-safety">
+      <div class="sec-h"><div class="sec-n">③</div><h2>操作防呆</h2></div>
+      <table id="t3"></table>
+    </div>
+  </div>
+</div>
+</div><!-- /wrap -->
+
+<script>
+const PR = {
+  metric:[
+    {d:'M6',D:6,P:1.0},{d:'M8',D:8,P:1.25},{d:'M10',D:10,P:1.5},
+    {d:'M12',D:12,P:1.75},{d:'M16',D:16,P:2.0},{d:'M20',D:20,P:2.5},
+    {d:'M24',D:24,P:3.0},{d:'M30',D:30,P:3.5},{d:'M36',D:36,P:4.0},
+    {d:'M42',D:42,P:4.5},{d:'M48',D:48,P:5.0},{d:'M56',D:56,P:5.5},{d:'M64',D:64,P:6.0},
+  ],
+  un:[
+    {d:'1/4"',D:0.25,T:20},{d:'5/16"',D:0.3125,T:18},{d:'3/8"',D:0.375,T:16},
+    {d:'7/16"',D:0.4375,T:14},{d:'1/2"',D:0.5,T:13},{d:'5/8"',D:0.625,T:11},
+    {d:'3/4"',D:0.75,T:10},{d:'7/8"',D:0.875,T:9},{d:'1"',D:1.0,T:8},
+    {d:'1-1/4"',D:1.25,T:7},{d:'1-1/2"',D:1.5,T:6},
+  ],
+  pt:[
+    {d:'PT 1/8',M:9.728,T:28},{d:'PT 1/4',M:13.157,T:19},{d:'PT 3/8',M:16.662,T:19},
+    {d:'PT 1/2',M:20.955,T:14},{d:'PT 3/4',M:26.441,T:14},{d:'PT 1',M:33.249,T:11},
+    {d:'PT 1-1/4',M:41.910,T:11},{d:'PT 1-1/2',M:47.803,T:11},{d:'PT 2',M:59.614,T:11},
+  ],
+  pf:[
+    {d:'PF 1/8',M:9.728,T:28},{d:'PF 1/4',M:13.157,T:19},{d:'PF 3/8',M:16.662,T:19},
+    {d:'PF 1/2',M:20.955,T:14},{d:'PF 3/4',M:26.441,T:14},{d:'PF 1',M:33.249,T:11},
+    {d:'PF 1-1/4',M:41.910,T:11},{d:'PF 1-1/2',M:47.803,T:11},{d:'PF 2',M:59.614,T:11},
+  ],
+  ps:[
+    {d:'PS 1/8',M:9.728,T:28},{d:'PS 1/4',M:13.157,T:19},{d:'PS 3/8',M:16.662,T:19},
+    {d:'PS 1/2',M:20.955,T:14},{d:'PS 3/4',M:26.441,T:14},{d:'PS 1',M:33.249,T:11},
+    {d:'PS 1-1/4',M:41.910,T:11},{d:'PS 1-1/2',M:47.803,T:11},{d:'PS 2',M:59.614,T:11},
+  ],
+  nptf:[
+    {d:'1/8',M:10.287,T:27},{d:'1/4',M:13.716,T:18},{d:'3/8',M:17.145,T:18},
+    {d:'1/2',M:21.336,T:14},{d:'3/4',M:26.670,T:14},{d:'1"',M:33.401,T:11.5},
+    {d:'1-1/4',M:42.164,T:11.5},{d:'1-1/2',M:48.260,T:11.5},{d:'2"',M:60.325,T:11.5},
+  ]
+};
+
+const TL = {
+  pt:  {9.728:6.5,13.157:9.7,16.662:10.1,20.955:13.6,26.441:14.1,33.249:16.8,41.910:19.1,47.803:19.1,59.614:23.4},
+  nptf:{10.287:6.8,13.716:10.8,17.145:10.8,21.336:13.6,26.670:13.6,33.401:17.3,42.164:17.3,48.260:17.3,60.325:19.2}
+};
+
+function onSys(){
+  const s=document.getElementById('sys').value;
+  const pipe=['pt','pf','ps','nptf'].includes(s);
+  document.getElementById('lD').textContent = pipe?'大徑 mm（快選帶入）':s==='metric'?'公稱直徑 mm':'公稱直徑（英寸）';
+  document.getElementById('lP').textContent = s==='metric'?'螺距 P (mm)':'牙數 TPI';
+  document.getElementById('D').placeholder  = pipe?'快選自動帶入':s==='metric'?'如 40':'如 1/2';
+  document.getElementById('P').placeholder  = s==='metric'?'如 3.0':'如 14';
+  const el=document.getElementById('presets'); el.innerHTML='';
+  (PR[s]||[]).forEach(p=>{
+    const b=document.createElement('button'); b.className='pb'; b.textContent=p.d;
+    b.onclick=()=>{
+      const pipe2=['pt','pf','ps','nptf'].includes(s);
+      document.getElementById('D').value=pipe2?p.M:s==='metric'?p.D:p.d.replace(/"/g,'');
+      document.getElementById('P').value=pipe2?p.T:s==='metric'?p.P:p.T;
+    };
+    el.appendChild(b);
+  });
+}
+
+function frac(s){
+  s=String(s).replace(/"/g,'').trim();
+  const dm=s.match(/^(\d+)-(\d+)\/(\d+)$/); if(dm) return +dm[1]+ +dm[2]/+dm[3];
+  const fm=s.match(/^(\d+)\/(\d+)$/);        if(fm) return +fm[1]/+fm[2];
+  return parseFloat(s);
+}
+
+function R(l,v,c='v'){ return `<tr><td>${l}</td><td class="${c}">${v}</td></tr>`; }
+function S(l){ return `<tr class="sub"><td colspan="2">${l}</td></tr>`; }
+
+function calc(){
+  const s=document.getElementById('sys').value;
+  const dR=document.getElementById('D').value.trim();
+  const pR=document.getElementById('P').value.trim();
+  if(!dR||!pR){alert('請輸入直徑與螺距/牙數');return;}
+
+  const pipe=['pt','pf','ps','nptf'].includes(s);
+  const taper=(s==='pt'||s==='nptf');
+  const is55=['pt','pf','ps'].includes(s);
+
+  let D= pipe?parseFloat(dR):s==='metric'?parseFloat(dR):frac(dR)*25.4;
+  let P,TPI;
+  if(s==='metric'){P=parseFloat(pR);TPI=null;}
+  else{TPI=parseFloat(pR);P=25.4/TPI;}
+
+  if(isNaN(D)||isNaN(P)||D<=0||P<=0){alert('數值格式錯誤');return;}
+
+  const hd=is55?27.5:30, hr=hd*Math.PI/180;
+  const df=is55?0.6403:0.6495;
+  const h=df*P, d2=D-df*P;
+  const mE=is55?1.2806:1.2269;
+  const d1e=D-mE*P;
+  // 外牙外徑預留：D-(0.1~0.2*P)
+  const odLo=D-0.20*P, odHi=D-0.10*P;
+  // 內牙底孔：基準 D-P，實務公差 +0.1~+0.2mm
+  const drBase=D-P, drLo=drBase+0.10, drHi=drBase+0.20;
+  // 總切深（外牙，單邊）固定用 60° 公式
+  const cutDepth=0.6495*P;
+  const ca=is55?27.5:29, ps=Math.ceil(h/0.2);
+
+  let Le=null,Ds=null;
+  if(taper){
+    const mp=TL[s]||{}, ks=Object.keys(mp).map(Number);
+    const nr=ks.reduce((a,b)=>Math.abs(b-D)<Math.abs(a-D)?b:a,ks[0]);
+    if(Math.abs(nr-D)<1){Le=mp[nr];Ds=D-Le/16;}
+  }
+
+  // Pills
+  const sn={metric:'公制 60°',un:'UN 60°',pt:'PT 55°',pf:'PF 55°',ps:'PS 55°',nptf:'NPTF 60°'}[s];
+  const pd=s==='metric'?`P=${P} mm`:`${TPI} TPI / P=${P.toFixed(2)} mm`;
+  document.getElementById('pills').innerHTML=`
+    <div class="pill">${sn}</div>
+    <div class="pill">D <b>${D.toFixed(2)} mm</b></div>
+    <div class="pill">${pd}</div>
+    <div class="pill">h <b>${h.toFixed(2)} mm</b></div>
+    <div class="pill">d₂ <b>${d2.toFixed(2)} mm</b></div>`;
+
+  // ① 數據表格
+  let t1='';
+  if(taper&&Le){
+    t1+=S('錐管幾何');
+    t1+=R('規格點大徑',D.toFixed(2)+' mm','va');
+    t1+=R('小端大徑（入口）',Ds.toFixed(2)+' mm','va');
+    t1+=R('有效螺紋長度 L',Le.toFixed(2)+' mm','v');
+    t1+=R('大小端直徑差',(D-Ds).toFixed(2)+' mm','v');
+  }
+  t1+=S('外螺紋');
+  t1+=R('外徑預留範圍',`${odLo.toFixed(2)} ~ ${odHi.toFixed(2)} mm`,'va');
+  t1+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
+  t1+=R('有效徑 d₂',d2.toFixed(2)+' mm','v');
+  t1+=R('底徑 d₁',d1e.toFixed(2)+' mm','v');
+  t1+=S('內螺紋');
+  t1+=R('底孔基準 D−P',drBase.toFixed(2)+' mm','va');
+  t1+=R('底孔加工範圍',`${drLo.toFixed(2)} ~ ${drHi.toFixed(2)} mm`,'va');
+  document.getElementById('t1').innerHTML=t1;
+
+  // ② 機台設定
+  let t2='';
+  if(taper&&Le){
+    t2+=S('錐度設定');
+    t2+=R('錐度比','1 : 16','vw');
+    t2+=R('半錐角',"1° 47' 24\"",'v');
+    t2+=R('小端大徑',Ds.toFixed(2)+' mm','va');
+    t2+=R('有效螺紋長 L',Le.toFixed(2)+' mm','v');
+  }
+  t2+=S('外牙');
+  t2+=R('複式滑板角',ca+'°','va');
+  t2+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
+  t2+=R('退刀槽寬',`${(2*P).toFixed(2)} ~ ${(3*P).toFixed(2)} mm`,'v');
+  t2+=R('退刀槽深',(cutDepth+0.2).toFixed(2)+' mm 以上','v');
+  t2+=R('粗車刀數估算',`≈ ${ps} 刀（每刀 0.2mm）`,'v');
+  t2+=R('牙尖圓角','建議略修圓（高壓油缸需求）','vw');
+  t2+=S('內牙');
+  t2+=R('複式滑板角',ca+'°（反向）','vw');
+  t2+=R('進刀方向','由裡向外退刀','vw');
+  t2+=R('鏜刀伸出長','≤ 孔深 + 5 mm','v');
+  t2+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
+  document.getElementById('t2').innerHTML=t2;
+
+  // ③ 操作防呆
+  let t3='';
+  t3+=S('量測');
+  t3+=R('外牙','螺紋環規（GO/NO GO）','vo');
+  t3+=R('內牙','螺紋塞規（GO/NO GO）','vo');
+  t3+=taper
+    ?R('錐管判斷','量規旋入量，非尺寸量測','vw')
+    :R('首刀試量','首刀 0.05mm，量後再調','v');
+  t3+=S('加工確認');
+  t3+=R('刀尖角',`螺紋角規對中 ${is55?55:60}°`,'v');
+  t3+=R('外牙退刀槽',`確認寬 ≥ ${(2*P).toFixed(2)} mm`,'v');
+  t3+=R('精車後光刀','空走 1~2 刀','v');
+  if(taper){
+    t3+=R('錐管退刀槽','通常省略，需確認','vw');
+    t3+=R('錐管進給','全程維持錐度　禁純橫向','vr');
+  }
+  t3+=S('內牙專項');
+  t3+=R('複式滑板方向','與外牙相反，確認偏轉方向','vw');
+  t3+=R('鏜刀剛性','刀桿盡量短，減少讓刀','v');
+  t3+=R('精修量測','每刀量後決定下一刀進量','v');
+  document.getElementById('t3').innerHTML=t3;
+
+  document.getElementById('results').classList.add('show');
+}
+
+onSys();
+</script>
+</body>
+</html>
