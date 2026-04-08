@@ -41,7 +41,7 @@
     .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
     .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
     .tool-card{position:relative;background:linear-gradient(135deg,rgba(26,58,92,0.7) 0%,rgba(13,27,46,0.9) 100%);border:1px solid var(--border);border-radius:4px;padding:24px 24px 20px;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;overflow:hidden;animation:fadeUp 0.4s ease both}
-    .tool-card:nth-child(1){animation-delay:0.05s}.tool-card:nth-child(2){animation-delay:0.10s}.tool-card:nth-child(3){animation-delay:0.15s}.tool-card:nth-child(4){animation-delay:0.20s}.tool-card:nth-child(5){animation-delay:0.25s}.tool-card:nth-child(6){animation-delay:0.30s}.tool-card:nth-child(7){animation-delay:0.35s}
+    .tool-card:nth-child(1){animation-delay:0.05s}.tool-card:nth-child(2){animation-delay:0.10s}.tool-card:nth-child(3){animation-delay:0.15s}.tool-card:nth-child(4){animation-delay:0.20s}.tool-card:nth-child(5){animation-delay:0.25s}.tool-card:nth-child(6){animation-delay:0.30s}.tool-card:nth-child(7){animation-delay:0.35s}.tool-card:nth-child(8){animation-delay:0.40s}.tool-card:nth-child(9){animation-delay:0.45s}.tool-card:nth-child(10){animation-delay:0.50s}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
     .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity 0.3s}
     .tool-card:hover{border-color:rgba(58,143,212,0.6);transform:translateY(-3px);box-shadow:0 12px 36px var(--shadow)}
@@ -157,7 +157,7 @@
   </section>
 
   <section class="tools-section">
-    <div class="section-label">工具總覽 — 7 items</div>
+    <div class="section-label">工具總覽 — 10 items</div>
     <div class="tools-grid">
       <a class="tool-card" href="./材料計算機.html">
         <div class="card-number">01 / 07</div>
@@ -206,6 +206,28 @@
         <span class="card-icon">📋</span>
         <div class="card-title">報價單產生器</div>
         <div class="card-desc">整合各項加工費用，自動彙整油壓缸完整報價單，支援列印輸出。</div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a class="tool-card" href="./鎖緊扭力表.html">
+        <div class="card-number">08 / 10</div>
+        <span class="card-icon">🔩</span>
+        <div class="card-title"><span class="title-full">鎖緊扭力表</span><span class="title-short">鎖緊扭力表</span></div>
+        <div class="card-desc">M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="tool-card" href="./螺紋加工計算機.html">
+        <div class="card-number">09 / 10</div>
+        <span class="card-icon">⚙️</span>
+        <div class="card-title"><span class="title-full">螺紋加工計算機</span><span class="title-short">螺紋加工</span></div>
+        <div class="card-desc">公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="tool-card" href="./硬度換算工具.html">
+        <div class="card-number">10 / 10</div>
+        <span class="card-icon">💎</span>
+        <div class="card-title"><span class="title-full">硬度換算工具</span><span class="title-short">硬度換算</span></div>
+        <div class="card-desc">HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。</div>
         <span class="card-arrow">→</span>
       </a>
     </div>
