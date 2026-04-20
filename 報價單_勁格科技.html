@@ -5,124 +5,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">報價單_勁格科技</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Oswald:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root {
-  --navy: #0d1b2a;
-  --steel: #1b2d42;
-  --mid: #2e4560;
-  --accent: #e8a020;
-  --accent2: #3db8e4;
-  --danger: #e05454;
-  --success: #2ecc71;
-  --light: #f4f6f9;
-  --border: #d0d7e2;
-  --text: #1a2535;
-  --muted: #6b7a90;
+  --navy: #2b3d4f;
+  --steel: #3a5068;
+  --mid: #4a6278;
+  --accent: #2e7aaa;
+  --accent2: #3a8fc4;
+  --danger: #a93226;
+  --success: #1e7e4e;
+  --light: #f5f7f9;
+  --border: #ccd6de;
+  --text: #1c2b35;
+  --muted: #607080;
   --white: #ffffff;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans TC', sans-serif; background: #eef1f7; color: var(--text); min-height: 100vh; }
+body { font-family: 'Noto Sans TC', sans-serif; background: #eaeff3; color: var(--text); min-height: 100vh; }
 
 /* ── TOP BAR ── */
 .top-bar {
   background: var(--navy);
   color: var(--white);
-  padding: 0 24px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 58px;
+  height: 50px;
   position: sticky; top: 0; z-index: 100;
-  border-bottom: 3px solid var(--accent);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
 }
-.top-bar-left { display: flex; align-items: center; gap: 14px; }
+.top-bar-left { display: flex; align-items: center; gap: 12px; }
 .logo-mark {
-  font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
-  color: var(--accent); letter-spacing: 2px;
-  border: 2px solid var(--accent); padding: 2px 9px; border-radius: 3px;
+  font-family: 'Noto Sans TC', sans-serif; font-size: 15px; font-weight: 700;
+  color: #ffffff; letter-spacing: 0.5px;
+  border: 1px solid rgba(255,255,255,0.4); padding: 3px 10px; border-radius: 2px;
 }
-.top-bar-title { font-size: 13px; color: #9ab0c8; letter-spacing: 1px; font-weight: 500; }
-.top-bar-right { display: flex; gap: 8px; }
+.top-bar-title { font-size: 12px; color: #8aaabb; letter-spacing: 0.3px; font-weight: 400; }
+.top-bar-right { display: flex; gap: 5px; }
 
 .btn {
-  border: none; border-radius: 4px; font-weight: 700; padding: 7px 14px;
-  cursor: pointer; font-size: 12px; letter-spacing: 0.5px;
-  display: inline-flex; align-items: center; gap: 5px;
+  border: none; border-radius: 2px; font-weight: 600; padding: 6px 12px;
+  cursor: pointer; font-size: 12px; letter-spacing: 0.2px;
+  display: inline-flex; align-items: center; gap: 4px;
   font-family: 'Noto Sans TC', sans-serif;
   transition: filter 0.15s, transform 0.1s;
 }
 .btn:hover { filter: brightness(1.1); }
 .btn:active { transform: scale(0.97); }
-.btn-accent  { background: var(--accent);  color: var(--navy); }
-.btn-info    { background: var(--accent2); color: var(--navy); }
-.btn-muted   { background: #334a63; color: #c5d4e3; }
-.btn-danger  { background: var(--danger);  color: white; }
+.btn-accent  { background: var(--accent); color: white; }
+.btn-info    { background: var(--accent2); color: white; }
+.btn-muted   { background: #4e6475; color: #dce8ef; }
+.btn-danger  { background: var(--danger); color: white; }
 .btn-success { background: var(--success); color: white; }
-.btn-dark    { background: var(--mid); color: #d0dce8; }
-.btn-print   { background: #455a72; color: white; }
-.btn-sm { padding: 4px 9px; font-size: 11px; }
+.btn-dark    { background: var(--mid); color: #dce8ef; }
+.btn-print   { background: #3a5068; color: white; }
+.btn-sm { padding: 4px 8px; font-size: 11px; }
 .btn-sym {
-  width: 22px; height: 22px; padding: 0; border-radius: 4px;
-  font-size: 15px; justify-content: center;
+  width: 22px; height: 22px; padding: 0; border-radius: 2px;
+  font-size: 14px; justify-content: center;
   transition: filter 0.15s, transform 0.1s;
 }
-.btn-sym:hover { filter: brightness(1.2); }
+.btn-sym:hover { filter: brightness(1.15); }
 .btn-sym:active { transform: scale(0.93); }
 
 /* ── MAIN WRAP ── */
-.wrap { max-width: 1580px; margin: 0 auto; padding: 20px 20px 40px; }
+.wrap { max-width: 1580px; margin: 0 auto; padding: 18px 18px 40px; }
 
 /* ── HEADER GRID ── */
 .doc-header {
-  background: var(--white); border-radius: 8px;
+  background: var(--white); border-radius: 4px;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-  padding: 14px 18px; margin-bottom: 16px;
-  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 12px 16px; margin-bottom: 12px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
 }
 .doc-header-section {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .doc-label {
   font-size: 11px; font-weight: 700; color: var(--muted);
-  letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+  letter-spacing: 0.5px; white-space: nowrap;
 }
 .doc-input {
-  border: 1px solid #c8d2df; border-radius: 4px; padding: 5px 10px;
+  border: 1px solid var(--border); border-radius: 2px; padding: 5px 9px;
   font-size: 13px; font-family: 'Noto Sans TC', sans-serif;
   color: var(--text); background: var(--light);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.15s;
 }
-.doc-input:focus { outline: none; border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(61,184,228,0.15); }
-.divider { width: 1px; height: 30px; background: var(--border); }
+.doc-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(46,122,170,0.12); }
+.divider { width: 1px; height: 28px; background: var(--border); }
 
 /* ── TABLE CONTAINER ── */
 .table-card {
-  background: var(--white); border-radius: 8px;
+  background: var(--white); border-radius: 4px;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-  overflow: hidden; margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  overflow: hidden; margin-bottom: 12px;
 }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 thead { background: var(--steel); }
 th {
-  color: var(--white); padding: 10px 6px; font-size: 12px; font-weight: 600;
-  text-align: center; border-right: 1px solid rgba(255,255,255,0.1);
-  letter-spacing: 0.5px; position: relative; white-space: nowrap;
+  color: var(--white); padding: 9px 6px; font-size: 12px; font-weight: 600;
+  text-align: center; border-right: 1px solid rgba(255,255,255,0.08);
+  letter-spacing: 0.3px; position: relative; white-space: nowrap;
 }
 th:last-child { border-right: none; }
-.th-accent { color: var(--accent); }
+.th-accent { color: #aad4ee; }
 
-tbody tr { border-bottom: 1px solid #e8ecf2; transition: background 0.1s; }
-tbody tr:hover { background: #f8fafd; }
+tbody tr { border-bottom: 1px solid #e2e8ee; transition: background 0.1s; }
+tbody tr:hover { background: #f2f6f9; }
 tbody tr:last-child { border-bottom: none; }
 td {
   padding: 6px 4px; vertical-align: middle; text-align: center;
-  border-right: 1px solid #edf0f5;
+  border-right: 1px solid #e8edf2;
 }
 td:last-child { border-right: none; }
 
@@ -131,14 +131,14 @@ input[type="number"] { -moz-appearance: textfield; -webkit-appearance: none; }
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .cell-input {
-  width: 100%; border: 1px solid #d4dbe5; border-radius: 3px;
-  padding: 4px 6px; font-size: 14px; text-align: right;
+  width: 100%; border: 1px solid var(--border); border-radius: 2px;
+  padding: 4px 5px; font-size: 13px; text-align: right;
   font-family: 'JetBrains Mono', monospace; background: var(--light);
-  color: var(--text); transition: border-color 0.2s;
+  color: var(--text); transition: border-color 0.15s;
 }
-.cell-input:focus { outline: none; border-color: var(--accent2); background: white; }
+.cell-input:focus { outline: none; border-color: var(--accent); background: white; }
 .name-input {
-  width: 95%; border: 1px solid #d4dbe5; border-radius: 3px;
+  width: 95%; border: 1px solid var(--border); border-radius: 2px;
   padding: 4px 6px; font-size: 13px; font-weight: 600; text-align: center;
   background: var(--light); color: var(--text); font-family: 'Noto Sans TC', sans-serif;
   min-width: 70px; word-break: break-all;
@@ -146,37 +146,37 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-app
 
 /* ── NAME SELECT ── */
 .name-select {
-  width: 95%; border: 1px solid #d4dbe5; border-radius: 3px;
+  width: 95%; border: 1px solid var(--border); border-radius: 2px;
   padding: 4px 4px; font-size: 13px; font-weight: 600; text-align: center;
-  background: #f0f4f8; color: #1a2a3a; font-family: 'Noto Sans TC', sans-serif;
+  background: var(--light); color: var(--text); font-family: 'Noto Sans TC', sans-serif;
   cursor: pointer;
 }
-.name-select:focus { outline: none; border-color: var(--accent2); background: white; }
+.name-select:focus { outline: none; border-color: var(--accent); background: white; }
 
 .row-total {
   font-family: 'JetBrains Mono', monospace; font-weight: 700;
-  color: var(--danger); font-size: 15px; background: #fff8f8;
+  color: var(--text); font-size: 14px; background: #eef2f5;
   min-width: 80px;
 }
 
 /* ── PROCESS COLUMN HEADER ── */
 .process-header { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 4px 0; }
 .process-input {
-  width: 88%; font-size: 13px; font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.4); border-radius: 3px;
-  background: rgba(13,27,42,0.7); color: white;
+  width: 88%; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.3); border-radius: 2px;
+  background: rgba(43,61,79,0.7); color: white;
   text-align: center; padding: 3px 4px; font-family: 'Noto Sans TC', sans-serif;
 }
-.process-input:focus { outline: none; background: rgba(13,27,42,0.9); }
+.process-input:focus { outline: none; background: rgba(43,61,79,0.9); }
 .process-select {
-  width: 88%; font-size: 12px; font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.4); border-radius: 3px;
-  background: rgba(13,27,42,0.8); color: white;
+  width: 88%; font-size: 12px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 2px;
+  background: rgba(43,61,79,0.75); color: white;
   text-align: center; padding: 3px 4px; font-family: 'Noto Sans TC', sans-serif;
   cursor: pointer;
 }
-.process-select option { background: #1a2a3a; color: white; }
-.process-select:focus { outline: none; background: rgba(13,27,42,0.95); }
+.process-select option { background: var(--navy); color: white; }
+.process-select:focus { outline: none; background: rgba(43,61,79,0.95); }
 .op-btns-row { display: flex; gap: 5px; }
 
 
@@ -235,29 +235,29 @@ select:focus { outline: none; border-color: var(--accent2); }
 .calc-item input { width: 60px !important; height: 22px; font-size: 12px; padding: 2px 4px !important; border: 1px solid #d4dbe5; border-radius: 3px; background: var(--light); font-family: 'JetBrains Mono', monospace; text-align: right; }
 
 .mat-fee-chip {
-  background: linear-gradient(135deg, #fff0f0, #ffe8e8);
-  border: 1px solid #f0c8c8; border-radius: 12px;
-  padding: 2px 10px; font-size: 13px; font-weight: 700;
-  color: var(--danger); margin-top: 2px;
+  background: #eef2f5;
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: 2px 8px; font-size: 12px; font-weight: 700;
+  color: var(--text); margin-top: 2px;
   font-family: 'JetBrains Mono', monospace;
 }
 .print-only-text { display: none; }
 
 /* ── TOTAL BAR ── */
 .total-bar {
-  background: linear-gradient(135deg, var(--navy), var(--steel));
-  border-radius: 8px; padding: 16px 24px;
+  background: #2c3e50;
+  border-radius: 6px; padding: 14px 22px;
   display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 4px 16px rgba(13,27,42,0.3);
-  border: 1px solid rgba(232,160,32,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  border: none;
 }
-.total-label { color: #9ab0c8; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+.total-label { color: #aab8c2; font-size: 13px; letter-spacing: 0.5px; font-weight: 500; }
 .total-value {
-  font-family: 'JetBrains Mono', monospace; font-size: 28px;
-  font-weight: 700; color: var(--accent);
-  text-shadow: 0 0 20px rgba(232,160,32,0.4);
+  font-family: 'JetBrains Mono', monospace; font-size: 26px;
+  font-weight: 700; color: #ffffff;
+  text-shadow: none;
 }
-.total-value span { font-size: 16px; margin-right: 4px; opacity: 0.8; }
+.total-value span { font-size: 15px; margin-right: 4px; opacity: 0.8; }
 
 /* ── ACTION BAR ── */
 .action-bar {
@@ -282,10 +282,10 @@ select:focus { outline: none; border-color: var(--accent2); }
 }
 @keyframes modalIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .modal-title {
-  font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 600;
+  font-family: 'Noto Sans TC', sans-serif; font-size: 16px; font-weight: 700;
   color: var(--navy); margin-bottom: 16px;
   border-bottom: 2px solid var(--accent); padding-bottom: 8px;
-  letter-spacing: 1px;
+  letter-spacing: 0.3px;
 }
 .save-name-row { display: flex; gap: 8px; margin-bottom: 16px; }
 .save-name-input {
@@ -328,60 +328,87 @@ select:focus { outline: none; border-color: var(--accent2); }
 
 /* ── PRINT STYLES ── */
 @media print {
-  @page { size: A4 portrait; margin: 0.7cm 0.6cm; }
-  body { background: white; }
+  @page { size: A4 portrait; margin: 0.6cm 0.6cm; }
+  body { background: white; font-family: 'Noto Sans TC', sans-serif; font-size: 10px; }
   .top-bar, .action-bar, .modal-overlay { display: none !important; }
   .wrap { padding: 0; max-width: 100%; }
-  .table-card { box-shadow: none; border: 1px solid #ccc; }
-  .doc-header { border: 1px solid #ccc; box-shadow: none; background: white; }
+  .table-card { box-shadow: none; border: none; }
+  .doc-header { border: 1px solid #888; box-shadow: none; background: white; padding: 5px 10px; margin-bottom: 6px; }
 
-  /* Print company header */
   .print-company-header { display: block !important; }
 
-  /* Auto-fit table to A4 */
-  table { table-layout: fixed; width: 100%; font-size: 11px; }
+  /* 欄寬 */
+  table { table-layout: fixed; width: 100%; font-size: 10px; border-collapse: collapse; }
   thead th:nth-child(1) { width: 11% !important; }
-  thead th:nth-child(2) { width: 20% !important; }
-  thead th:last-child  { width: 10% !important; }
+  thead th:nth-child(2) { width: 5% !important; }
+  thead th:nth-child(3) { width: 21% !important; }
+  thead th:last-child  { width: 9% !important; }
   .proc-col { min-width: 0 !important; width: auto !important; }
 
-  th { background: #1b2d42 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 11px !important; color: white !important; padding: 6px 3px !important; }
-  td { font-size: 11px !important; border-color: #ccc; padding: 4px 3px !important; }
+  /* 表頭：白底黑字 */
+  th {
+    background: white !important;
+    color: #111 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 4px 3px !important;
+    border: 1px solid #333 !important;
+    text-align: center;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  td {
+    font-size: 10px !important;
+    border: 1px solid #aaa !important;
+    padding: 3px 3px !important;
+    vertical-align: middle;
+    word-break: break-word;
+  }
+  tbody tr:nth-child(odd) td { background: #f8f8f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  tbody tr:nth-child(even) td { background: white !important; }
+
   thead { display: table-header-group; }
   tr { page-break-inside: avoid; }
 
-  .cell-input, .name-input { border: none !important; background: transparent !important; font-size: 11px !important; }
+  .cell-input { border: none !important; background: transparent !important; font-size: 10px !important; }
   select, .btn, .btn-sym, .op-col, .name-select, .process-select { display: none !important; }
   .proc-custom { display: none !important; }
   .name-custom { display: none !important; }
-  .process-print { display: block !important; font-size: 11px; font-weight: 700; color: white; }
-  .name-print { display: block !important; font-size: 12px; font-weight: 700; }
+  .process-print { display: block !important; font-size: 10px; font-weight: 700; color: #111; }
+  .name-print { display: block !important; font-size: 11px; font-weight: 700; color: #111; }
 
-  /* Material column: hide interactive elements, show print summary */
+  /* 材料欄 */
   .mat-row, .mat-inputs-wrapper, .mat-calc-row { display: none !important; }
   .mat-print-summary {
     display: flex !important; flex-direction: column; align-items: center;
-    gap: 2px; padding: 3px 2px; font-size: 11px; line-height: 1.4;
+    gap: 1px; padding: 2px 2px; line-height: 1.4;
   }
-  .mat-print-summary .ps-mat  { font-weight: 700; color: #1a2535; }
-  .mat-print-summary .ps-spec { color: #334455; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
-  .mat-print-summary .ps-fee  { font-weight: 700; color: #e05454; }
+  .mat-print-summary .ps-mat  { font-size: 10px; font-weight: 700; color: #111; }
+  .mat-print-summary .ps-spec { font-size: 9px; color: #333; font-family: 'JetBrains Mono', monospace; }
+  .mat-print-summary .ps-fee  { font-size: 10px; font-weight: 700; color: #111; }
 
-  .mat-fee-chip { border: 1px solid #f0c8c8; font-size: 11px; }
-  .total-bar { background: #1b2d42 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .total-value { color: var(--accent) !important; font-size: 18px !important; }
-  .row-total { background: #fff8f8 !important; font-size: 13px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .doc-label { font-size: 11px !important; }
-  .doc-input { font-size: 12px !important; border: none !important; background: transparent !important; }
+  /* 總計 */
+  .total-bar { background: white !important; border: 1.5px solid #111 !important; box-shadow: none !important; margin-top: 4px; border-radius: 0 !important; padding: 5px 10px !important; }
+  .total-label { color: #111 !important; font-size: 10px !important; font-weight: 700; letter-spacing: 0 !important; }
+  .total-value { color: #111 !important; font-size: 16px !important; text-shadow: none !important; }
+  .total-value span { font-size: 11px !important; }
+
+  /* 備註 */
+  #remarkText { border: none !important; background: transparent !important; resize: none; font-size: 10px !important; padding: 0 !important; line-height: 1.5; }
+  .remark-box { border: 1px solid #666 !important; box-shadow: none !important; padding: 6px 10px !important; margin-top: 6px !important; border-radius: 0 !important; }
+  .remark-label { border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-bottom: 3px; font-size: 10px !important; font-weight: 700; color: #444 !important; }
+  .row-total { font-size: 11px !important; font-weight: 700; }
+  .doc-label { font-size: 10px !important; font-weight: 700; color: #555 !important; }
+  .doc-input { font-size: 11px !important; border: none !important; background: transparent !important; font-weight: 600; }
 }
 
 /* ── PRINT COMPANY HEADER ── */
 .print-company-header {
-  display: none; text-align: center; margin-bottom: 14px;
-  border-bottom: 3px double #333; padding-bottom: 10px;
+  display: none; text-align: center; margin-bottom: 6px;
+  border-bottom: 1.5px solid #333; padding-bottom: 5px;
 }
-.print-company-header h1 { font-size: 22px; margin-bottom: 4px; font-family: 'Oswald', sans-serif; letter-spacing: 2px; }
-.print-company-header p { font-size: 13px; color: #555; letter-spacing: 1px; }
+.print-company-header h1 { font-size: 16px; margin-bottom: 2px; font-family: 'Noto Sans TC', sans-serif; font-weight: 700; letter-spacing: 0.5px; }
+.print-company-header p { font-size: 10px; color: #555; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
@@ -421,28 +448,39 @@ select:focus { outline: none; border-color: var(--accent2); }
     </div>
     <div class="divider"></div>
     <div class="doc-header-section">
+      <span class="doc-label">案號</span>
+      <input type="text" class="doc-input" id="caseId" style="width:120px;" placeholder="選填">
+    </div>
+    <div class="divider"></div>
+    <div class="doc-header-section">
       <span class="doc-label">報價日期</span>
       <input type="date" class="doc-input" id="docDate" oninput="updateFileName()">
     </div>
     <div class="divider"></div>
     <div class="doc-header-section">
-      <span class="doc-label">內徑</span>
-      <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
-      <input type="number" class="doc-input dim-a" style="width:60px;" oninput="validNum(this)" placeholder="mm">
-      <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
-      <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
-      <input type="number" class="doc-input dim-b" style="width:60px;" oninput="validNum(this)" placeholder="mm">
-      <span class="doc-label">軸徑</span>
-      <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
-      <input type="number" class="doc-input dim-a" style="width:60px;" oninput="validNum(this)" placeholder="mm">
-      <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
-      <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
-      <input type="number" class="doc-input dim-b" style="width:60px;" oninput="validNum(this)" placeholder="mm">
-      <span class="doc-label">行程</span>
-      <input type="number" class="doc-input dim-a" style="width:65px;" oninput="validNum(this)" placeholder="mm">
-      <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
-      <input type="number" class="doc-input dim-b" style="width:65px;" oninput="validNum(this)" placeholder="mm">
-      <span class="doc-label">st</span>
+      <span class="dim-group" id="dimGroup0">
+        <span class="doc-label">內徑</span>
+        <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
+        <input type="number" class="doc-input dim-a" style="width:60px;" oninput="validNum(this)" placeholder="mm">
+        <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
+        <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
+        <input type="number" class="doc-input dim-b" style="width:60px;" oninput="validNum(this)" placeholder="mm">
+      </span>
+      <span class="dim-group" id="dimGroup1">
+        <span class="doc-label">軸徑</span>
+        <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
+        <input type="number" class="doc-input dim-a" style="width:60px;" oninput="validNum(this)" placeholder="mm">
+        <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
+        <span style="font-size:16px;font-weight:700;color:var(--steel);margin-right:1px;">⌀</span>
+        <input type="number" class="doc-input dim-b" style="width:60px;" oninput="validNum(this)" placeholder="mm">
+      </span>
+      <span class="dim-group" id="dimGroup2">
+        <span class="doc-label">行程</span>
+        <input type="number" class="doc-input dim-a" style="width:65px;" oninput="validNum(this)" placeholder="mm">
+        <span class="dim-slash" style="color:var(--muted);font-weight:700;">/</span>
+        <input type="number" class="doc-input dim-b" style="width:65px;" oninput="validNum(this)" placeholder="mm">
+        <span class="doc-label">st</span>
+      </span>
     </div>
   </div>
 
@@ -471,6 +509,7 @@ select:focus { outline: none; border-color: var(--accent2); }
         <thead>
           <tr id="headerRow">
             <th style="width:120px;">品名</th>
+            <th style="width:44px;">數量</th>
             <th style="width:160px;">材料規格 / 重量 / 費用</th>
             <th class="th-accent">小計 (NT$)</th>
           </tr>
@@ -478,6 +517,15 @@ select:focus { outline: none; border-color: var(--accent2); }
         <tbody id="tableBody"></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- REMARK -->
+  <div class="remark-box" style="background:var(--white);border-radius:8px;border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 18px;margin-top:16px;">
+    <div class="remark-label" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:8px;">備註 REMARKS</div>
+    <textarea id="remarkText" rows="4"
+      style="width:100%;border:1px solid #d4dbe5;border-radius:4px;padding:8px 10px;font-size:13px;font-family:'Noto Sans TC',sans-serif;color:var(--text);background:var(--light);resize:vertical;line-height:1.6;"
+      oninput="triggerAutosave()"
+      placeholder="交期、付款條件、有效期限、其他說明…"></textarea>
   </div>
 
 </div>
@@ -560,35 +608,58 @@ window.onload = () => {
   loadOptions();
   _initializing = true;
 
-  const saved = getAutosave();
-  if (saved) {
-    // 有備份 → 直接還原，不詢問
-    restoreState(saved.data);
-    showToast(`↩ 已還原上次工作狀態（${saved.ts}）`);
-  } else {
-    // 第一次開啟，沒有備份 → 載入預設值
-    document.getElementById('docDate').valueAsDate = new Date();
-    DEFAULT_PROCESSES.forEach(p => addProcess(p));
-    DEFAULT_ITEMS.forEach(i => addItem(i));
-    updateFileName();
-  }
+  // 每次開啟都是空白預設狀態（固定欄位數維持 A4 比例）
+  document.getElementById('docDate').valueAsDate = new Date();
+  for (let i = 0; i < 6; i++) addProcess('');
+  for (let i = 0; i < 7; i++) addItem('');
+  updateFileName();
 
   _initializing = false;
 };
 
 window.onbeforeprint = () => {
+  // 隱藏 dim-slash（原有邏輯）
   const slashes = document.querySelectorAll('.dim-slash');
   slashes.forEach(slash => {
     const a = slash.previousElementSibling;
-    // a might be a ⌀ span, actual input is before that
     const aInput = (a && a.tagName === 'SPAN') ? a.previousElementSibling : a;
-    const bSpan = slash.nextElementSibling; // could be ⌀ span or input
+    const bSpan = slash.nextElementSibling;
     const bInput = (bSpan && bSpan.tagName === 'SPAN') ? bSpan.nextElementSibling : bSpan;
     const aVal = aInput && aInput.value ? aInput.value.trim() : '';
     const bVal = bInput && bInput.value ? bInput.value.trim() : '';
     const show = aVal && bVal;
     slash.style.display = show ? '' : 'none';
     if (bSpan && bSpan.tagName === 'SPAN') bSpan.style.display = show ? '' : 'none';
+  });
+  // 內徑 / 軸徑 / 行程：整組沒有任何輸入值就隱藏
+  ['dimGroup0','dimGroup1','dimGroup2'].forEach(id => {
+    const grp = document.getElementById(id);
+    if (!grp) return;
+    const hasVal = Array.from(grp.querySelectorAll('input')).some(i => i.value.trim() !== '');
+    grp.style.display = hasVal ? '' : 'none';
+  });
+  // 數量欄整欄隱藏
+  const qtyTh = document.querySelector('#headerRow th:nth-child(2)');
+  if (qtyTh) qtyTh.style.display = 'none';
+  document.querySelectorAll('.qty-input').forEach(i => i.closest('td').style.display = 'none');
+  // 數量 > 1 → 品名加 ×N；品名空白 → 整列數字清空
+  document.querySelectorAll('.item-row').forEach(row => {
+    const nameEl = row.querySelector('.name-select, .name-custom-active');
+    const hasName = nameEl && nameEl.value.trim() !== '';
+    const qty = Number(row.querySelector('.qty-input').value) || 1;
+    const namePrint = row.querySelector('.name-print');
+    if (hasName && qty > 1 && namePrint) {
+      namePrint.dataset._savedName = namePrint.innerText;
+      namePrint.innerText = namePrint.innerText + ' ×' + qty;
+    }
+    if (!hasName) {
+      // 清空所有數字輸入和小計
+      row.querySelectorAll('.val').forEach(i => { i.dataset._sv = i.value; i.value = ''; });
+      const rt = row.querySelector('.row-total');
+      if (rt) { rt.dataset._sv = rt.innerText; rt.innerText = ''; }
+      const ps = row.querySelector('.mat-print-summary');
+      if (ps) ps.dataset._hide = '1', ps.style.visibility = 'hidden';
+    }
   });
 };
 
@@ -597,6 +668,27 @@ window.onafterprint = () => {
     slash.style.display = '';
     const bSpan = slash.nextElementSibling;
     if (bSpan && bSpan.tagName === 'SPAN') bSpan.style.display = '';
+  });
+  ['dimGroup0','dimGroup1','dimGroup2'].forEach(id => {
+    const grp = document.getElementById(id);
+    if (grp) grp.style.display = '';
+  });
+  // 還原數量欄
+  const qtyTh2 = document.querySelector('#headerRow th:nth-child(2)');
+  if (qtyTh2) qtyTh2.style.display = '';
+  document.querySelectorAll('.qty-input').forEach(i => i.closest('td').style.display = '');
+  // 還原品名與空白列數字
+  document.querySelectorAll('.item-row').forEach(row => {
+    const namePrint = row.querySelector('.name-print');
+    if (namePrint && namePrint.dataset._savedName !== undefined) {
+      namePrint.innerText = namePrint.dataset._savedName;
+      delete namePrint.dataset._savedName;
+    }
+    row.querySelectorAll('.val').forEach(i => { if (i.dataset._sv !== undefined) { i.value = i.dataset._sv; delete i.dataset._sv; } });
+    const rt = row.querySelector('.row-total');
+    if (rt && rt.dataset._sv !== undefined) { rt.innerText = rt.dataset._sv; delete rt.dataset._sv; }
+    const ps = row.querySelector('.mat-print-summary');
+    if (ps && ps.dataset._hide) { ps.style.visibility = ''; delete ps.dataset._hide; }
   });
 };
 
@@ -629,11 +721,12 @@ function buildProcessHeader(name) {
     </div>
   </div>`;
   }
-  const selVal = name || PROCESS_OPTIONS[0];
+  const selVal = name || '';
+  const blankOpt = `<option value=""${!name?' selected':''}></option>`;
   const opts = PROCESS_OPTIONS.map(o => `<option value="${o}"${o===selVal?' selected':''}>${o}</option>`).join('');
   return `<div class="process-header">
     <select class="process-select" onchange="handleProcChange(this)">
-      ${opts}
+      ${blankOpt}${opts}
     </select>
     <span class="process-print" style="display:none;">${selVal}</span>
     <div class="op-btns-row">
@@ -641,6 +734,15 @@ function buildProcessHeader(name) {
       <button class="btn btn-sym btn-danger" onclick="removeCol(this)">-</button>
     </div>
   </div>`;
+}
+
+function syncQtyWithName(row) {
+  const nameEl = row.querySelector('.name-select, .name-custom-active');
+  const qtyInput = row.querySelector('.qty-input');
+  if (!qtyInput) return;
+  const hasName = nameEl && nameEl.value.trim() !== '';
+  if (hasName && qtyInput.value === '') qtyInput.value = 1;
+  if (!hasName) qtyInput.value = '';
 }
 
 function syncProcPrint(el) {
@@ -671,14 +773,13 @@ function handleProcChange(el) {
 function switchToProcSelect(input) {
   const div = input.closest('.process-header');
   const print = div.querySelector('.process-print');
-  const selVal = PROCESS_OPTIONS[0];
-  const opts = PROCESS_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
+  const opts = `<option value="" selected></option>` + PROCESS_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
   const sel = document.createElement('select');
   sel.className = 'process-select';
   sel.innerHTML = opts;
   sel.onchange = function(){ handleProcChange(this); };
   div.replaceChild(sel, input);
-  print.innerText = selVal;
+  print.innerText = '';
 }
 
 function getProcessName(th) {
@@ -717,8 +818,9 @@ function removeCol(btn) {
 function getMatTemplate() {
   return `<div class="mat-spec-box">
     <div class="mat-row">
-      <div class="print-only-text">SS400</div>
+      <div class="print-only-text"></div>
       <select class="mat-select mat-type" onchange="syncPrintText(this);toggleOther(this);calcWeight(this)">
+        <option value="">-- 材料 --</option>
         <optgroup label="── 碳鋼 ──">
           <option value="SS400">SS400</option>
           <option value="S45C">S45C</option>
@@ -759,9 +861,9 @@ function getMatTemplate() {
         </optgroup>
       </select>
       <input type="text" class="other-mat-input" placeholder="名稱" oninput="syncPrintText(this)">
-      <div class="print-only-text">方料</div>
+      <div class="print-only-text"></div>
       <select class="mat-select mat-shape" onchange="syncPrintText(this);updateMatInput(this)">
-        <option value="box">方料</option><option value="round">圓料</option>
+        <option value="">-- 形狀 --</option><option value="box">方料</option><option value="round">圓料</option>
         <option value="tube">鋼管</option><option value="none">不計重</option>
       </select>
     </div>
@@ -772,13 +874,13 @@ function getMatTemplate() {
     </div>
     <div class="mat-calc-row">
       <div class="calc-item weight-row"><span>重:</span><input type="number" class="mat-wgt" readonly><span>kg</span></div>
-      <div class="calc-item"><span>單價:</span><input type="number" class="mat-uprice" oninput="calcWeight(this)" value="0"></div>
+      <div class="calc-item"><span>單價:</span><input type="number" class="mat-uprice" oninput="calcWeight(this)" placeholder="0"></div>
       <div class="mat-fee-chip">材料費: NT$ <span class="mat-final-fee">0</span></div>
     </div>
     <div class="mat-print-summary">
-      <span class="ps-mat">SS400</span>
+      <span class="ps-mat"></span>
       <span class="ps-spec"></span>
-      <span class="ps-fee">材料費: NT$ 0</span>
+      <span class="ps-fee"></span>
     </div>
   </div>`;
 }
@@ -798,7 +900,11 @@ function updateMatInput(sel) {
   const weightRow = box.querySelector('.weight-row');
   const priceLabel = box.querySelector('.mat-calc-row .calc-item:nth-child(2) span');
   const type = sel.value;
-  if (type === 'none') {
+  if (type === '') {
+    wrapper.style.visibility = 'hidden';
+    weightRow.style.display = 'none';
+    if (priceLabel) priceLabel.innerText = '單價:';
+  } else if (type === 'none') {
     wrapper.style.visibility = 'hidden';
     weightRow.style.display = 'none';
     if (priceLabel) priceLabel.innerText = '直填:';
@@ -827,7 +933,11 @@ function calcWeight(el) {
   const dims = Array.from(box.querySelectorAll('.dim')).map(i => Number(i.value) || 0);
   const uprice = Number(box.querySelector('.mat-uprice').value) || 0;
   let fee = 0;
-  if (shape === 'none') {
+  if (shape === '') {
+    box.querySelector('.mat-wgt').value = '';
+    box.querySelector('.mat-final-fee').innerText = 0;
+    updatePrintSummary(box); calc(); return;
+  } else if (shape === 'none') {
     box.querySelector('.mat-wgt').value = 0;
     fee = uprice;
   } else {
@@ -863,7 +973,7 @@ function updatePrintSummary(box) {
   ps.querySelector('.ps-mat').innerText = matLabel;
   ps.querySelector('.ps-spec').innerText = specStr;
   ps.querySelector('.ps-spec').style.display = specStr ? 'block' : 'none';
-  ps.querySelector('.ps-fee').innerText = `材料費: NT$ ${Number(fee).toLocaleString()}`;
+  ps.querySelector('.ps-fee').innerText = fee > 0 ? `NT$ ${Number(fee).toLocaleString()}` : '';
 }
 
 function syncPrintText(el) {
@@ -892,11 +1002,12 @@ function buildNameCell(name) {
     </div>
   </td>`;
   }
-  const selVal = name || NAME_OPTIONS[0];
+  const selVal = name || '';
+  const blankOpt = `<option value=""${!name?' selected':''}></option>`;
   const opts = NAME_OPTIONS.map(o => `<option value="${o}"${o===selVal?' selected':''}>${o}</option>`).join('');
   return `<td>
     <select class="name-select" onchange="handleNameChange(this)" style="width:100%;margin-bottom:3px;">
-      ${opts}
+      ${blankOpt}${opts}
     </select>
     <span class="name-print" style="display:none;">${selVal}</span>
     <div style="display:flex;gap:3px;justify-content:center;margin-top:4px;">
@@ -909,6 +1020,7 @@ function buildNameCell(name) {
 function syncNamePrint(el) {
   const td = el.closest('td');
   td.querySelector('.name-print').innerText = el.value;
+  syncQtyWithName(el.closest('tr'));
 }
 
 function handleNameChange(el) {
@@ -931,27 +1043,28 @@ function handleNameChange(el) {
   }
   syncNamePrint(el);
   const n = el.value;
+  const row2 = el.closest('tr');
   if (n === "油封" || n === "防塵套") {
-    const row = el.closest('tr');
-    const typeSel = row.querySelector('.mat-type');
-    const shapeSel = row.querySelector('.mat-shape');
+    const typeSel = row2.querySelector('.mat-type');
+    const shapeSel = row2.querySelector('.mat-shape');
     typeSel.value = "市購品"; shapeSel.value = "none";
     updateMatInput(shapeSel);
   }
+  syncQtyWithName(row2);
 }
 
 function switchToNameSelect(input) {
   const td = input.closest('td');
   const print = td.querySelector('.name-print');
-  const selVal = NAME_OPTIONS[0];
-  const opts = NAME_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
+  const opts = `<option value="" selected></option>` + NAME_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('');
   const sel = document.createElement('select');
   sel.className = 'name-select';
   sel.style.cssText = 'width:100%;margin-bottom:3px;';
   sel.innerHTML = opts;
   sel.onchange = function(){ handleNameChange(this); };
   td.replaceChild(sel, input);
-  print.innerText = selVal;
+  print.innerText = '';
+  syncQtyWithName(td.closest('tr'));
 }
 
 function getRowName(row) {
@@ -963,7 +1076,7 @@ function getRowName(row) {
 
 function buildRowHTML(name) {
   const pCount = document.getElementById('headerRow').querySelectorAll('.proc-col').length;
-  let html = buildNameCell(name) + `<td>${getMatTemplate()}</td>`;
+  let html = buildNameCell(name) + `<td><input type="number" class="cell-input qty-input" value="1" min="1" style="width:36px;text-align:center;" oninput="validNum(this);calc()"></td>` + `<td>${getMatTemplate()}</td>`;
   for (let i = 0; i < pCount; i++) html += `<td><input type="number" class="cell-input val" value="0" style="width:72px;" oninput="calc()"></td>`;
   html += `<td class="row-total">0</td>`;
   return html;
@@ -999,6 +1112,8 @@ function calc() {
     let s = 0;
     r.querySelectorAll('.val').forEach(i => s += Number(i.value) || 0);
     s += Number(r.querySelector('.mat-final-fee').innerText) || 0;
+    const qty = Number(r.querySelector('.qty-input').value) || 1;
+    s = s * qty;
     r.querySelector('.row-total').innerText = s.toLocaleString();
     gt += s;
   });
@@ -1135,9 +1250,11 @@ function closeModal(id) {
 
 /* ── STATE CAPTURE / RESTORE ── */
 function captureState() {
-  const state = { custId: '', docDate: '', dims: [], processes: [], rows: [] };
+  const state = { custId: '', docDate: '', dims: [], processes: [], rows: [], remark: '' };
   state.custId = document.getElementById('custId').value;
+  state.caseId = document.getElementById('caseId').value;
   state.docDate = document.getElementById('docDate').value;
+  state.remark = document.getElementById('remarkText').value;
   document.querySelectorAll('.doc-input').forEach((el, i) => {
     if (i >= 2) state.dims.push(el.value);
   });
@@ -1153,6 +1270,7 @@ function captureState() {
     r.otherMat = box.querySelector('.other-mat-input').value;
     r.dims = Array.from(box.querySelectorAll('.dim')).map(i => i.value);
     r.uprice = box.querySelector('.mat-uprice').value;
+    r.qty = row.querySelector('.qty-input').value;
     r.vals = Array.from(row.querySelectorAll('.val')).map(i => i.value);
     state.rows.push(r);
   });
@@ -1165,7 +1283,9 @@ function restoreState(state) {
   document.querySelectorAll('.proc-col').forEach(th => th.remove());
 
   document.getElementById('custId').value = state.custId || '';
+  document.getElementById('caseId').value = state.caseId || '';
   document.getElementById('docDate').value = state.docDate || '';
+  document.getElementById('remarkText').value = state.remark || '';
   const dimInputs = document.querySelectorAll('.doc-input');
   (state.dims || []).forEach((v, i) => { if (dimInputs[i+2]) dimInputs[i+2].value = v; });
   updateFileName();
@@ -1179,15 +1299,16 @@ function restoreState(state) {
     const box = row.querySelector('.mat-spec-box');
     const typeSel = box.querySelector('.mat-type');
     const shapeSel = box.querySelector('.mat-shape');
-    typeSel.value = r.matType || 'SS400';
+    typeSel.value = r.matType || '';
     toggleOther(typeSel);
-    shapeSel.value = r.matShape || 'box';
+    shapeSel.value = r.matShape || '';
     updateMatInput(shapeSel);
     if (r.otherMat) box.querySelector('.other-mat-input').value = r.otherMat;
     const dimEls = box.querySelectorAll('.dim');
     (r.dims || []).forEach((v, i) => { if (dimEls[i]) dimEls[i].value = v; });
-    box.querySelector('.mat-uprice').value = r.uprice || 0;
+    box.querySelector('.mat-uprice').value = r.uprice || '';
     calcWeight(box.querySelector('.mat-uprice'));
+    row.querySelector('.qty-input').value = r.qty || 1;
     const valEls = row.querySelectorAll('.val');
     (r.vals || []).forEach((v, i) => { if (valEls[i]) valEls[i].value = v; });
     calc();
