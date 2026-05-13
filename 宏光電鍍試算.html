@@ -404,7 +404,7 @@
       <span class="n-item">油缸 Ø400以上 或 長度≧3000mm 請估價</span>
       <span class="n-item">油缸著底無通請估價</span>
       <span class="n-item">CR15/20/25：Ø120＜D≦300 且 L＞3000mm 請估價</span>
-      <span class="n-item">退電再電單價 = 電鍍單價 + 1 元/in²</span>
+      <span class="n-item">純退電：1.6 元/in²；退電後再電鍍：退電 1 元/in² + 電鍍費分開計算</span>
       <span class="n-item">價格自 2025.1.13 起適用</span>
     </div>
   </div>
@@ -679,17 +679,22 @@ function calculate() {
           <div class="estimate-row">⚠ 超出試算範圍，請聯絡廠商估價</div>
         </div>`;
       } else if (baseInfo) {
-        const replateUnit = baseInfo.unitPrice + 1;
-        const fee = calcFee(areaIN2, { unitPrice: replateUnit, basePrice: baseInfo.basePrice });
-        total = fee;
+        const stripFee  = areaIN2 * 1;                          // 退電 1元/in²，無基本價
+        const plateFee  = calcFee(areaIN2, baseInfo);           // 電鍍 MAX(計算值, 基本價)
+        // 退電再電不顯示合計，明細各自列出即可
         html = `<div class="process-result">
           <div class="process-result-title">🔄 退電再電 <span class="process-badge">${activeCRLabel}</span></div>
           <div class="result-rows">${makeRows([
             ['側面積', `${fmtF(areaMM2)} mm²  /  ${fmtF(areaIN2,3)} in²`, false],
-            [`英吋單價（電鍍 ${baseInfo.unitPrice} + 退電 1）`, `${replateUnit} 元/in²`, false],
-            ['計算金額', fmt(areaIN2 * replateUnit), false],
-            ['基本價', fmt(baseInfo.basePrice), false],
           ])}</div>
+          <div class="total-row" style="margin-top:8px;">
+            <span class="t-label">⚡ 退電費（1 元/in²）</span>
+            <span class="t-val">${fmt(stripFee)}</span>
+          </div>
+          <div class="total-row" style="margin-top:6px;">
+            <span class="t-label">🔵 電鍍費（${baseInfo.unitPrice} 元/in²，基本價 ${fmt(baseInfo.basePrice)}）</span>
+            <span class="t-val">${fmt(plateFee)}</span>
+          </div>
         </div>`;
       }
     }
