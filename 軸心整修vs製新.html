@@ -160,7 +160,7 @@ const MAT_TABLE=[
   [30,326],[32,377],[35,451],[35.5,445],[36,449],[38,474],
   [38.1,479],[40,539],[45,612],[50,785],[50.8,836],[55,918],
   [56,954],[60,1081],[63,1224],[65,1387],[70,1734],[71,1977],
-  [75,1938],[80,2244],[85,2550],[90,2856],[95,3162],[100,3775]
+  [75,1938],[80,2244],[85,2550],[90,2856],[95,3162],[100,3775],[110,5091]
 ];
 function matPricePerM(D){
   let p=MAT_TABLE[0][1];
@@ -209,7 +209,8 @@ function calcNew(D,L,mat){
     const mp=matPricePerM(D);
     matFee=L*mp/1000;
     latheFee=latheChromeShaft(D);
-    rows=[['材料費',matFee],['車床費',latheFee],['銑床費',mill],['長度加價',lenA]];
+    if(D>65&&L>1000)latheFee=Math.round(latheFee*1.8);
+    rows=[['材料費',matFee],['車床費'+(D>65&&L>1000?' (×1.8)':''),latheFee],['銑床費',mill],['長度加價',lenA]];
     const total=matFee+latheFee+mill+lenA;
     return{total,rows};
   }
@@ -219,7 +220,7 @@ function calcNew(D,L,mat){
   const latheAdjFee=(D>99?800:0)+(D>149?500:0)+(D>199?500:0)+(D>249?500:0);
   // 研+電 @5.5元/in²
   const area=Math.PI*D*L/645;
-  plateFee=area*(D>250?6.5:5.5);
+  plateFee=Math.max(area*(D>250?6.5:5.5),650);
 
   if(mat==='s45c'){
     // 跑流程S45C：重量計料，無QT
