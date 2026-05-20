@@ -335,26 +335,29 @@ const PLATE_SPEC_FUKGEN = [2, 3, 4, 5, 6, 8, 9, 10, 12, 16, 19, 20, 22, 25, 28, 
 const PLATE_SPEC_GUAN   = [1.6, 2, 2.3, 3, 4, 4.5, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 19, 20, 22, 25, 28, 30, 32, 35, 38, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 155, 160, 170, 180, 190, 205, 220, 230, 265];
 
 const PLATE_PRICES = {
-  // 鐵板（四角板）：福源/冠華（113.09）
+  // 鐵板（四角板）：福源/冠華（114.04）冠華T≤150 +1
   square: [
-    {max:50,  fukgen:30, guan:31},
-    {max:85,  fukgen:31, guan:32},
+    {max:50,  fukgen:30, guan:32},
+    {max:85,  fukgen:31, guan:33},
+    {max:150, fukgen:37, guan:35},
     {max:165, fukgen:37, guan:34},
     {max:200, fukgen:38, guan:35},
     {max:265, fukgen:38, guan:38},
   ],
-  // 型體板：福源/冠華（113.09）
+  // 型體板：福源/冠華（114.04）冠華T≤150 +1
   profile: [
-    {max:50,  fukgen:31, guan:32},
-    {max:90,  fukgen:32, guan:33},
+    {max:50,  fukgen:31, guan:33},
+    {max:90,  fukgen:32, guan:34},
+    {max:150, fukgen:38, guan:36},
     {max:165, fukgen:38, guan:35},
     {max:200, fukgen:39, guan:36},
     {max:265, fukgen:39, guan:null},
   ],
-  // 圓板切孔（一孔）：福源/冠華（113.09）
+  // 圓板切孔（一孔）：福源/冠華（114.04）冠華T≤150 +1
   circle: [
-    {max:50,  fukgen:35, guan:35},
-    {max:90,  fukgen:36, guan:36},
+    {max:50,  fukgen:35, guan:36},
+    {max:90,  fukgen:36, guan:37},
+    {max:150, fukgen:42, guan:39},
     {max:165, fukgen:42, guan:38},
     {max:200, fukgen:43, guan:39},
     {max:265, fukgen:43, guan:null},
@@ -362,64 +365,118 @@ const PLATE_PRICES = {
   // 特殊鋼板：另洽梧濟/高碳，不自動帶單價
 };
 const BAR_PRICES = {
-  // 光圓鐵 SS400（光中碳+0.5元）
+  // 光圓鐵 SS400（光中碳+0.5元）建興 114.04 / 合興 115.03.30
   SS400_rnd: [
-    {max:10,   heXing:35,   jianXing:34.5, haoXing:null},
-    {max:50.8, heXing:31,   jianXing:31.5, haoXing:null},
-    {max:101.6,heXing:31,   jianXing:32.5, haoXing:null},
-    {max:999,  heXing:32,   jianXing:null, haoXing:null},
+    {max:10,   heXing:36,   jianXing:35.5, haoXing:null},
+    {max:50.8, heXing:32,   jianXing:32.5, haoXing:null},
+    {max:101.6,heXing:33,   jianXing:33.5, haoXing:null},
+    {max:999,  heXing:null, jianXing:null, haoXing:null},
   ],
-  // 光四角 SS400
+  // 光四角 SS400 建興 114.04 / 合興 115.03.30
   SS400_sq: [
-    {max:9.5,  heXing:null, jianXing:37.5, haoXing:null},
-    {max:38.1, heXing:33,   jianXing:33.5, haoXing:null},
-    {max:50.8, heXing:34,   jianXing:34.5, haoXing:null},
+    {max:9.5,  heXing:null, jianXing:38.5, haoXing:null},
+    {max:38.1, heXing:34,   jianXing:34.5, haoXing:null},
+    {max:50.8, heXing:35,   jianXing:35.5, haoXing:null},
   ],
-  // 光六角 SS400
+  // 光六角 SS400 建興 114.04 / 合興 115.03.30
   SS400_hex: [
-    {max:41,   heXing:33,   jianXing:33.5, haoXing:null},
-    {max:50,   heXing:34,   jianXing:34.5, haoXing:null},
-    {max:65,   heXing:42.5, jianXing:40.5, haoXing:null},
+    {max:41,   heXing:34,   jianXing:34.5, haoXing:null},
+    {max:50,   heXing:35,   jianXing:35.5, haoXing:null},
+    {max:65,   heXing:43.5, jianXing:41.5, haoXing:null},
   ],
-  // S45C 黑圓中碳
+  // S45C 黑圓中碳 建興 114.04（≤300 +1）/ 合興 115.03.30 / 豪星 115.04.15
   S45C_rnd: [
-    {max:48,   heXing:26,   jianXing:26,   haoXing:28},
-    {max:300,  heXing:22,   jianXing:22.5, haoXing:21},
-    {max:350,  heXing:28.5, jianXing:28,   haoXing:26.5},
-    {max:490,  heXing:30,   jianXing:30.5, haoXing:30},
-    {max:550,  heXing:31,   jianXing:33,   haoXing:null},
+    {max:38,   heXing:27,   jianXing:27,   haoXing:28},
+    {max:48,   heXing:27,   jianXing:27,   haoXing:23.5},
+    {max:120,  heXing:23,   jianXing:23.5, haoXing:23.5},
+    {max:300,  heXing:23,   jianXing:23.5, haoXing:24.5},
+    {max:350,  heXing:29.5, jianXing:28,   haoXing:28},
+    {max:420,  heXing:30,   jianXing:30.5, haoXing:31},
+    {max:490,  heXing:31,   jianXing:30.5, haoXing:31},
+    {max:550,  heXing:null, jianXing:33,   haoXing:null},
   ],
-  // 黑皮四角
+  // 黑皮四角 建興 114.04 / 合興 115.03.30
   SS400_sq_blk: [
-    {max:50.8, heXing:null, jianXing:32,   haoXing:null},
-    {max:140,  heXing:45.5, jianXing:46,   haoXing:null},
+    {max:50.8, heXing:null, jianXing:33,   haoXing:null},
+    {max:140,  heXing:46.5, jianXing:46,   haoXing:null},
   ],
-  // 黑皮圓鐵 S20C
+  // 黑皮圓鐵 S20C 建興 114.04 / 合興 115.03.30
   S20C_rnd: [
-    {max:60,   heXing:26,   jianXing:27,   haoXing:null},
-    {max:100,  heXing:27.5, jianXing:27.5, haoXing:null},
-    {max:300,  heXing:28,   jianXing:26,   haoXing:null},
-    {max:350,  heXing:null, jianXing:43,   haoXing:null},
+    {max:60,   heXing:27,   jianXing:28,   haoXing:null},
+    {max:100,  heXing:28.5, jianXing:27.5, haoXing:null},
+    {max:300,  heXing:29,   jianXing:26,   haoXing:null},
+    {max:370,  heXing:null, jianXing:36,   haoXing:null},
     {max:420,  heXing:null, jianXing:44,   haoXing:null},
   ],
-  // SCM440 紅十字
+  // SCM440 紅十字 建興 114.04 / 合興 115.03.30 / 豪星 115.04.15
   SCM440_rnd: [
-    {max:48,   heXing:31.5, jianXing:32.5, haoXing:33},
-    {max:300,  heXing:27.5, jianXing:29,   haoXing:26.5},
-    {max:460,  heXing:37.5, jianXing:37,   haoXing:32},
+    {max:38,   heXing:32.5, jianXing:33.5, haoXing:33},
+    {max:48,   heXing:32.5, jianXing:33.5, haoXing:28.5},
+    {max:120,  heXing:28.5, jianXing:30,   haoXing:28.5},
+    {max:300,  heXing:28.5, jianXing:30,   haoXing:29.5},
+    {max:350,  heXing:37.5, jianXing:37,   haoXing:32.5},
+    {max:430,  heXing:37.5, jianXing:37,   haoXing:35},
+    {max:460,  heXing:37.5, jianXing:37,   haoXing:null},
   ],
-  // SCM415 綠十字
+  // SCM415 綠十字 建興 114.04 / 合興 115.03.30
   SCM415_rnd: [
-    {max:48,   heXing:32.5, jianXing:32.5, haoXing:null},
-    {max:300,  heXing:29.5, jianXing:30,   haoXing:null},
+    {max:48,   heXing:33.5, jianXing:33.5, haoXing:null},
+    {max:300,  heXing:30.5, jianXing:31,   haoXing:null},
     {max:430,  heXing:null, jianXing:37,   haoXing:null},
   ],
-  // SNCM439 藍十字
+  // SNCM439 藍十字 / 豪星 115.04.15
   SNCM439_rnd: [
-    {max:220,  heXing:null, jianXing:61,   haoXing:56},
+    {max:200,  heXing:null, jianXing:61,   haoXing:60},
+    {max:220,  heXing:null, jianXing:61,   haoXing:null},
     {max:300,  heXing:null, jianXing:64,   haoXing:null},
   ],
+  // SUJ-2 軸承鋼 豪星 115.04.15
+  SUJ2_rnd: [
+    {max:110,  heXing:null, jianXing:null, haoXing:44},
+    {max:180,  heXing:null, jianXing:null, haoXing:51},
+  ],
+  // SKD-11 冷作模具鋼 豪星 115.04.15
+  SKD11_rnd: [
+    {max:48,   heXing:null, jianXing:null, haoXing:105},
+    {max:300,  heXing:null, jianXing:null, haoXing:102},
+  ],
 };
+// 豪星切工費（元/刀）115.04.15
+// 群組A: S45C / SCM440 / SCM415
+// 群組B: SNCM439 / SK-3 / SNCM-21
+// 群組C: SKD-11 / SKD-61 / SA-1
+// 長度加成：30~50mm ×1.2，20~30mm ×1.5，≤20mm ×2
+const HAO_XING_SAW_FEE = [
+  {max:50,  grpA:5,  grpB:7,   grpC:8},
+  {max:55,  grpA:6,  grpB:7,   grpC:8},
+  {max:60,  grpA:6,  grpB:7,   grpC:10},
+  {max:65,  grpA:7,  grpB:8,   grpC:10},
+  {max:70,  grpA:7,  grpB:8,   grpC:10},
+  {max:75,  grpA:8,  grpB:8,   grpC:10},
+  {max:80,  grpA:8,  grpB:10,  grpC:15},
+  {max:85,  grpA:9,  grpB:10,  grpC:15},
+  {max:90,  grpA:9,  grpB:10,  grpC:20},
+  {max:95,  grpA:10, grpB:12,  grpC:20},
+  {max:100, grpA:12, grpB:15,  grpC:25},
+  {max:110, grpA:12, grpB:15,  grpC:25},
+  {max:120, grpA:15, grpB:15,  grpC:30},
+  {max:130, grpA:15, grpB:20,  grpC:35},
+  {max:140, grpA:15, grpB:20,  grpC:40},
+  {max:150, grpA:20, grpB:25,  grpC:45},
+  {max:160, grpA:20, grpB:25,  grpC:50},
+  {max:170, grpA:20, grpB:30,  grpC:60},
+  {max:180, grpA:20, grpB:35,  grpC:65},
+  {max:190, grpA:25, grpB:35,  grpC:70},
+  {max:200, grpA:25, grpB:40,  grpC:80},
+  {max:210, grpA:30, grpB:50,  grpC:90},
+  {max:220, grpA:35, grpB:50,  grpC:95},
+  {max:230, grpA:40, grpB:60,  grpC:110},
+  {max:240, grpA:45, grpB:70,  grpC:120},
+  {max:250, grpA:50, grpB:80,  grpC:130},
+  {max:260, grpA:60, grpB:80,  grpC:150},
+  {max:280, grpA:70, grpB:90,  grpC:160},
+  {max:300, grpA:80, grpB:100, grpC:180},
+];
 const SUS_PIPE_PRICES = [
   {id:20,  od:25,  whole:1.92,  cut:2.112},
   {id:20,  od:30,  whole:3.18,  cut:3.498},
@@ -510,6 +567,8 @@ function lookupBarPrice(matCode, shape, dim) {
     else if(matCode==='SCM440') tbl=BAR_PRICES.SCM440_rnd;
     else if(matCode==='SCM415') tbl=BAR_PRICES.SCM415_rnd;
     else if(matCode==='SNCM439') tbl=BAR_PRICES.SNCM439_rnd;
+    else if(matCode==='SUJ2') tbl=BAR_PRICES.SUJ2_rnd;
+    else if(matCode==='SKD11') tbl=BAR_PRICES.SKD11_rnd;
   } else if(shape==='bar_sq') {
     if(matCode==='SS400') tbl=BAR_PRICES.SS400_sq;
     else if(matCode==='S45C_L'||matCode==='S45C_B') tbl=BAR_PRICES.S45C_rnd;
@@ -521,7 +580,24 @@ function lookupBarPrice(matCode, shape, dim) {
   if(!row) return null;
   const candidates = [{name:'合興',px:row.heXing},{name:'建興',px:row.jianXing},{name:'豪星',px:row.haoXing}].filter(x=>x.px);
   if(!candidates.length) return null;
-  return {best:candidates.reduce((a,b)=>a.px<b.px?a:b), all:candidates};
+  return {best:candidates.reduce((a,b)=>a.px>b.px?a:b), all:candidates};
+}
+
+// 豪星切工費查詢：回傳 {base, mult, fee, note, grpKey} 或 null
+function lookupSawFee(matCode, dia, length) {
+  let grpKey = null;
+  if(['S45C_L','S45C_B','S50C','SCM440','SCM415'].includes(matCode)) grpKey = 'grpA';
+  else if(matCode === 'SNCM439') grpKey = 'grpB';
+  else if(matCode === 'SKD11')   grpKey = 'grpC';
+  if(!grpKey || dia < 50) return null;
+  const row = HAO_XING_SAW_FEE.find(r => dia <= r.max);
+  if(!row) return null;
+  const base = row[grpKey];
+  let mult = 1.0, note = '';
+  if(length <= 20)      { mult = 2.0; note = '長≤20mm ×2倍'; }
+  else if(length <= 30) { mult = 1.5; note = '長≤30mm ×1.5倍'; }
+  else if(length <= 50) { mult = 1.2; note = '長≤50mm ×1.2倍'; }
+  return { base, mult, fee: Math.round(base * mult * 10) / 10, note, grpKey };
 }
 
 function lookupPlatePrice(thickness, matCode, plateType) {
@@ -538,7 +614,7 @@ function lookupPlatePrice(thickness, matCode, plateType) {
   }
   if(mc==='S50C') {
     const cands=[{name:'高碳',px:33},{name:'梧濟',px:38}];
-    return {best:cands.reduce((a,b)=>a.px<b.px?a:b), all:cands, confirm:true};
+    return {best:cands.reduce((a,b)=>a.px>b.px?a:b), all:cands, confirm:true};
   }
   if(mc==='SCM440') {
     const cands=[{name:'高碳',px:55}];
@@ -555,7 +631,7 @@ function lookupPlatePrice(thickness, matCode, plateType) {
     hasGuan && row.guan   ? {name:'冠華', px:row.guan}   : null,
   ].filter(Boolean);
   if(!candidates.length) return null;
-  return {best:candidates.reduce((a,b)=>a.px<b.px?a:b), all:candidates};
+  return {best:candidates.reduce((a,b)=>a.px>b.px?a:b), all:candidates};
 }
 
 // ══════════════════════════════════════════════════
@@ -671,6 +747,10 @@ const SHAPE_MATS = {
       ['SCM440|7.85','SCM440　紅十字'],
       ['SCM415|7.85','SCM415　綠十字'],
       ['SNCM439|7.85','SNCM439　藍十字'],
+      ['SUJ2|7.85','SUJ-2　軸承鋼'],
+    ]},
+    {group:'工具鋼', items:[
+      ['SKD11|7.85','SKD-11　冷作模具鋼'],
     ]},
     {group:'不鏽鋼', items:[
       ['SUS304|7.93','SUS304　不鏽鋼'],
@@ -1030,8 +1110,8 @@ function updateProdPipeHint() {
   if(!cands.length) {
     hint.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--red)">⚠ 此規格無報價，請詢問廠商</div>';
   } else {
-    const best = cands.reduce((a,b)=>a.px<b.px?a:b);
-    hint.innerHTML = '<div style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">最低：</span><span style="color:var(--accent)">'+best.name+' '+best.px+' 元/mm　</span>'+cands.map(x=>x.name+':'+x.px).join('　')+'</div>';
+    const best = cands.reduce((a,b)=>a.px>b.px?a:b);
+    hint.innerHTML = '<div style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">最高：</span><span style="color:var(--accent)">'+best.name+' '+best.px+' 元/mm　</span>'+cands.map(x=>x.name+':'+x.px).join('　')+'</div>';
   }
 }
 
@@ -1100,8 +1180,8 @@ function calculate() {
       document.getElementById('result').innerHTML = '<div class="warn">⚠ Ø'+p.id+'×Ø'+p.od+' '+typeLabel[tp]+' 無廠商報價，請詢問廠商</div>';
       return;
     }
-    const best = cands.reduce((a,b)=>a.px<b.px?a:b);
-    let html = '<div class="price-big"><div class="price-label-sm">LOWEST PRICE</div><div class="price-num">NT$ '+fmtNT(best.px*L*qty)+'</div><div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+'mm</div></div></div><div style="margin-top:12px"><div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+':'+x.px+'元/mm').join('　')+'</span></div></div>';
+    const best = cands.reduce((a,b)=>a.px>b.px?a:b);
+    let html = '<div class="price-big"><div class="price-label-sm">HIGHEST PRICE</div><div class="price-num">NT$ '+fmtNT(best.px*L*qty)+'</div><div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+'mm</div></div></div><div style="margin-top:12px"><div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+':'+x.px+'元/mm').join('　')+'</span></div></div>';
     document.getElementById('result').innerHTML = '<div class="res-card"><div class="res-card-header">STKM13C '+typeLabel[tp]+' Ø'+p.id+'×Ø'+p.od+' ／ '+L+'mm</div><div class="res-card-body">'+html+'</div></div>';
     return;
   }
@@ -1117,8 +1197,8 @@ function calculate() {
     const pxMap = {s45c:[{name:'金亞洲',px:s.jy_s45c},{name:'益陽',px:s.yi_s45c}],scm:[{name:'金亞洲',px:s.jy_scm}],hf:[{name:'金亞洲',px:s.jy_hf}],sus:[{name:'金亞洲',px:s.jy_sus},{name:'益陽',px:s.yi_sus}]};
     const cands = (pxMap[mat]||[]).filter(x=>x.px);
     if(!cands.length) { document.getElementById('result').innerHTML = '<div class="warn">⚠ Ø'+s.dia+'mm '+matMap[mat]+' 無廠商報價資料</div>'; return; }
-    const best = cands.reduce((a,b)=>a.px<b.px?a:b);
-    document.getElementById('result').innerHTML = '<div class="res-card"><div class="res-card-header">硬鉻軸心 Ø'+s.dia+'mm '+matMap[mat]+' ／ '+L+'mm</div><div class="res-card-body"><div class="price-big"><div class="price-label-sm">LOWEST PRICE</div><div class="price-num">NT$ '+fmtNT(best.px*L*qty)+'</div><div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+'mm</div></div></div><div style="margin-top:12px"><div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+':'+x.px+'元/mm').join('　')+'</span></div></div></div></div>';
+    const best = cands.reduce((a,b)=>a.px>b.px?a:b);
+    document.getElementById('result').innerHTML = '<div class="res-card"><div class="res-card-header">硬鉻軸心 Ø'+s.dia+'mm '+matMap[mat]+' ／ '+L+'mm</div><div class="res-card-body"><div class="price-big"><div class="price-label-sm">HIGHEST PRICE</div><div class="price-num">NT$ '+fmtNT(best.px*L*qty)+'</div><div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+'mm</div></div></div><div style="margin-top:12px"><div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+':'+x.px+'元/mm').join('　')+'</span></div></div></div></div>';
     return;
   }
 
@@ -1166,7 +1246,7 @@ function calculate() {
 
   const specHTML = '';
 
-  // 建議採購單價
+  // 保守採購單價
   let suggestHTML = '';
   let autoPrice = null;
   if(currentShape==='plate') {
@@ -1175,14 +1255,14 @@ function calculate() {
     if(res && res.inquiry) {
       suggestHTML = '<div class="res-card"><div class="res-card-header">採購建議</div><div class="res-card-body"><div class="warn-ok" style="background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.4);color:var(--blue)">📞 建議另洽詢價：'+res.suppliers+'</div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">特殊鋼板規格庫存不定，請先確認有料再計算費用</div></div></div>';
     } else if(res) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">建議採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最低廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
+      suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
       autoPrice = res.best.px;
     }
   } else if(['bar_rnd','bar_sq','bar_hex'].includes(currentShape)) {
     const dim = currentShape==='bar_rnd'?dims.D:currentShape==='bar_sq'?dims.A:dims.S;
     const res = lookupBarPrice(matName, currentShape, dim);
     if(res) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">建議採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最低廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
+      suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
       autoPrice = res.best.px;
     }
   }
@@ -1247,8 +1327,19 @@ function calculate() {
   document.getElementById('result').innerHTML =
     mainCard +
     '<div class="res-card"><div class="res-card-header">計算公式</div><div class="res-card-body"><div class="formula-box">'+formula+'<br>= <strong style="color:var(--accent)">'+fmt(kg)+' kg</strong></div></div></div>'+
-
-    suggestHTML + costHTML;
+    suggestHTML +
+    (()=>{
+      if(currentShape!=='bar_rnd') return '';
+      const sfRes = lookupSawFee(matName, dims.D, dims.L);
+      if(!sfRes) return '';
+      const grpLabel = {grpA:'群組A（S45C/SCM440/SCM415）',grpB:'群組B（SNCM439/SK-3）',grpC:'群組C（SKD-11/SKD-61）'};
+      return '<div class="res-card"><div class="res-card-header">✂ 切工費（豪星）</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">每刀費用</span><span class="res-val accent">'+sfRes.fee+' 元/刀</span></div>'+
+        (sfRes.note?'<div class="res-row"><span class="res-label">長度加成</span><span class="res-val" style="color:var(--accent2)">'+sfRes.note+'</span></div>':'')+
+        '<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">基本費 '+sfRes.base+' 元/刀　'+grpLabel[sfRes.grpKey]+'　115.04.15</div>'+
+        '</div></div>';
+    })()+
+    costHTML;
 }
 
 // ══════════════════════════════════════════════════
@@ -1290,6 +1381,7 @@ function renderLookup() {
       bar_rnd: [
         ['SS400','SS400'],['S45C_L','S45C 光中碳'],['S45C_B','S45C 黑中碳'],
         ['S20C','S20C'],['SCM440','SCM440'],['SCM415','SCM415'],
+        ['SNCM439','SNCM439'],['SUJ2','SUJ-2 軸承鋼'],['SKD11','SKD-11 工具鋼'],
       ],
       bar_sq:  [['SS400','SS400'],['S45C_L','S45C 光中四角'],['S45C_B','S45C 黑四角']],
       bar_hex: [['SS400','SS400'],['S45C_L','S45C 光中六角']],
