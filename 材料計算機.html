@@ -80,7 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .field input[type=number]{-moz-appearance:textfield}
 
 /* ── SHAPE BUTTONS ── */
-.shape-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.shape-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .shape-btn{
   background:var(--bg);border:1px solid var(--border);
   color:var(--muted);padding:8px 4px;cursor:pointer;
@@ -88,6 +88,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   transition:all .15s;border-radius:2px;line-height:1.4;
 }
 .shape-btn .icon{font-size:18px;display:block;margin-bottom:3px}
+.bar-sub{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
 .shape-btn:hover{border-color:var(--accent);color:var(--accent)}
 .shape-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
 
@@ -235,14 +236,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <button class="shape-btn active" onclick="setShape('plate')" id="btn-plate">
           <span class="icon">▬</span>板材
         </button>
-        <button class="shape-btn" onclick="setShape('bar_rnd')" id="btn-bar_rnd">
-          <span class="icon">●</span>圓棒
-        </button>
-        <button class="shape-btn" onclick="setShape('bar_sq')" id="btn-bar_sq">
-          <span class="icon">■</span>四角棒
-        </button>
-        <button class="shape-btn" onclick="setShape('bar_hex')" id="btn-bar_hex">
-          <span class="icon">⬡</span>六角棒
+        <button class="shape-btn" onclick="selectBarGroup()" id="btn-bar_group">
+          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="3.5" cy="10" rx="2.5" ry="5"/><rect x="3.5" y="5" width="13" height="10"/><ellipse cx="16.5" cy="10" rx="2.5" ry="5" opacity=".7"/></svg></span>棒材
         </button>
         <button class="shape-btn" onclick="setShape('pipe')" id="btn-pipe">
           <span class="icon">◎</span>管料
@@ -252,6 +247,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         </button>
         <button class="shape-btn" onclick="setShape('shaft')" id="btn-shaft">
           <span class="icon">⊕</span>硬鉻軸
+        </button>
+      </div>
+      <div class="bar-sub" id="bar-sub-row" style="display:none">
+        <button class="shape-btn" onclick="setShape('bar_rnd')" id="btn-bar_rnd">
+          <span class="icon">●</span>圓棒
+        </button>
+        <button class="shape-btn" onclick="setShape('bar_sq')" id="btn-bar_sq">
+          <span class="icon">■</span>四角棒
+        </button>
+        <button class="shape-btn" onclick="setShape('bar_hex')" id="btn-bar_hex">
+          <span class="icon">⬡</span>六角棒
         </button>
       </div>
     </div>
@@ -299,7 +305,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 </div>
 
 <script>
-const STKM_PRICES = [{"id": 18.0, "od": 31.0, "yi_fin": 0.723, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.32, "jy_plt": null}, {"id": 20.0, "od": 30.0, "yi_fin": 0.688, "yi_raw": null, "yi_plt": null, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 1.18, "jy_plt": null}, {"id": 25.0, "od": 32.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 0.612, "dy_raw": 0.204, "jy_fin": null, "jy_plt": null}, {"id": 25.0, "od": 35.0, "yi_fin": 0.75, "yi_raw": null, "yi_plt": null, "dy_fin": 0.689, "dy_raw": null, "jy_fin": 1.18, "jy_plt": null}, {"id": 30.0, "od": 36.0, "yi_fin": 0.768, "yi_raw": null, "yi_plt": null, "dy_fin": 0.672, "dy_raw": null, "jy_fin": 1.4, "jy_plt": null}, {"id": 30.0, "od": 40.0, "yi_fin": 0.899, "yi_raw": null, "yi_plt": null, "dy_fin": 0.701, "dy_raw": 0.344, "jy_fin": 1.43, "jy_plt": null}, {"id": 32.0, "od": 42.0, "yi_fin": 0.956, "yi_raw": null, "yi_plt": null, "dy_fin": 0.737, "dy_raw": null, "jy_fin": 1.43, "jy_plt": null}, {"id": 35.0, "od": 41.0, "yi_fin": 0.912, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 35.0, "od": 45.0, "yi_fin": 1.03, "yi_raw": null, "yi_plt": null, "dy_fin": 0.808, "dy_raw": null, "jy_fin": 1.38, "jy_plt": null}, {"id": 38.0, "od": 50.0, "yi_fin": 1.226, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.6, "jy_plt": null}, {"id": 38.1, "od": 50.8, "yi_fin": 1.278, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.66, "jy_plt": null}, {"id": 40.0, "od": 44.0, "yi_fin": 0.69, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.08, "jy_plt": null}, {"id": 40.0, "od": 45.0, "yi_fin": 0.736, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 40.0, "od": 46.0, "yi_fin": 0.767, "yi_raw": null, "yi_plt": 1.428, "dy_fin": 0.523, "dy_raw": null, "jy_fin": 1.13, "jy_plt": null}, {"id": 40.0, "od": 48.0, "yi_fin": 0.825, "yi_raw": null, "yi_plt": null, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 1.3, "jy_plt": null}, {"id": 40.0, "od": 50.0, "yi_fin": 0.554, "yi_raw": 0.452, "yi_plt": 1.127, "dy_fin": 0.606, "dy_raw": null, "jy_fin": 1.5, "jy_plt": null}, {"id": 40.0, "od": 55.0, "yi_fin": 0.781, "yi_raw": 0.723, "yi_plt": null, "dy_fin": 0.867, "dy_raw": null, "jy_fin": 1.75, "jy_plt": null}, {"id": 40.0, "od": 60.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.295, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 45.0, "od": 51.0, "yi_fin": 0.539, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.43, "jy_plt": null}, {"id": 45.0, "od": 55.0, "yi_fin": 0.612, "yi_raw": 0.519, "yi_plt": null, "dy_fin": 0.618, "dy_raw": null, "jy_fin": 1.43, "jy_plt": null}, {"id": 45.0, "od": 60.0, "yi_fin": 0.868, "yi_raw": null, "yi_plt": null, "dy_fin": 0.927, "dy_raw": null, "jy_fin": 2.05, "jy_plt": null}, {"id": 50.0, "od": 55.0, "yi_fin": 0.437, "yi_raw": null, "yi_plt": 1.126, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 1.38, "jy_plt": null}, {"id": 50.0, "od": 57.0, "yi_fin": 0.452, "yi_raw": null, "yi_plt": 1.175, "dy_fin": 0.558, "dy_raw": null, "jy_fin": 1.43, "jy_plt": null}, {"id": 50.0, "od": 58.0, "yi_fin": 0.5, "yi_raw": 0.404, "yi_plt": null, "dy_fin": 0.642, "dy_raw": null, "jy_fin": 1.48, "jy_plt": null}, {"id": 50.0, "od": 60.0, "yi_fin": 0.55, "yi_raw": 0.495, "yi_plt": null, "dy_fin": 0.653, "dy_raw": null, "jy_fin": 1.6, "jy_plt": null}, {"id": 50.0, "od": 65.0, "yi_fin": 0.799, "yi_raw": 0.733, "yi_plt": 1.585, "dy_fin": 0.95, "dy_raw": null, "jy_fin": 2.25, "jy_plt": null}, {"id": 50.0, "od": 70.0, "yi_fin": 1.128, "yi_raw": 1.09, "yi_plt": null, "dy_fin": 1.461, "dy_raw": null, "jy_fin": 2.83, "jy_plt": null}, {"id": 50.8, "od": 63.5, "yi_fin": 0.76, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.25, "jy_plt": null}, {"id": 55.0, "od": 65.0, "yi_fin": 0.617, "yi_raw": 0.519, "yi_plt": 1.46, "dy_fin": 0.725, "dy_raw": null, "jy_fin": 1.7, "jy_plt": null}, {"id": 55.0, "od": 70.0, "yi_fin": 0.857, "yi_raw": null, "yi_plt": null, "dy_fin": 1.057, "dy_raw": 1.029, "jy_fin": 2.73, "jy_plt": null}, {"id": 57.0, "od": 70.0, "yi_fin": 0.834, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.73, "jy_plt": null}, {"id": 60.0, "od": 70.0, "yi_fin": 0.665, "yi_raw": 0.588, "yi_plt": null, "dy_fin": 0.784, "dy_raw": null, "jy_fin": 1.86, "jy_plt": null}, {"id": 60.0, "od": 72.0, "yi_fin": 0.819, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.3, "jy_plt": null}, {"id": 60.0, "od": 75.0, "yi_fin": 0.932, "yi_raw": null, "yi_plt": null, "dy_fin": 1.14, "dy_raw": null, "jy_fin": 2.52, "jy_plt": null}, {"id": 60.0, "od": 80.0, "yi_fin": 1.314, "yi_raw": null, "yi_plt": null, "dy_fin": 1.58, "dy_raw": null, "jy_fin": 3.32, "jy_plt": null}, {"id": 63.0, "od": 68.0, "yi_fin": 0.549, "yi_raw": null, "yi_plt": 1.42, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 63.0, "od": 69.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 0.677, "dy_raw": null, "jy_fin": 1.56, "jy_plt": null}, {"id": 63.0, "od": 71.0, "yi_fin": 0.619, "yi_raw": null, "yi_plt": 1.447, "dy_fin": 0.713, "dy_raw": null, "jy_fin": 1.7, "jy_plt": null}, {"id": 63.0, "od": 73.0, "yi_fin": 0.698, "yi_raw": 0.612, "yi_plt": null, "dy_fin": 0.808, "dy_raw": null, "jy_fin": 1.93, "jy_plt": 0.831}, {"id": 63.0, "od": 76.0, "yi_fin": 0.884, "yi_raw": 0.818, "yi_plt": 1.9, "dy_fin": 1.022, "dy_raw": null, "jy_fin": 2.68, "jy_plt": 0.831}, {"id": 63.0, "od": 80.0, "yi_fin": 1.141, "yi_raw": 1.06, "yi_plt": null, "dy_fin": 1.414, "dy_raw": null, "jy_fin": 3.3, "jy_plt": null}, {"id": 63.0, "od": 84.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.96, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 63.5, "od": 73.5, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.52, "jy_plt": null}, {"id": 63.5, "od": 76.2, "yi_fin": 0.937, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.1, "jy_plt": null}, {"id": 65.0, "od": 75.0, "yi_fin": 0.718, "yi_raw": 0.61, "yi_plt": null, "dy_fin": 0.84, "dy_raw": null, "jy_fin": 1.99, "jy_plt": null}, {"id": 65.0, "od": 80.0, "yi_fin": 1.065, "yi_raw": 0.925, "yi_plt": 2.15, "dy_fin": 1.164, "dy_raw": null, "jy_fin": 2.97, "jy_plt": null}, {"id": 65.0, "od": 83.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.224, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 65.0, "od": 85.0, "yi_fin": 1.411, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.84, "jy_plt": null}, {"id": 70.0, "od": 80.0, "yi_fin": 0.77, "yi_raw": null, "yi_plt": null, "dy_fin": 0.903, "dy_raw": null, "jy_fin": 2.14, "jy_plt": null}, {"id": 70.0, "od": 82.0, "yi_fin": 0.965, "yi_raw": null, "yi_plt": null, "dy_fin": 1.093, "dy_raw": null, "jy_fin": 2.6, "jy_plt": null}, {"id": 70.0, "od": 85.0, "yi_fin": 1.081, "yi_raw": 0.794, "yi_plt": null, "dy_fin": 1.295, "dy_raw": null, "jy_fin": 2.85, "jy_plt": null}, {"id": 70.0, "od": 90.0, "yi_fin": 1.522, "yi_raw": null, "yi_plt": null, "dy_fin": 1.853, "dy_raw": null, "jy_fin": 3.56, "jy_plt": null}, {"id": 75.0, "od": 85.0, "yi_fin": 0.815, "yi_raw": null, "yi_plt": 2.03, "dy_fin": 0.962, "dy_raw": null, "jy_fin": 2.3, "jy_plt": null}, {"id": 75.0, "od": 90.0, "yi_fin": 1.152, "yi_raw": null, "yi_plt": null, "dy_fin": 1.402, "dy_raw": null, "jy_fin": 3.16, "jy_plt": null}, {"id": 75.0, "od": 95.0, "yi_fin": 1.603, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.05, "jy_plt": null}, {"id": 76.2, "od": 88.9, "yi_fin": 1.115, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.19, "jy_plt": null}, {"id": 80.0, "od": 86.0, "yi_fin": 0.752, "yi_raw": null, "yi_plt": 1.852, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 80.0, "od": 87.0, "yi_fin": null, "yi_raw": null, "yi_plt": 1.852, "dy_fin": 0.915, "dy_raw": null, "jy_fin": 2.12, "jy_plt": null}, {"id": 80.0, "od": 89.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.16, "jy_plt": null}, {"id": 80.0, "od": 90.0, "yi_fin": 0.873, "yi_raw": 1.063, "yi_plt": 1.925, "dy_fin": 1.022, "dy_raw": null, "jy_fin": 2.44, "jy_plt": null}, {"id": 80.0, "od": 95.0, "yi_fin": 1.217, "yi_raw": 1.119, "yi_plt": null, "dy_fin": 1.497, "dy_raw": null, "jy_fin": 3.56, "jy_plt": null}, {"id": 80.0, "od": 100.0, "yi_fin": 1.706, "yi_raw": 1.63, "yi_plt": 2.78, "dy_fin": 1.984, "dy_raw": null, "jy_fin": 4.5, "jy_plt": null}, {"id": 82.55, "od": 95.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.68, "jy_plt": null}, {"id": 82.55, "od": 98.0, "yi_fin": 1.412, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.63, "jy_plt": null}, {"id": 85.0, "od": 95.0, "yi_fin": 0.925, "yi_raw": null, "yi_plt": null, "dy_fin": 1.105, "dy_raw": null, "jy_fin": 2.7, "jy_plt": null}, {"id": 85.0, "od": 100.0, "yi_fin": 1.302, "yi_raw": 1.131, "yi_plt": null, "dy_fin": 1.58, "dy_raw": null, "jy_fin": 4.21, "jy_plt": null}, {"id": 85.0, "od": 105.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 88.9, "od": 101.6, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.03, "jy_plt": null}, {"id": 88.9, "od": 105.0, "yi_fin": 1.562, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.15, "jy_plt": null}, {"id": 90.0, "od": 100.0, "yi_fin": 0.977, "yi_raw": null, "yi_plt": 2.48, "dy_fin": 1.188, "dy_raw": null, "jy_fin": 2.87, "jy_plt": null}, {"id": 90.0, "od": 405.0, "yi_fin": 1.37, "yi_raw": null, "yi_plt": null, "dy_fin": 1.628, "dy_raw": null, "jy_fin": 3.68, "jy_plt": null}, {"id": 90.0, "od": 110.0, "yi_fin": 1.905, "yi_raw": 1.717, "yi_plt": null, "dy_fin": 2.233, "dy_raw": null, "jy_fin": 4.87, "jy_plt": null}, {"id": 95.0, "od": 110.0, "yi_fin": 1.51, "yi_raw": null, "yi_plt": null, "dy_fin": 1.746, "dy_raw": null, "jy_fin": 4.12, "jy_plt": null}, {"id": 95.0, "od": 115.0, "yi_fin": 2.016, "yi_raw": null, "yi_plt": null, "dy_fin": 2.4, "dy_raw": null, "jy_fin": 4.98, "jy_plt": null}, {"id": 100.0, "od": 107.0, "yi_fin": 1.011, "yi_raw": null, "yi_plt": 2.416, "dy_fin": 1.129, "dy_raw": null, "jy_fin": 2.8, "jy_plt": null}, {"id": 100.0, "od": 109.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.87, "jy_plt": null}, {"id": 100.0, "od": 110.0, "yi_fin": 1.161, "yi_raw": null, "yi_plt": 2.435, "dy_fin": 1.295, "dy_raw": null, "jy_fin": 3.03, "jy_plt": null}, {"id": 100.0, "od": 114.0, "yi_fin": 1.545, "yi_raw": 1.305, "yi_plt": 3.075, "dy_fin": 1.758, "dy_raw": null, "jy_fin": 3.68, "jy_plt": null}, {"id": 100.0, "od": 115.0, "yi_fin": 1.628, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.06, "jy_plt": null}, {"id": 100.0, "od": 116.0, "yi_fin": 1.702, "yi_raw": 1.503, "yi_plt": 3.276, "dy_fin": 1.972, "dy_raw": null, "jy_fin": 4.41, "jy_plt": null}, {"id": 100.0, "od": 120.0, "yi_fin": 2.105, "yi_raw": 1.915, "yi_plt": 3.562, "dy_fin": 2.519, "dy_raw": null, "jy_fin": 5.32, "jy_plt": null}, {"id": 100.0, "od": 125.0, "yi_fin": 2.696, "yi_raw": 2.55, "yi_plt": null, "dy_fin": 3.243, "dy_raw": null, "jy_fin": 6.85, "jy_plt": null}, {"id": 100.0, "od": 130.0, "yi_fin": 3.376, "yi_raw": null, "yi_plt": null, "dy_fin": 4.004, "dy_raw": null, "jy_fin": 8.95, "jy_plt": null}, {"id": 100.0, "od": 135.0, "yi_fin": 3.92, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 101.6, "od": 118.0, "yi_fin": 1.912, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.64, "jy_plt": null}, {"id": 105.0, "od": 120.0, "yi_fin": 1.808, "yi_raw": null, "yi_plt": null, "dy_fin": 1.984, "dy_raw": null, "jy_fin": 4, "jy_plt": null}, {"id": 105.0, "od": 125.0, "yi_fin": 2.305, "yi_raw": null, "yi_plt": null, "dy_fin": 2.697, "dy_raw": null, "jy_fin": 5.37, "jy_plt": null}, {"id": 110.0, "od": 120.0, "yi_fin": 1.317, "yi_raw": 1.143, "yi_plt": null, "dy_fin": 1.6, "dy_raw": null, "jy_fin": 3.41, "jy_plt": null}, {"id": 110.0, "od": 125.0, "yi_fin": 1.817, "yi_raw": null, "yi_plt": null, "dy_fin": 2.02, "dy_raw": null, "jy_fin": 4.59, "jy_plt": null}, {"id": 110.0, "od": 130.0, "yi_fin": 2.284, "yi_raw": null, "yi_plt": null, "dy_fin": 2.756, "dy_raw": null, "jy_fin": 6.05, "jy_plt": null}, {"id": 110.0, "od": 135.0, "yi_fin": 2.97, "yi_raw": null, "yi_plt": null, "dy_fin": 3.695, "dy_raw": null, "jy_fin": 8.573, "jy_plt": null}, {"id": 115.0, "od": 130.0, "yi_fin": 1.909, "yi_raw": null, "yi_plt": null, "dy_fin": 2.138, "dy_raw": null, "jy_fin": 4.95, "jy_plt": null}, {"id": 115.0, "od": 135.0, "yi_fin": 2.381, "yi_raw": 2.176, "yi_plt": null, "dy_fin": 2.839, "dy_raw": null, "jy_fin": 7.623, "jy_plt": 1.786}, {"id": 115.0, "od": 140.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 3.802, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 120.0, "od": 132.0, "yi_fin": 1.682, "yi_raw": null, "yi_plt": null, "dy_fin": 1.936, "dy_raw": null, "jy_fin": 4.88, "jy_plt": null}, {"id": 120.0, "od": 135.0, "yi_fin": 1.987, "yi_raw": null, "yi_plt": null, "dy_fin": 2.21, "dy_raw": null, "jy_fin": 5.1, "jy_plt": null}, {"id": 120.0, "od": 140.0, "yi_fin": 2.478, "yi_raw": null, "yi_plt": null, "dy_fin": 2.851, "dy_raw": null, "jy_fin": 6.33, "jy_plt": null}, {"id": 120.0, "od": 145.0, "yi_fin": 3.202, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 125.0, "od": 135.0, "yi_fin": 1.551, "yi_raw": 1.291, "yi_plt": 3.02, "dy_fin": 1.77, "dy_raw": 0.734, "jy_fin": 3.8, "jy_plt": null}, {"id": 125.0, "od": 137.0, "yi_fin": 1.755, "yi_raw": null, "yi_plt": 3.583, "dy_fin": 2.043, "dy_raw": null, "jy_fin": 4.18, "jy_plt": null}, {"id": 125.0, "od": 140.0, "yi_fin": 2.06, "yi_raw": 1.583, "yi_plt": 3.944, "dy_fin": 2.305, "dy_raw": null, "jy_fin": 5.29, "jy_plt": null}, {"id": 125.0, "od": 145.0, "yi_fin": 2.57, "yi_raw": 2.18, "yi_plt": 4.563, "dy_fin": 3.029, "dy_raw": null, "jy_fin": 6.34, "jy_plt": null}, {"id": 125.0, "od": 150.0, "yi_fin": 3.416, "yi_raw": null, "yi_plt": 5.242, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 125.0, "od": 152.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 4.217, "dy_raw": 3.913, "jy_fin": 9.49, "jy_plt": 5.553}, {"id": 127.0, "od": 146.0, "yi_fin": 2.654, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 6.43, "jy_plt": null}, {"id": 130.0, "od": 142.0, "yi_fin": 1.857, "yi_raw": null, "yi_plt": null, "dy_fin": 2.162, "dy_raw": null, "jy_fin": 5.04, "jy_plt": null}, {"id": 130.0, "od": 150.0, "yi_fin": 2.779, "yi_raw": null, "yi_plt": null, "dy_fin": 3.362, "dy_raw": null, "jy_fin": 7.8, "jy_plt": null}, {"id": 130.0, "od": 153.0, "yi_fin": 3.341, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 8.65, "jy_plt": null}, {"id": 130.0, "od": 155.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 4.277, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 135.0, "od": 160.0, "yi_fin": 3.661, "yi_raw": null, "yi_plt": null, "dy_fin": 4.396, "dy_raw": null, "jy_fin": 10.774, "jy_plt": null}, {"id": 140.0, "od": 153.0, "yi_fin": 2.087, "yi_raw": null, "yi_plt": 3.989, "dy_fin": 2.554, "dy_raw": null, "jy_fin": 5.25, "jy_plt": null}, {"id": 140.0, "od": 160.0, "yi_fin": 2.867, "yi_raw": 2.61, "yi_plt": null, "dy_fin": 3.623, "dy_raw": null, "jy_fin": 7.3, "jy_plt": null}, {"id": 140.0, "od": 165.0, "yi_fin": 3.799, "yi_raw": null, "yi_plt": null, "dy_fin": 4.752, "dy_raw": null, "jy_fin": 9.23, "jy_plt": null}, {"id": 140.0, "od": 170.0, "yi_fin": 4.693, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 11.64, "jy_plt": null}, {"id": 145.0, "od": 170.0, "yi_fin": 4.078, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 145.0, "od": 175.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 13.342, "jy_plt": null}, {"id": 150.0, "od": 160.0, "yi_fin": 2.329, "yi_raw": 1.572, "yi_plt": 4.44, "dy_fin": 2.614, "dy_raw": null, "jy_fin": 5.4, "jy_plt": null}, {"id": 150.0, "od": 163.0, "yi_fin": 2.761, "yi_raw": null, "yi_plt": 4.875, "dy_fin": 2.792, "dy_raw": null, "jy_fin": 5.46, "jy_plt": null}, {"id": 150.0, "od": 168.0, "yi_fin": 3.517, "yi_raw": null, "yi_plt": 5.687, "dy_fin": null, "dy_raw": null, "jy_fin": 8.5, "jy_plt": null}, {"id": 150.0, "od": 170.0, "yi_fin": 3.824, "yi_raw": null, "yi_plt": 5.924, "dy_fin": 4.039, "dy_raw": null, "jy_fin": 8.85, "jy_plt": null}, {"id": 150.0, "od": 175.0, "yi_fin": 4.505, "yi_raw": null, "yi_plt": null, "dy_fin": 5.108, "dy_raw": null, "jy_fin": 9.64, "jy_plt": null}, {"id": 150.0, "od": 180.0, "yi_fin": 5.355, "yi_raw": null, "yi_plt": null, "dy_fin": 5.453, "dy_raw": null, "jy_fin": 11.98, "jy_plt": null}, {"id": 152.4, "od": 171.5, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 8, "jy_plt": null}, {"id": 152.4, "od": 178.0, "yi_fin": 4.961, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 11.163, "jy_plt": null}, {"id": 160.0, "od": 172.0, "yi_fin": 3.244, "yi_raw": 1.857, "yi_plt": 5.533, "dy_fin": 4.348, "dy_raw": null, "jy_fin": 7.15, "jy_plt": null}, {"id": 160.0, "od": 178.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 8.75, "jy_plt": null}, {"id": 160.0, "od": 180.0, "yi_fin": 4.348, "yi_raw": 3.5, "yi_plt": 6.755, "dy_fin": 4.871, "dy_raw": null, "jy_fin": 9.65, "jy_plt": null}, {"id": 160.0, "od": 185.0, "yi_fin": 5.057, "yi_raw": 4.4385, "yi_plt": 7.305, "dy_fin": 5.94, "dy_raw": null, "jy_fin": 11.9, "jy_plt": null}, {"id": 160.0, "od": 190.0, "yi_fin": 5.899, "yi_raw": 5.297, "yi_plt": null, "dy_fin": 7.069, "dy_raw": null, "jy_fin": 12.73, "jy_plt": null}, {"id": 165.0, "od": 190.0, "yi_fin": 5.158, "yi_raw": null, "yi_plt": null, "dy_fin": 6.261, "dy_raw": null, "jy_fin": 12.1, "jy_plt": null}, {"id": 170.0, "od": 190.0, "yi_fin": 4.498, "yi_raw": null, "yi_plt": null, "dy_fin": 5.168, "dy_raw": null, "jy_fin": 10.65, "jy_plt": null}, {"id": 170.0, "od": 195.0, "yi_fin": 5.308, "yi_raw": null, "yi_plt": null, "dy_fin": 6.475, "dy_raw": null, "jy_fin": 13.35, "jy_plt": null}, {"id": 175.0, "od": 190.0, "yi_fin": 3.904, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 177.8, "od": 203.0, "yi_fin": 5.79, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 15.1, "jy_plt": null}, {"id": 177.8, "od": 216.0, "yi_fin": 8.125, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 22.7, "jy_plt": null}, {"id": 180.0, "od": 196.0, "yi_fin": 4.316, "yi_raw": 3.125, "yi_plt": null, "dy_fin": 5.655, "dy_raw": null, "jy_fin": 9.5, "jy_plt": null}, {"id": 180.0, "od": 202.0, "yi_fin": 5.333, "yi_raw": null, "yi_plt": null, "dy_fin": 6.356, "dy_raw": null, "jy_fin": 12.06, "jy_plt": null}, {"id": 180.0, "od": 203.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 180.0, "od": 210.0, "yi_fin": 6.733, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 18.54, "jy_plt": null}, {"id": 180.0, "od": 212.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 9.152, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 180.0, "od": 216.0, "yi_fin": 7.784, "yi_raw": null, "yi_plt": 10.323, "dy_fin": 9.504, "dy_raw": null, "jy_fin": 21.52, "jy_plt": null}, {"id": 180.0, "od": 220.0, "yi_fin": 8.583, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 185.0, "od": 220.0, "yi_fin": 7.773, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 190.0, "od": 220.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 8.672, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 200.0, "od": 216.0, "yi_fin": 5.739, "yi_raw": null, "yi_plt": 8.86, "dy_fin": 6.178, "dy_raw": null, "jy_fin": 10.95, "jy_plt": null}, {"id": 200.0, "od": 220.0, "yi_fin": 6.308, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 13.26, "jy_plt": null}, {"id": 200.0, "od": 232.0, "yi_fin": 8.668, "yi_raw": null, "yi_plt": null, "dy_fin": 9.742, "dy_raw": null, "jy_fin": 23.5, "jy_plt": null}, {"id": 200.0, "od": 242.0, "yi_fin": 11.269, "yi_raw": null, "yi_plt": null, "dy_fin": 12.236, "dy_raw": null, "jy_fin": 29.6, "jy_plt": null}, {"id": 203.2, "od": 228.5, "yi_fin": 8.364, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 20.7, "jy_plt": null}, {"id": 203.2, "od": 241.3, "yi_fin": 11.631, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 28.59, "jy_plt": null}, {"id": 220.0, "od": 255.0, "yi_fin": 12.578, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 225.0, "od": 254.0, "yi_fin": 10.108, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 22, "jy_plt": null}, {"id": 250.0, "od": 266.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 6.95, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 250.0, "od": 268.0, "yi_fin": 9.064, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 14.85, "jy_plt": null}, {"id": 250.0, "od": 290.0, "yi_fin": 15.489, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 30.1, "jy_plt": null}, {"id": 250.0, "od": 298.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 16.87, "dy_raw": null, "jy_fin": 35.4, "jy_plt": null}, {"id": 250.0, "od": 299.0, "yi_fin": 18.862, "yi_raw": null, "yi_plt": 10.323, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 300.0, "od": 318.0, "yi_fin": 17.528, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 19.08, "jy_plt": null}, {"id": 300.0, "od": 350.0, "yi_fin": 30.683, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 38.1, "jy_plt": null}, {"id": 350.0, "od": 420.0, "yi_fin": 45.429, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 51.8, "jy_plt": null}];
+const STKM_PRICES = [
+  {"id": 18.0, "od": 31.0, "yi_fin": 0.723, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.122, "jy_plt": null}, {"id": 20.0, "od": 30.0, "yi_fin": 0.688, "yi_raw": null, "yi_plt": null, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 1.003, "jy_plt": null}, {"id": 25.0, "od": 32.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 0.612, "dy_raw": 0.204, "jy_fin": null, "jy_plt": null}, {"id": 25.0, "od": 35.0, "yi_fin": 0.75, "yi_raw": null, "yi_plt": null, "dy_fin": 0.689, "dy_raw": null, "jy_fin": 1.003, "jy_plt": null}, {"id": 30.0, "od": 36.0, "yi_fin": 0.768, "yi_raw": null, "yi_plt": null, "dy_fin": 0.672, "dy_raw": null, "jy_fin": 1.19, "jy_plt": null}, {"id": 30.0, "od": 40.0, "yi_fin": 0.899, "yi_raw": null, "yi_plt": null, "dy_fin": 0.701, "dy_raw": 0.344, "jy_fin": 1.2155, "jy_plt": null}, {"id": 32.0, "od": 42.0, "yi_fin": 0.956, "yi_raw": null, "yi_plt": null, "dy_fin": 0.737, "dy_raw": null, "jy_fin": 1.2155, "jy_plt": null}, {"id": 35.0, "od": 41.0, "yi_fin": 0.912, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 35.0, "od": 45.0, "yi_fin": 1.03, "yi_raw": null, "yi_plt": null, "dy_fin": 0.808, "dy_raw": null, "jy_fin": 0.69, "jy_plt": null}, {"id": 38.0, "od": 50.0, "yi_fin": 1.226, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.8, "jy_plt": null}, {"id": 38.1, "od": 50.8, "yi_fin": 1.278, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.83, "jy_plt": null}, {"id": 40.0, "od": 44.0, "yi_fin": 0.69, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.54, "jy_plt": null}, {"id": 40.0, "od": 45.0, "yi_fin": 0.736, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 40.0, "od": 46.0, "yi_fin": 0.767, "yi_raw": null, "yi_plt": 1.428, "dy_fin": 0.523, "dy_raw": null, "jy_fin": 0.565, "jy_plt": null}, {"id": 40.0, "od": 48.0, "yi_fin": 0.825, "yi_raw": null, "yi_plt": null, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 0.65, "jy_plt": null}, {"id": 40.0, "od": 50.0, "yi_fin": 0.554, "yi_raw": 0.452, "yi_plt": 1.127, "dy_fin": 0.606, "dy_raw": null, "jy_fin": 0.75, "jy_plt": null}, {"id": 40.0, "od": 55.0, "yi_fin": 0.781, "yi_raw": 0.723, "yi_plt": null, "dy_fin": 0.867, "dy_raw": null, "jy_fin": 0.875, "jy_plt": null}, {"id": 40.0, "od": 60.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.295, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 45.0, "od": 51.0, "yi_fin": 0.539, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.715, "jy_plt": null}, {"id": 45.0, "od": 55.0, "yi_fin": 0.612, "yi_raw": 0.519, "yi_plt": null, "dy_fin": 0.618, "dy_raw": null, "jy_fin": 0.715, "jy_plt": null}, {"id": 45.0, "od": 60.0, "yi_fin": 0.868, "yi_raw": null, "yi_plt": null, "dy_fin": 0.927, "dy_raw": null, "jy_fin": 1.025, "jy_plt": null}, {"id": 50.0, "od": 55.0, "yi_fin": 0.437, "yi_raw": null, "yi_plt": 1.126, "dy_fin": 0.546, "dy_raw": null, "jy_fin": 0.5934, "jy_plt": null}, {"id": 50.0, "od": 57.0, "yi_fin": 0.452, "yi_raw": null, "yi_plt": 1.175, "dy_fin": 0.558, "dy_raw": null, "jy_fin": 0.6149, "jy_plt": null}, {"id": 50.0, "od": 58.0, "yi_fin": 0.5, "yi_raw": 0.404, "yi_plt": null, "dy_fin": 0.642, "dy_raw": null, "jy_fin": 0.6364, "jy_plt": null}, {"id": 50.0, "od": 60.0, "yi_fin": 0.55, "yi_raw": 0.495, "yi_plt": null, "dy_fin": 0.653, "dy_raw": null, "jy_fin": 0.688, "jy_plt": null}, {"id": 50.0, "od": 65.0, "yi_fin": 0.799, "yi_raw": 0.733, "yi_plt": 1.585, "dy_fin": 0.95, "dy_raw": null, "jy_fin": 0.9675, "jy_plt": null}, {"id": 50.0, "od": 70.0, "yi_fin": 1.128, "yi_raw": 1.09, "yi_plt": null, "dy_fin": 1.461, "dy_raw": null, "jy_fin": 1.2169, "jy_plt": null}, {"id": 50.8, "od": 63.5, "yi_fin": 0.76, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.9675, "jy_plt": null}, {"id": 55.0, "od": 65.0, "yi_fin": 0.617, "yi_raw": 0.519, "yi_plt": 1.46, "dy_fin": 0.725, "dy_raw": null, "jy_fin": 0.731, "jy_plt": null}, {"id": 55.0, "od": 70.0, "yi_fin": 0.857, "yi_raw": null, "yi_plt": null, "dy_fin": 1.057, "dy_raw": 1.029, "jy_fin": 1.1739, "jy_plt": null}, {"id": 57.0, "od": 70.0, "yi_fin": 0.834, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.1739, "jy_plt": null}, {"id": 60.0, "od": 70.0, "yi_fin": 0.665, "yi_raw": 0.588, "yi_plt": null, "dy_fin": 0.784, "dy_raw": null, "jy_fin": 0.7998, "jy_plt": null}, {"id": 60.0, "od": 72.0, "yi_fin": 0.819, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.989, "jy_plt": null}, {"id": 60.0, "od": 75.0, "yi_fin": 0.932, "yi_raw": null, "yi_plt": null, "dy_fin": 1.14, "dy_raw": null, "jy_fin": 1.0836, "jy_plt": null}, {"id": 60.0, "od": 80.0, "yi_fin": 1.314, "yi_raw": null, "yi_plt": null, "dy_fin": 1.58, "dy_raw": null, "jy_fin": 1.4276, "jy_plt": null}, {"id": 63.0, "od": 68.0, "yi_fin": 0.549, "yi_raw": null, "yi_plt": 1.42, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 63.0, "od": 69.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 0.677, "dy_raw": null, "jy_fin": 0.6708, "jy_plt": null}, {"id": 63.0, "od": 71.0, "yi_fin": 0.619, "yi_raw": null, "yi_plt": 1.447, "dy_fin": 0.713, "dy_raw": null, "jy_fin": 0.731, "jy_plt": null}, {"id": 63.0, "od": 73.0, "yi_fin": 0.698, "yi_raw": 0.612, "yi_plt": null, "dy_fin": 0.808, "dy_raw": null, "jy_fin": 0.8299, "jy_plt": 0.831}, {"id": 63.0, "od": 76.0, "yi_fin": 0.884, "yi_raw": 0.818, "yi_plt": 1.9, "dy_fin": 1.022, "dy_raw": null, "jy_fin": 1.1524, "jy_plt": 0.831}, {"id": 63.0, "od": 80.0, "yi_fin": 1.141, "yi_raw": 1.06, "yi_plt": null, "dy_fin": 1.414, "dy_raw": null, "jy_fin": 1.419, "jy_plt": null}, {"id": 63.0, "od": 84.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.96, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 63.5, "od": 73.5, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.0836, "jy_plt": null}, {"id": 63.5, "od": 76.2, "yi_fin": 0.937, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.333, "jy_plt": null}, {"id": 65.0, "od": 75.0, "yi_fin": 0.718, "yi_raw": 0.61, "yi_plt": null, "dy_fin": 0.84, "dy_raw": null, "jy_fin": 0.8557, "jy_plt": null}, {"id": 65.0, "od": 80.0, "yi_fin": 1.065, "yi_raw": 0.925, "yi_plt": 2.15, "dy_fin": 1.164, "dy_raw": null, "jy_fin": 1.2771, "jy_plt": null}, {"id": 65.0, "od": 83.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 1.224, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 65.0, "od": 85.0, "yi_fin": 1.411, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.6512, "jy_plt": null}, {"id": 70.0, "od": 80.0, "yi_fin": 0.77, "yi_raw": null, "yi_plt": null, "dy_fin": 0.903, "dy_raw": null, "jy_fin": 0.9202, "jy_plt": null}, {"id": 70.0, "od": 82.0, "yi_fin": 0.965, "yi_raw": null, "yi_plt": null, "dy_fin": 1.093, "dy_raw": null, "jy_fin": 1.118, "jy_plt": null}, {"id": 70.0, "od": 85.0, "yi_fin": 1.081, "yi_raw": 0.794, "yi_plt": null, "dy_fin": 1.295, "dy_raw": null, "jy_fin": 1.2255, "jy_plt": null}, {"id": 70.0, "od": 90.0, "yi_fin": 1.522, "yi_raw": null, "yi_plt": null, "dy_fin": 1.853, "dy_raw": null, "jy_fin": 1.5308, "jy_plt": null}, {"id": 75.0, "od": 85.0, "yi_fin": 0.815, "yi_raw": null, "yi_plt": 2.03, "dy_fin": 0.962, "dy_raw": null, "jy_fin": 0.989, "jy_plt": null}, {"id": 75.0, "od": 90.0, "yi_fin": 1.152, "yi_raw": null, "yi_plt": null, "dy_fin": 1.402, "dy_raw": null, "jy_fin": 1.3588, "jy_plt": null}, {"id": 75.0, "od": 95.0, "yi_fin": 1.603, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.7415, "jy_plt": null}, {"id": 76.2, "od": 88.9, "yi_fin": 1.115, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.3717, "jy_plt": null}, {"id": 80.0, "od": 86.0, "yi_fin": 0.752, "yi_raw": null, "yi_plt": 1.852, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 80.0, "od": 87.0, "yi_fin": null, "yi_raw": null, "yi_plt": 1.852, "dy_fin": 0.915, "dy_raw": null, "jy_fin": 0.9116, "jy_plt": null}, {"id": 80.0, "od": 89.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 0.9288, "jy_plt": null}, {"id": 80.0, "od": 90.0, "yi_fin": 0.873, "yi_raw": 1.063, "yi_plt": 1.925, "dy_fin": 1.022, "dy_raw": null, "jy_fin": 1.0492, "jy_plt": null}, {"id": 80.0, "od": 95.0, "yi_fin": 1.217, "yi_raw": 1.119, "yi_plt": null, "dy_fin": 1.497, "dy_raw": null, "jy_fin": 1.5308, "jy_plt": null}, {"id": 80.0, "od": 100.0, "yi_fin": 1.706, "yi_raw": 1.63, "yi_plt": 2.78, "dy_fin": 1.984, "dy_raw": null, "jy_fin": 1.935, "jy_plt": null}, {"id": 82.55, "od": 95.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.5824, "jy_plt": null}, {"id": 82.55, "od": 98.0, "yi_fin": 1.412, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.9909, "jy_plt": null}, {"id": 85.0, "od": 95.0, "yi_fin": 0.925, "yi_raw": null, "yi_plt": null, "dy_fin": 1.105, "dy_raw": null, "jy_fin": 1.161, "jy_plt": null}, {"id": 85.0, "od": 100.0, "yi_fin": 1.302, "yi_raw": 1.131, "yi_plt": null, "dy_fin": 1.58, "dy_raw": null, "jy_fin": 1.8103, "jy_plt": null}, {"id": 85.0, "od": 105.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 88.9, "od": 101.6, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.7329, "jy_plt": null}, {"id": 88.9, "od": 105.0, "yi_fin": 1.562, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.7845, "jy_plt": null}, {"id": 90.0, "od": 100.0, "yi_fin": 0.977, "yi_raw": null, "yi_plt": 2.48, "dy_fin": 1.188, "dy_raw": null, "jy_fin": 1.2341, "jy_plt": null}, {"id": 90.0, "od": 105.0, "yi_fin": 1.37, "yi_raw": null, "yi_plt": null, "dy_fin": 1.628, "dy_raw": null, "jy_fin": 1.5824, "jy_plt": null}, {"id": 90.0, "od": 110.0, "yi_fin": 1.905, "yi_raw": 1.717, "yi_plt": null, "dy_fin": 2.233, "dy_raw": null, "jy_fin": 2.0941, "jy_plt": null}, {"id": 95.0, "od": 110.0, "yi_fin": 1.51, "yi_raw": null, "yi_plt": null, "dy_fin": 1.746, "dy_raw": null, "jy_fin": 1.7716, "jy_plt": null}, {"id": 95.0, "od": 115.0, "yi_fin": 2.016, "yi_raw": null, "yi_plt": null, "dy_fin": 2.4, "dy_raw": null, "jy_fin": 2.1414, "jy_plt": null}, {"id": 100.0, "od": 107.0, "yi_fin": 1.011, "yi_raw": null, "yi_plt": 2.416, "dy_fin": 1.129, "dy_raw": null, "jy_fin": 1.204, "jy_plt": null}, {"id": 100.0, "od": 109.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.2341, "jy_plt": null}, {"id": 100.0, "od": 110.0, "yi_fin": 1.161, "yi_raw": null, "yi_plt": 2.435, "dy_fin": 1.295, "dy_raw": null, "jy_fin": 1.3029, "jy_plt": null}, {"id": 100.0, "od": 114.0, "yi_fin": 1.545, "yi_raw": 1.305, "yi_plt": 3.075, "dy_fin": 1.758, "dy_raw": null, "jy_fin": 1.5824, "jy_plt": null}, {"id": 100.0, "od": 115.0, "yi_fin": 1.628, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 1.7458, "jy_plt": null}, {"id": 100.0, "od": 116.0, "yi_fin": 1.702, "yi_raw": 1.503, "yi_plt": 3.276, "dy_fin": 1.972, "dy_raw": null, "jy_fin": 1.8963, "jy_plt": null}, {"id": 100.0, "od": 120.0, "yi_fin": 2.105, "yi_raw": 1.915, "yi_plt": 3.562, "dy_fin": 2.519, "dy_raw": null, "jy_fin": 2.2876, "jy_plt": null}, {"id": 100.0, "od": 125.0, "yi_fin": 2.696, "yi_raw": 2.55, "yi_plt": null, "dy_fin": 3.243, "dy_raw": null, "jy_fin": 3.26, "jy_plt": null}, {"id": 100.0, "od": 130.0, "yi_fin": 3.376, "yi_raw": null, "yi_plt": null, "dy_fin": 4.004, "dy_raw": null, "jy_fin": 4.2065, "jy_plt": null}, {"id": 100.0, "od": 135.0, "yi_fin": 3.92, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 101.6, "od": 118.0, "yi_fin": 1.912, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 2.1808, "jy_plt": null}, {"id": 105.0, "od": 120.0, "yi_fin": 1.808, "yi_raw": null, "yi_plt": null, "dy_fin": 1.984, "dy_raw": null, "jy_fin": 1.88, "jy_plt": null}, {"id": 105.0, "od": 125.0, "yi_fin": 2.305, "yi_raw": null, "yi_plt": null, "dy_fin": 2.697, "dy_raw": null, "jy_fin": 2.5239, "jy_plt": null}, {"id": 110.0, "od": 120.0, "yi_fin": 1.317, "yi_raw": 1.143, "yi_plt": null, "dy_fin": 1.6, "dy_raw": null, "jy_fin": 1.6027, "jy_plt": null}, {"id": 110.0, "od": 125.0, "yi_fin": 1.817, "yi_raw": null, "yi_plt": null, "dy_fin": 2.02, "dy_raw": null, "jy_fin": 2.1573, "jy_plt": null}, {"id": 110.0, "od": 130.0, "yi_fin": 2.284, "yi_raw": null, "yi_plt": null, "dy_fin": 2.756, "dy_raw": null, "jy_fin": 2.8435, "jy_plt": null}, {"id": 110.0, "od": 135.0, "yi_fin": 2.97, "yi_raw": null, "yi_plt": null, "dy_fin": 3.695, "dy_raw": null, "jy_fin": 4.0293, "jy_plt": null}, {"id": 115.0, "od": 130.0, "yi_fin": 1.909, "yi_raw": null, "yi_plt": null, "dy_fin": 2.138, "dy_raw": null, "jy_fin": 2.3265, "jy_plt": null}, {"id": 115.0, "od": 135.0, "yi_fin": 2.381, "yi_raw": 2.176, "yi_plt": null, "dy_fin": 2.839, "dy_raw": null, "jy_fin": 3.5828, "jy_plt": 1.786}, {"id": 115.0, "od": 140.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 3.802, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 120.0, "od": 132.0, "yi_fin": 1.682, "yi_raw": null, "yi_plt": null, "dy_fin": 1.936, "dy_raw": null, "jy_fin": 2.2936, "jy_plt": null}, {"id": 120.0, "od": 135.0, "yi_fin": 1.987, "yi_raw": null, "yi_plt": null, "dy_fin": 2.21, "dy_raw": null, "jy_fin": 2.397, "jy_plt": null}, {"id": 120.0, "od": 140.0, "yi_fin": 2.478, "yi_raw": null, "yi_plt": null, "dy_fin": 2.851, "dy_raw": null, "jy_fin": 2.9751, "jy_plt": null}, {"id": 120.0, "od": 145.0, "yi_fin": 3.202, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 125.0, "od": 135.0, "yi_fin": 1.551, "yi_raw": 1.291, "yi_plt": 3.02, "dy_fin": 1.77, "dy_raw": 0.734, "jy_fin": 1.786, "jy_plt": null}, {"id": 125.0, "od": 137.0, "yi_fin": 1.755, "yi_raw": null, "yi_plt": 3.583, "dy_fin": 2.043, "dy_raw": null, "jy_fin": 1.9646, "jy_plt": null}, {"id": 125.0, "od": 140.0, "yi_fin": 2.06, "yi_raw": 1.583, "yi_plt": 3.944, "dy_fin": 2.305, "dy_raw": null, "jy_fin": 2.4863, "jy_plt": null}, {"id": 125.0, "od": 145.0, "yi_fin": 2.57, "yi_raw": 2.18, "yi_plt": 4.563, "dy_fin": 3.029, "dy_raw": null, "jy_fin": 2.9798, "jy_plt": null}, {"id": 125.0, "od": 150.0, "yi_fin": 3.416, "yi_raw": null, "yi_plt": 5.242, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 125.0, "od": 152.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 4.217, "dy_raw": 3.913, "jy_fin": 4.4603, "jy_plt": 5.553}, {"id": 127.0, "od": 146.0, "yi_fin": 2.654, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.0221, "jy_plt": null}, {"id": 130.0, "od": 142.0, "yi_fin": 1.857, "yi_raw": null, "yi_plt": null, "dy_fin": 2.162, "dy_raw": null, "jy_fin": 2.3688, "jy_plt": null}, {"id": 130.0, "od": 150.0, "yi_fin": 2.779, "yi_raw": null, "yi_plt": null, "dy_fin": 3.362, "dy_raw": null, "jy_fin": 3.666, "jy_plt": null}, {"id": 130.0, "od": 153.0, "yi_fin": 3.341, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.0655, "jy_plt": null}, {"id": 130.0, "od": 155.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 4.277, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 135.0, "od": 160.0, "yi_fin": 3.661, "yi_raw": null, "yi_plt": null, "dy_fin": 4.396, "dy_raw": null, "jy_fin": 5.0638, "jy_plt": null}, {"id": 140.0, "od": 153.0, "yi_fin": 2.087, "yi_raw": null, "yi_plt": 3.989, "dy_fin": 2.554, "dy_raw": null, "jy_fin": 2.4675, "jy_plt": null}, {"id": 140.0, "od": 160.0, "yi_fin": 2.867, "yi_raw": 2.61, "yi_plt": null, "dy_fin": 3.623, "dy_raw": null, "jy_fin": 3.431, "jy_plt": null}, {"id": 140.0, "od": 165.0, "yi_fin": 3.799, "yi_raw": null, "yi_plt": null, "dy_fin": 4.752, "dy_raw": null, "jy_fin": 4.3381, "jy_plt": null}, {"id": 140.0, "od": 170.0, "yi_fin": 4.693, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 5.4708, "jy_plt": null}, {"id": 145.0, "od": 170.0, "yi_fin": 4.078, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 145.0, "od": 175.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 6.2707, "jy_plt": null}, {"id": 150.0, "od": 160.0, "yi_fin": 2.329, "yi_raw": 1.572, "yi_plt": 4.44, "dy_fin": 2.614, "dy_raw": null, "jy_fin": 2.538, "jy_plt": null}, {"id": 150.0, "od": 163.0, "yi_fin": 2.761, "yi_raw": null, "yi_plt": 4.875, "dy_fin": 2.792, "dy_raw": null, "jy_fin": 2.5662, "jy_plt": null}, {"id": 150.0, "od": 168.0, "yi_fin": 3.517, "yi_raw": null, "yi_plt": 5.687, "dy_fin": null, "dy_raw": null, "jy_fin": 3.995, "jy_plt": null}, {"id": 150.0, "od": 170.0, "yi_fin": 3.824, "yi_raw": null, "yi_plt": 5.924, "dy_fin": 4.039, "dy_raw": null, "jy_fin": 4.1595, "jy_plt": null}, {"id": 150.0, "od": 175.0, "yi_fin": 4.505, "yi_raw": null, "yi_plt": null, "dy_fin": 5.108, "dy_raw": null, "jy_fin": 4.5308, "jy_plt": null}, {"id": 150.0, "od": 180.0, "yi_fin": 5.355, "yi_raw": null, "yi_plt": null, "dy_fin": 5.453, "dy_raw": null, "jy_fin": 5.6306, "jy_plt": null}, {"id": 152.4, "od": 171.5, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 3.76, "jy_plt": null}, {"id": 152.4, "od": 178.0, "yi_fin": 4.961, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 5.2466, "jy_plt": null}, {"id": 160.0, "od": 172.0, "yi_fin": 3.244, "yi_raw": 1.857, "yi_plt": 5.533, "dy_fin": 4.348, "dy_raw": null, "jy_fin": 3.3605, "jy_plt": null}, {"id": 160.0, "od": 178.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 4.1125, "jy_plt": null}, {"id": 160.0, "od": 180.0, "yi_fin": 4.348, "yi_raw": 3.5, "yi_plt": 6.755, "dy_fin": 4.871, "dy_raw": null, "jy_fin": 4.5355, "jy_plt": null}, {"id": 160.0, "od": 185.0, "yi_fin": 5.057, "yi_raw": 4.4385, "yi_plt": 7.305, "dy_fin": 5.94, "dy_raw": null, "jy_fin": 5.593, "jy_plt": null}, {"id": 160.0, "od": 190.0, "yi_fin": 5.899, "yi_raw": 5.297, "yi_plt": null, "dy_fin": 7.069, "dy_raw": null, "jy_fin": 5.9831, "jy_plt": null}, {"id": 165.0, "od": 190.0, "yi_fin": 5.158, "yi_raw": null, "yi_plt": null, "dy_fin": 6.261, "dy_raw": null, "jy_fin": 5.687, "jy_plt": null}, {"id": 170.0, "od": 190.0, "yi_fin": 4.498, "yi_raw": null, "yi_plt": null, "dy_fin": 5.168, "dy_raw": null, "jy_fin": 5.0055, "jy_plt": null}, {"id": 170.0, "od": 195.0, "yi_fin": 5.308, "yi_raw": null, "yi_plt": null, "dy_fin": 6.475, "dy_raw": null, "jy_fin": 6.2745, "jy_plt": null}, {"id": 175.0, "od": 190.0, "yi_fin": 3.904, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 177.8, "od": 203.0, "yi_fin": 5.79, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 7.097, "jy_plt": null}, {"id": 177.8, "od": 216.0, "yi_fin": 8.125, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 10.669, "jy_plt": null}, {"id": 180.0, "od": 196.0, "yi_fin": 4.316, "yi_raw": 3.125, "yi_plt": null, "dy_fin": 5.655, "dy_raw": null, "jy_fin": 4.465, "jy_plt": null}, {"id": 180.0, "od": 202.0, "yi_fin": 5.333, "yi_raw": null, "yi_plt": null, "dy_fin": 6.356, "dy_raw": null, "jy_fin": 5.6682, "jy_plt": null}, {"id": 180.0, "od": 203.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 180.0, "od": 210.0, "yi_fin": 6.733, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 8.7138, "jy_plt": null}, {"id": 180.0, "od": 212.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 9.152, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 180.0, "od": 216.0, "yi_fin": 7.784, "yi_raw": null, "yi_plt": 10.323, "dy_fin": 9.504, "dy_raw": null, "jy_fin": 10.1144, "jy_plt": null}, {"id": 180.0, "od": 220.0, "yi_fin": 8.583, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 185.0, "od": 220.0, "yi_fin": 7.773, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 190.0, "od": 220.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 8.672, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 200.0, "od": 216.0, "yi_fin": 5.739, "yi_raw": null, "yi_plt": 8.86, "dy_fin": 6.178, "dy_raw": null, "jy_fin": 5.1465, "jy_plt": null}, {"id": 200.0, "od": 220.0, "yi_fin": 6.308, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 6.2322, "jy_plt": null}, {"id": 200.0, "od": 232.0, "yi_fin": 8.668, "yi_raw": null, "yi_plt": null, "dy_fin": 9.742, "dy_raw": null, "jy_fin": 11.045, "jy_plt": null}, {"id": 200.0, "od": 242.0, "yi_fin": 11.269, "yi_raw": null, "yi_plt": null, "dy_fin": 12.236, "dy_raw": null, "jy_fin": 13.912, "jy_plt": null}, {"id": 203.2, "od": 228.5, "yi_fin": 8.364, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 9.729, "jy_plt": null}, {"id": 203.2, "od": 241.3, "yi_fin": 11.631, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 13.4373, "jy_plt": null}, {"id": 220.0, "od": 255.0, "yi_fin": 12.578, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 225.0, "od": 254.0, "yi_fin": 10.108, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 10.34, "jy_plt": null}, {"id": 250.0, "od": 266.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 6.95, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 250.0, "od": 268.0, "yi_fin": 9.064, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 6.9795, "jy_plt": null}, {"id": 250.0, "od": 290.0, "yi_fin": 15.489, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": 14.147, "jy_plt": null}, {"id": 250.0, "od": 298.0, "yi_fin": null, "yi_raw": null, "yi_plt": null, "dy_fin": 16.87, "dy_raw": null, "jy_fin": 16.638, "jy_plt": null}, {"id": 250.0, "od": 299.0, "yi_fin": 18.862, "yi_raw": null, "yi_plt": 10.323, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 300.0, "od": 318.0, "yi_fin": 17.528, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 300.0, "od": 350.0, "yi_fin": 30.683, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}, {"id": 350.0, "od": 420.0, "yi_fin": 45.429, "yi_raw": null, "yi_plt": null, "dy_fin": null, "dy_raw": null, "jy_fin": null, "jy_plt": null}];
 
 // ══════════════════════════════════════════════════
 // 狀態
@@ -318,6 +325,8 @@ const SPECS = {
     'S20C':  [25,30,32,35,38,40,45,50,55,60,65,70,145,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420],
     'SCM440':[13,14,16,19,20,22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260],
     'SCM415':[16,19,22,26,28,30,32,34,36,38,40,42,44,46,48,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330],
+    'C3604':[25.4, 38.1, 42, 47.6, 50.8, 54, 57.1, 63.5, 70, 73, 76.2, 82.5, 92, 102, 114.3, 127],
+    'FCD45':[30, 35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 105, 115, 120, 125, 130, 135, 145, 155, 165, 170, 185, 205, 225, 260, 265, 310, 360],
     'default_rnd':[22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560],
   },
   bar_sq: {
@@ -331,32 +340,44 @@ const SPECS = {
     'default_hex':[10,12,14,17,19,21,23,26,29,32,35,38,41,46,50,55,57,60,65],
   },
 };
-const PLATE_SPEC_FUKGEN = [2, 3, 4, 5, 6, 8, 9, 10, 12, 16, 19, 20, 22, 25, 28, 30, 32, 35, 38, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 115, 125, 135, 145, 155, 165, 175, 180, 185, 205, 230, 265];
+const PLATE_SPEC_FUKGEN = [2.3, 4.5, 6, 8, 9, 10, 12, 16, 19, 20, 22, 25, 28, 30, 32, 35, 38, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 115, 125, 135, 145, 155, 165, 175, 180, 185, 205, 230, 265];
+// FCD45 鑄棒單價（元/mm，武安奧達，2020.08 基準）
+const FCD45_PPM = [
+  {maxD: 310, ppm: 2.667},
+  {maxD: 360, ppm: 4.651},
+];
+function lookupFCD45Price(dia) {
+  const row = FCD45_PPM.find(r => dia <= r.maxD);
+  return row ? row.ppm : FCD45_PPM[FCD45_PPM.length-1].ppm;
+}
+
+const PLATE_SPEC_S45C   = [13, 16, 19, 22, 25, 28, 32, 38, 45, 50, 55, 65, 75, 85, 95, 105, 115, 125, 135, 145, 155, 165, 175, 185];
+const PLATE_SPEC_SCM440 = [13, 16, 19, 22, 25, 32, 38, 45, 50, 55, 65, 75, 85, 95, 105];
 const PLATE_SPEC_GUAN   = [1.6, 2, 2.3, 3, 4, 4.5, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 19, 20, 22, 25, 28, 30, 32, 35, 38, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 155, 160, 170, 180, 190, 205, 220, 230, 265];
 
 const PLATE_PRICES = {
-  // 鐵板（四角板）：福源/冠華（114.04）冠華T≤150 +1
+  // 鐵板（四角板）：福源/冠華（115.04.26）冠華T≤150 +1
   square: [
-    {max:50,  fukgen:30, guan:32},
-    {max:85,  fukgen:31, guan:33},
-    {max:150, fukgen:37, guan:35},
-    {max:165, fukgen:37, guan:34},
-    {max:200, fukgen:38, guan:35},
-    {max:265, fukgen:38, guan:38},
+    {max:50,  fukgen:31, guan:32},
+    {max:85,  fukgen:32, guan:33},
+    {max:150, fukgen:36, guan:35},
+    {max:165, fukgen:36, guan:34},
+    {max:200, fukgen:37, guan:35},
+    {max:265, fukgen:37, guan:38},
   ],
-  // 型體板：福源/冠華（114.04）冠華T≤150 +1
+  // 型體板：福源/冠華（115.04.26）冠華T≤150 +1
   profile: [
-    {max:50,  fukgen:31, guan:33},
-    {max:90,  fukgen:32, guan:34},
-    {max:150, fukgen:38, guan:36},
-    {max:165, fukgen:38, guan:35},
-    {max:200, fukgen:39, guan:36},
-    {max:265, fukgen:39, guan:null},
+    {max:50,  fukgen:32, guan:33},
+    {max:85,  fukgen:33, guan:34},
+    {max:150, fukgen:37, guan:36},
+    {max:165, fukgen:37, guan:35},
+    {max:200, fukgen:38, guan:36},
+    {max:265, fukgen:38, guan:null},
   ],
-  // 圓板切孔（一孔）：福源/冠華（114.04）冠華T≤150 +1
+  // 圓板切孔（一孔）：福源/冠華（115.04.26）圓板切割+1元
   circle: [
-    {max:50,  fukgen:35, guan:36},
-    {max:90,  fukgen:36, guan:37},
+    {max:50,  fukgen:37, guan:36},
+    {max:85,  fukgen:38, guan:37},
     {max:150, fukgen:42, guan:39},
     {max:165, fukgen:42, guan:38},
     {max:200, fukgen:43, guan:39},
@@ -477,6 +498,24 @@ const HAO_XING_SAW_FEE = [
   {max:280, grpA:70, grpB:90,  grpC:160},
   {max:300, grpA:80, grpB:100, grpC:180},
 ];
+const HE_XING_SAW_FEE = [
+  {min:3,   max:10,  fee:1},
+  {min:11,  max:19,  fee:1},
+  {min:20,  max:30,  fee:2},
+  {min:31,  max:49,  fee:3},
+  {min:50,  max:69,  fee:4},
+  {min:70,  max:89,  fee:5},
+  {min:90,  max:100, fee:6},
+  {min:101, max:125, fee:10},
+  {min:126, max:145, fee:12},
+  {min:146, max:165, fee:15},
+  {min:166, max:190, fee:20},
+  {min:191, max:250, fee:25},
+  {min:251, max:300, fee:30},
+  {min:301, max:350, fee:40},
+  {min:351, max:400, fee:50},
+  {min:401, max:450, fee:80},
+];
 const SUS_PIPE_PRICES = [
   {id:20,  od:25,  whole:1.92,  cut:2.112},
   {id:20,  od:30,  whole:3.18,  cut:3.498},
@@ -543,7 +582,7 @@ function getSpecArr(matCode, shape) {
   if(!grp) return null;
   const key = shape.replace('bar_','');
   // 不鏽鋼、鋁合金、銅合金：無內建規格，回傳 null（modal 顯示「無規格資料」）
-  const noSpec = ['SUS304','A6061','A7075','C3604','BC6','PBC3','ALBC3','HBrass'];
+  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass'];
   if(noSpec.includes(matCode)) return null;
   if(matCode==='SS400'||matCode==='ST52'||matCode==='STKM13A') return grp['SS400']||grp['default_'+key];
   if(matCode==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key];
@@ -598,6 +637,34 @@ function lookupSawFee(matCode, dia, length) {
   else if(length <= 30) { mult = 1.5; note = '長≤30mm ×1.5倍'; }
   else if(length <= 50) { mult = 1.2; note = '長≤50mm ×1.2倍'; }
   return { base, mult, fee: Math.round(base * mult * 10) / 10, note, grpKey };
+}
+
+// 合興切工費查詢：外徑分段，長度 < 50mm 才計費
+function lookupHeXingSawFee(dia, length, matCode, shape) {
+  if(shape !== 'bar_rnd') return null;
+  if(length >= 50) return null;
+  // 確認合興對此規格有報價
+  const barRes = lookupBarPrice(matCode, shape, dia);
+  if(!barRes) return null;
+  const hasHX = barRes.best.name === '合興';
+  if(!hasHX) return null;
+  const row = HE_XING_SAW_FEE.find(r => dia >= r.min && dia <= r.max);
+  if(!row) return null;
+  return { fee: row.fee, dia, length };
+}
+
+// 依廠商取切工費：有切工表用表，否則預設外徑/10
+function getVendorSawFee(vendorName, matCode, shape, dim, length) {
+  if(!['bar_rnd','bar_sq','bar_hex'].includes(shape)) return 0;
+  if(vendorName === '合興' && shape === 'bar_rnd' && length < 50) {
+    const row = HE_XING_SAW_FEE.find(r => dim >= r.min && dim <= r.max);
+    if(row) return row.fee;
+  }
+  if(vendorName === '豪星' && shape === 'bar_rnd') {
+    const sfRes = lookupSawFee(matCode, dim, length);
+    if(sfRes) return sfRes.fee;
+  }
+  return Math.round(dim / 10 * 10) / 10;
 }
 
 function lookupPlatePrice(thickness, matCode, plateType) {
@@ -699,12 +766,12 @@ function autoFillUnitPrice() {
   // 板材種類：只有 SS400 才顯示
   const typeSection = document.getElementById('plate-type-section');
   if(typeSection && currentShape==='plate') {
-    const showType = matCode==='SS400';
-    typeSection.style.display = showType ? '' : 'none';
-    if(!showType) {
-      const ts = document.getElementById('plate-type-sel');
-      if(ts) ts.value = 'square'; // 非SS400 重設為四角板
-    }
+    typeSection.style.display = '';
+    // 圓板選項只有 SS400 才顯示
+    const circleOpt = document.querySelector('#plate-type-sel option[value="circle"]');
+    if(circleOpt) circleOpt.style.display = matCode==='SS400' ? '' : 'none';
+    const ts = document.getElementById('plate-type-sel');
+    if(ts && ts.value==='circle' && matCode!=='SS400') ts.value = 'square';
   }
 
   let px = null;
@@ -712,7 +779,9 @@ function autoFillUnitPrice() {
   if(currentShape==='plate') {
     const plateType = document.getElementById('plate-type-sel')?.value || 'square';
     const T = parseFloat(document.getElementById('dim-T')?.value) || 0;
-    if(T) {
+    if(plateType==='profile' && ['S45C_L','S45C_B','S50C','SCM440'].includes(matCode)) {
+      px = 77; // S45C/SCM440 型體板固定 77 元/kg
+    } else if(T) {
       const res = lookupPlatePrice(T, matCode, plateType);
       if(res && !res.inquiry) px = res.best.px;
     }
@@ -734,7 +803,7 @@ function autoFillUnitPrice() {
 // ══════════════════════════════════════════════════
 // 各形狀對應材質清單
 const SHAPE_MATS = {
-  plate:   [['SS400|7.85','SS400'],['S45C_B|7.85','S45C'],['S50C|7.85','S50C'],['SCM440|7.85','SCM440']],
+  plate:   [['SS400|7.85','SS400'],['S45C_B|7.85','S50C'],['SCM440|7.85','SCM440']],
   // bar_rnd 使用群組格式：{group:'群組名', items:[...]}
   bar_rnd: [
     {group:'碳鋼', items:[
@@ -751,6 +820,9 @@ const SHAPE_MATS = {
     ]},
     {group:'工具鋼', items:[
       ['SKD11|7.85','SKD-11　冷作模具鋼'],
+    ]},
+    {group:'鑄鐵', items:[
+      ['FCD45|7.1','FCD45　球墨鑄鐵'],
     ]},
     {group:'不鏽鋼', items:[
       ['SUS304|7.93','SUS304　不鏽鋼'],
@@ -829,12 +901,55 @@ function updateMatOptions(shape) {
   onMatChange();
 }
 
+function setCopperType(type) {
+  const hollowRow = document.getElementById('hollow-id-row');
+  if(hollowRow) hollowRow.style.display = type==='hollow' ? '' : 'none';
+  if(type==='hollow') {
+    // 清空內徑避免殘值
+    const idInp = document.getElementById('dim-ID');
+    if(idInp && !idInp.value) idInp.value = '';
+  } else {
+    const idInp = document.getElementById('dim-ID');
+    if(idInp) idInp.value = '';
+  }
+  ['solid','hollow'].forEach(v => {
+    const btn = document.getElementById('copper-'+v);
+    if(!btn) return;
+    const active = v===type;
+    btn.style.background = active ? 'var(--accent)' : 'var(--card)';
+    btn.style.color = active ? '#000' : 'var(--muted)';
+    btn.style.fontWeight = active ? '600' : '400';
+  });
+}
+
+function selectBarGroup() {
+  const sub = document.getElementById('bar-sub-row');
+  const isVisible = sub.style.display !== 'none';
+  if(isVisible) {
+    sub.style.display = 'none';
+    document.getElementById('btn-bar_group').classList.remove('active');
+  } else {
+    sub.style.display = 'grid';
+    document.getElementById('btn-bar_group').classList.add('active');
+    setShape('bar_rnd');
+  }
+}
+
 function setShape(s) {
   currentShape = s;
-  ['plate','bar_rnd','bar_sq','bar_hex','pipe','prod_pipe','shaft'].forEach(id => {
+  const isBar = ['bar_rnd','bar_sq','bar_hex'].includes(s);
+  ['plate','pipe','prod_pipe','shaft'].forEach(id => {
     const btn = document.getElementById('btn-'+id);
     if(btn) btn.classList.toggle('active', id===s);
   });
+  ['bar_rnd','bar_sq','bar_hex'].forEach(id => {
+    const btn = document.getElementById('btn-'+id);
+    if(btn) btn.classList.toggle('active', id===s);
+  });
+  const grpBtn = document.getElementById('btn-bar_group');
+  if(grpBtn) grpBtn.classList.toggle('active', isBar);
+  const subRow = document.getElementById('bar-sub-row');
+  if(subRow) subRow.style.display = isBar ? 'grid' : 'none';
   updateMatOptions(s);
   renderDims();
 }
@@ -876,7 +991,7 @@ function getSpecsForMat(shape) {
   const key = shape.replace('bar_','');
   const mc = matCode;
   // 不鏽鋼、鋁合金、銅合金：無內建規格
-  const noSpec = ['SUS304','A6061','A7075','C3604','BC6','PBC3','ALBC3','HBrass'];
+  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass'];
   if(noSpec.includes(mc)) return [];
   if(mc==='SS400'||mc==='ST52') return grp['SS400']||grp['default_'+key]||[];
   if(mc==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key]||[];
@@ -885,6 +1000,8 @@ function getSpecsForMat(shape) {
   if(mc==='SCM440') return grp['SCM440']||grp['default_'+key]||[];
   if(mc==='SCM415') return grp['SCM415']||grp['default_'+key]||[];
   if(mc==='SNCM439') return []; // 無內建規格
+  if(mc==='C3604') return grp['C3604']||[];
+  if(mc==='FCD45') return grp['FCD45']||[];
   return grp['default_'+key]||[];
 }
 
@@ -905,13 +1022,17 @@ function renderDims() {
     area.appendChild(typeField);
     // 尺寸輸入
     const plateMat = document.getElementById('mat')?.value.split('|')[0] || '';
-    const isSpecialPlate = (plateMat==='S45C_B'||plateMat==='S45C_L'||plateMat==='S45C'||plateMat==='S50C'||plateMat==='SCM440');
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const tWidget = isSpecialPlate ? mkInput('dim-T','0.5') : mkSpecSel('dim-T', getSpecsForMat('plate'), '', autoFillUnitPrice);
-    const tf=mkField('T（厚）',tWidget);
-    tf.querySelector('label').innerHTML = isSpecialPlate
-      ? 'T（厚）<span style="color:var(--blue);font-size:9px;margin-left:4px">現貨規格請洽供應商確認</span>'
-      : 'T（厚）';
+    let plateSpecs, plateSpecLabel;
+    if(plateMat==='SCM440') {
+      plateSpecs = PLATE_SPEC_SCM440; plateSpecLabel = 'T（厚）';
+    } else if(['S45C_B','S45C_L','S45C','S50C'].includes(plateMat)) {
+      plateSpecs = PLATE_SPEC_S45C; plateSpecLabel = 'T（厚）';
+    } else {
+      plateSpecs = getSpecsForMat('plate'); plateSpecLabel = 'T（厚）';
+    }
+    const tWidget = mkSpecSel('dim-T', plateSpecs, '', autoFillUnitPrice);
+    const tf=mkField(plateSpecLabel, tWidget);
     tf.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
@@ -921,14 +1042,40 @@ function renderDims() {
     area.appendChild(g);
 
   } else if(currentShape==='bar_rnd') {
+    const hollowCopperMats = ['BC6','PBC3','ALBC3','HBrass'];
+    const matCode0 = document.getElementById('mat')?.value.split('|')[0]||'';
+    const isHollowCopper = hollowCopperMats.includes(matCode0);
+    // 空心切換（非C3604銅料才顯示）
+    if(isHollowCopper) {
+      const toggleWrap = mk('div',{style:'display:flex;gap:6px;margin-bottom:8px'});
+      ['solid','hollow'].forEach((v,i) => {
+        const btn = mk('button',{
+          id:'copper-'+v,
+          type:'button',
+          style:'flex:1;padding:6px;border:0.5px solid var(--border);border-radius:3px;cursor:pointer;font-size:12px;'+(i===0?'background:var(--accent);color:#000;font-weight:600':'background:var(--card);color:var(--muted)')
+        }, i===0?'● 實心棒':'◎ 空心棒');
+        btn.addEventListener('click', () => setCopperType(v));
+        toggleWrap.appendChild(btn);
+      });
+      area.appendChild(toggleWrap);
+    }
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
     const specsD = getSpecsForMat('bar_rnd');
     const dInput = specsD.length > 0 ? mkSpecSel('dim-D', specsD, 'Ø', autoFillUnitPrice) : mkInput('dim-D','0.1');
-    const df=mkField('Ø（徑）',dInput); df.style.flex='1';
+    const df=mkField('Ø（外徑）',dInput); df.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
     g.appendChild(df); g.appendChild(x1); g.appendChild(lf);
     area.appendChild(g);
+    // 空心內徑列（預設隱藏）
+    if(isHollowCopper) {
+      const hollowRow = mk('div',{id:'hollow-id-row',style:'display:none;margin-top:6px'});
+      const g2=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
+      const idf=mkField('Ø（內徑）',mkInput('dim-ID','0.1')); idf.style.flex='1';
+      g2.appendChild(idf);
+      hollowRow.appendChild(g2);
+      area.appendChild(hollowRow);
+    }
 
   } else if(currentShape==='bar_sq') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
@@ -1081,8 +1228,13 @@ function calcWeight(shape, dims, density) {
     vol = dims.L * dims.W * dims.T;
     formula = dims.L+' × '+dims.W+' × '+dims.T+' × '+density+' ÷ 1,000,000';
   } else if(shape==='bar_rnd') {
-    vol = Math.PI/4 * dims.D**2 * dims.L;
-    formula = 'π/4 × Ø'+dims.D+'² × '+dims.L+' × '+density+' ÷ 1,000,000';
+    if(dims.ID && dims.ID > 0) {
+      vol = Math.PI/4 * (dims.D**2 - dims.ID**2) * dims.L;
+      formula = 'π/4 × (Ø'+dims.D+'² - Ø'+dims.ID+'²) × '+dims.L+' × '+density+' ÷ 1,000,000';
+    } else {
+      vol = Math.PI/4 * dims.D**2 * dims.L;
+      formula = 'π/4 × Ø'+dims.D+'² × '+dims.L+' × '+density+' ÷ 1,000,000';
+    }
   } else if(shape==='bar_sq') {
     vol = dims.A**2 * dims.L;
     formula = dims.A+'² × '+dims.L+' × '+density+' ÷ 1,000,000';
@@ -1208,7 +1360,8 @@ function calculate() {
     dims = {L:g('dim-L'), W:g('dim-W'), T:g('dim-T')};
     if(!dims.L || !dims.W || !dims.T) valid=false;
   } else if(currentShape==='bar_rnd') {
-    dims = {D:g('dim-D'), L:g('dim-L')};
+    const idVal = parseFloat(document.getElementById('dim-ID')?.value)||0;
+    dims = {D:g('dim-D'), L:g('dim-L'), ...(idVal>0?{ID:idVal}:{})};
     if(!dims.D || !dims.L) valid=false;
   } else if(currentShape==='bar_sq') {
     dims = {A:g('dim-A'), L:g('dim-L')};
@@ -1238,9 +1391,27 @@ function calculate() {
 
   if(!valid) { alert('請填入所有尺寸'); return; }
 
-  let {kg, formula} = calcWeight(currentShape, dims, density);
+  // 銅料圓棒：外徑+7、內徑-7、長度+5，密度9，×1.03
+  const copperBarMats = ['C3604','BC6','PBC3','ALBC3','HBrass'];
+  const isCopperBar = copperBarMats.includes(matName) && currentShape==='bar_rnd';
+  if(isCopperBar) {
+    dims = {...dims,
+      D: dims.D + 7,
+      L: dims.L + 5,
+      ...(dims.ID && dims.ID > 0 ? {ID: Math.max(dims.ID - 7, 1)} : {})
+    };
+  }
+  const copperDensity = isCopperBar ? 9 : density;
+  let {kg, formula} = calcWeight(currentShape, dims, copperDensity);
+  if(isCopperBar) { kg = Math.round(kg * 1.03 * 10000) / 10000; }
   if(currentShape==='plate' && kg < 1) kg = 1;
   let totalKg = kg * qty;
+  let autoSawFeeAmt = 0;
+  // 型體板 S45C/SCM440 → 長寬各加 10mm（採購餘量）
+  const plateType = document.getElementById('plate-type-sel')?.value || 'square';
+  const isProfileSpecial = currentShape==='plate' && plateType==='profile' &&
+    ['S45C_L','S45C_B','S50C','SCM440'].includes(matName);
+  if(isProfileSpecial) { dims = {...dims, L: dims.L+10, W: dims.W+10}; }
   // 規格選單已限定現貨，不需要 checkSpec
   let hasCost = !isNaN(unitPrice) && unitPrice > 0;
 
@@ -1250,21 +1421,76 @@ function calculate() {
   let suggestHTML = '';
   let autoPrice = null;
   if(currentShape==='plate') {
-    const plateType = document.getElementById('plate-type-sel')?.value || 'square';
     const res = lookupPlatePrice(dims.T, matName, plateType);
-    if(res && res.inquiry) {
+    if(isProfileSpecial) {
+      suggestHTML = '<div class="res-card"><div class="res-card-header">採購說明</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">供應商</span><span class="res-val accent">益聖（唯一可處理）</span></div>'+
+        '<div class="res-row"><span class="res-label">計算尺寸</span><span class="res-val" style="color:var(--accent2)">L '+dims.L+'mm（+10）× W '+dims.W+'mm（+10）× T '+dims.T+'mm</span></div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--muted)">型體板採購尺寸長寬各加 10mm 計重，請手動輸入益聖單價</div>'+
+        '</div></div>';
+    } else if(res && res.inquiry) {
       suggestHTML = '<div class="res-card"><div class="res-card-header">採購建議</div><div class="res-card-body"><div class="warn-ok" style="background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.4);color:var(--blue)">📞 建議另洽詢價：'+res.suppliers+'</div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">特殊鋼板規格庫存不定，請先確認有料再計算費用</div></div></div>';
     } else if(res) {
       suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
       autoPrice = res.best.px;
     }
-  } else if(['bar_rnd','bar_sq','bar_hex'].includes(currentShape)) {
+  }
+  // S45C/SCM440 型體板以 77 元/kg 計價
+  if(currentShape==='plate' && plateType==='profile' && ['S45C_L','S45C_B','S50C','SCM440'].includes(matName) && !hasCost) autoPrice = 77;
+  if(['bar_rnd','bar_sq','bar_hex'].includes(currentShape)) {
     const dim = currentShape==='bar_rnd'?dims.D:currentShape==='bar_sq'?dims.A:dims.S;
+    // 銅料：尺寸已調整，直接設定單價，無切工費
+    if(isCopperBar) {
+      const copperPx = matName==='PBC3' ? 600 : matName==='C3604' ? 240 : 650;
+      autoSawFeeAmt = 0;
+      autoPrice = copperPx;
+      const hollowNote = dims.ID && dims.ID>0
+        ? 'Ø'+dims.D+'（+7）× Ø'+dims.ID+'（-7）× '+dims.L+'（+5）× 密度9 × 1.03'
+        : 'Ø'+dims.D+'（+7）× '+dims.L+'（+5）× 密度9 × 1.03';
+      suggestHTML = '<div class="res-card"><div class="res-card-header">採購單價（銅料）</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">單價</span><span class="res-val accent">'+copperPx+' 元/kg</span></div>'+
+        '<div class="res-row"><span class="res-label">計算尺寸</span><span class="res-val" style="color:var(--accent2)">'+hollowNote+'</span></div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--muted)">銅料不計切工費，外徑+7、內徑-7、長度+5，密度9，×1.03</div>'+
+        '</div></div>';
+    // FCD45：按長度計費（元/mm），直接輸出結果
+    } else if(matName==='FCD45' && currentShape==='bar_rnd') {
+      const ppm = lookupFCD45Price(dims.D);
+      const matCostFCD = Math.round(ppm * dims.L * 10) / 10;
+      const sawFeeFCD = getVendorSawFee('', 'FCD45', 'bar_rnd', dims.D, dims.L);
+      const fcdCost = Math.round((matCostFCD + sawFeeFCD) * 10) / 10;
+      const fcdFormulaCard = '<div class="res-card"><div class="res-card-header">計算公式</div><div class="res-card-body"><div class="formula-box">'+formula+'<br>= <strong style="color:var(--accent)">'+fmt(kg)+' kg</strong></div></div></div>';
+      const fcdSuggest = '<div class="res-card"><div class="res-card-header">採購單價（武安奧達）</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">單價</span><span class="res-val accent">'+ppm.toFixed(3)+' 元/mm</span></div>'+
+        '<div class="res-row"><span class="res-label">材料費</span><span class="res-val green">NT$ '+fmtNT(fcdCost)+'</span></div>'+
+        '<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">FCD45 Ø'+dims.D+'mm × '+dims.L+'mm　武安奧達 2020.08</div>'+
+        '</div></div>';
+      const fcdMainCard = '<div class="res-card"><div class="res-card-header">計算結果 ／ FCD45　圓棒</div><div class="res-card-body">'+
+        '<div class="price-big"><div class="price-label-sm">TOTAL COST</div><div class="price-num">NT$ '+fmtNT(fcdCost)+'</div>'+
+        '<div class="price-sub">'+ppm.toFixed(3)+' 元/mm × '+dims.L+' mm</div></div>'+
+        '<div style="margin-top:12px">'+
+        '<div class="res-row"><span class="res-label">材料費</span><span class="res-val">NT$ '+fmtNT(matCostFCD)+'</span></div>'+
+        (sawFeeFCD>0?'<div class="res-row"><span class="res-label">切工費</span><span class="res-val" style="color:var(--muted)">含 '+sawFeeFCD+' 元（Ø'+dims.D+'÷10）</span></div>':'')+
+        '<div class="res-row"><span class="res-label">重量（參考）</span><span class="res-val">'+fmt(kg)+' kg</span></div>'+
+        '<div class="res-row"><span class="res-label">換算單價</span><span class="res-val" style="color:var(--muted)">約 '+fmt(fcdCost/kg)+' 元/kg</span></div>'+
+        '</div></div></div>';
+      document.getElementById('result').innerHTML = fcdMainCard + fcdFormulaCard + fcdSuggest;
+      return;
+    } else {
     const res = lookupBarPrice(matName, currentShape, dim);
     if(res) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
-      autoPrice = res.best.px;
+      const allWithSaw = res.all.map(v => {
+        const sf = getVendorSawFee(v.name, matName, currentShape, dim, dims.L);
+        return {name:v.name, px:v.px, sawFee:sf, total:Math.round((kg*v.px+sf)*10)/10};
+      });
+      const bestTotal = allWithSaw.reduce((a,b)=>a.total>b.total?a:b);
+      autoSawFeeAmt = bestTotal.sawFee;
+      autoPrice = bestTotal.px;
+      const sawHint = bestTotal.sawFee>0 ? '　<span style="font-size:10px;color:var(--muted)">（含切工 '+bestTotal.sawFee+' 元）</span>' : '';
+      suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+bestTotal.name+'　'+bestTotal.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(bestTotal.total)+sawHint+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠（含切工）：'+allWithSaw.map(x=>x.name+' NT$'+fmtNT(x.total)).join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
+    } else {
+      autoSawFeeAmt = getVendorSawFee('', matName, currentShape, dim, dims.L);
     }
+    } // end else (non-copper non-FCD45)
   }
 
   // 費用計算
@@ -1277,7 +1503,8 @@ function calculate() {
 
   // 有建議單價時：隱藏輸入框，用 autoPrice 計算
   // 有建議單價時自動套用；否則要求使用者輸入
-  if(autoPrice) {
+  if(autoPrice && !hasCost) {
+    // 有自動單價且使用者未手動輸入 → 套用自動單價
     unitPrice = autoPrice;
     hasCost = true;
     if(upWrapEl) upWrapEl.style.display = 'none';
@@ -1287,20 +1514,23 @@ function calculate() {
     if(upInputEl) upInputEl.focus();
     return;
   }
+  // hasCost=true 且使用者已手動輸入 → 保留使用者的值
   totalKg = kg * qty;
 
   // 金額優先顯示
   let mainCard = '';
   if(hasCost) {
-    // 有手動單價：大字顯示總金額
-    const totalCost = totalKg * unitPrice;
+    // 有手動單價：大字顯示總金額（含切工費）
+    const matCost = totalKg * unitPrice;
+    const totalCost = matCost + autoSawFeeAmt;
     const unitCost = kg * unitPrice;
+    const sawNote = autoSawFeeAmt > 0 ? '<div class="res-row"><span class="res-label">切工費</span><span class="res-val" style="color:var(--muted)">含 '+autoSawFeeAmt+' 元</span></div>' : '';
     mainCard = '<div class="res-card"><div class="res-card-header">計算結果 ／ '+matDisplay+'　'+shapeNames[currentShape]+'</div><div class="res-card-body">'+
       '<div class="price-big"><div class="price-label-sm">TOTAL COST</div><div class="price-num">NT$ '+fmtNT(totalCost)+'</div><div class="price-sub">NT$ '+fmtNT(unitCost)+'</div></div>'+
       '<div style="margin-top:12px">'+
       '<div class="res-row"><span class="res-label">單價</span><span class="res-val">'+unitPrice.toLocaleString()+' 元/kg</span></div>'+
       '<div class="res-row"><span class="res-label">重量（單件）</span><span class="res-val">'+fmt(kg)+' kg</span></div>'+
-      ''+
+      sawNote+
       '<div class="res-row"><span class="res-label">材質</span><span class="res-val">'+matDisplay+'</span></div>'+
       '</div></div></div>';
     costHTML = ''; // 已整合進 mainCard，不再重複
@@ -1328,17 +1558,7 @@ function calculate() {
     mainCard +
     '<div class="res-card"><div class="res-card-header">計算公式</div><div class="res-card-body"><div class="formula-box">'+formula+'<br>= <strong style="color:var(--accent)">'+fmt(kg)+' kg</strong></div></div></div>'+
     suggestHTML +
-    (()=>{
-      if(currentShape!=='bar_rnd') return '';
-      const sfRes = lookupSawFee(matName, dims.D, dims.L);
-      if(!sfRes) return '';
-      const grpLabel = {grpA:'群組A（S45C/SCM440/SCM415）',grpB:'群組B（SNCM439/SK-3）',grpC:'群組C（SKD-11/SKD-61）'};
-      return '<div class="res-card"><div class="res-card-header">✂ 切工費（豪星）</div><div class="res-card-body">'+
-        '<div class="res-row"><span class="res-label">每刀費用</span><span class="res-val accent">'+sfRes.fee+' 元/刀</span></div>'+
-        (sfRes.note?'<div class="res-row"><span class="res-label">長度加成</span><span class="res-val" style="color:var(--accent2)">'+sfRes.note+'</span></div>':'')+
-        '<div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">基本費 '+sfRes.base+' 元/刀　'+grpLabel[sfRes.grpKey]+'　115.04.15</div>'+
-        '</div></div>';
-    })()+
+
     costHTML;
 }
 
