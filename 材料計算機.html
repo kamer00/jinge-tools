@@ -1441,7 +1441,7 @@ function calculate() {
     const dim = currentShape==='bar_rnd'?dims.D:currentShape==='bar_sq'?dims.A:dims.S;
     // 銅料：尺寸已調整，直接設定單價，無切工費
     if(isCopperBar) {
-      const copperPx = matName==='PBC3' ? 600 : matName==='C3604' ? 240 : 650;
+      const copperPx = matName==='PBC3' ? 600 : matName==='C3604' ? 240 : matName==='ALBC3' ? 660 : 650;
       autoSawFeeAmt = 0;
       autoPrice = copperPx;
       const hollowNote = dims.ID && dims.ID>0
