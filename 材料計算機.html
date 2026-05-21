@@ -1045,37 +1045,20 @@ function renderDims() {
     const hollowCopperMats = ['BC6','PBC3','ALBC3','HBrass'];
     const matCode0 = document.getElementById('mat')?.value.split('|')[0]||'';
     const isHollowCopper = hollowCopperMats.includes(matCode0);
-    // 空心切換（非C3604銅料才顯示）
-    if(isHollowCopper) {
-      const toggleWrap = mk('div',{style:'display:flex;gap:6px;margin-bottom:8px'});
-      ['solid','hollow'].forEach((v,i) => {
-        const btn = mk('button',{
-          id:'copper-'+v,
-          type:'button',
-          style:'flex:1;padding:6px;border:0.5px solid var(--border);border-radius:3px;cursor:pointer;font-size:12px;'+(i===0?'background:var(--accent);color:#000;font-weight:600':'background:var(--card);color:var(--muted)')
-        }, i===0?'● 實心棒':'◎ 空心棒');
-        btn.addEventListener('click', () => setCopperType(v));
-        toggleWrap.appendChild(btn);
-      });
-      area.appendChild(toggleWrap);
-    }
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
     const specsD = getSpecsForMat('bar_rnd');
     const dInput = specsD.length > 0 ? mkSpecSel('dim-D', specsD, 'Ø', autoFillUnitPrice) : mkInput('dim-D','0.1');
     const df=mkField('Ø（外徑）',dInput); df.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
-    g.appendChild(df); g.appendChild(x1); g.appendChild(lf);
-    area.appendChild(g);
-    // 空心內徑列（預設隱藏）
     if(isHollowCopper) {
-      const hollowRow = mk('div',{id:'hollow-id-row',style:'display:none;margin-top:6px'});
-      const g2=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
+      const x0=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
       const idf=mkField('Ø（內徑）',mkInput('dim-ID','0.1')); idf.style.flex='1';
-      g2.appendChild(idf);
-      hollowRow.appendChild(g2);
-      area.appendChild(hollowRow);
+      g.appendChild(df); g.appendChild(x0); g.appendChild(idf); g.appendChild(x1); g.appendChild(lf);
+    } else {
+      g.appendChild(df); g.appendChild(x1); g.appendChild(lf);
     }
+    area.appendChild(g);
 
   } else if(currentShape==='bar_sq') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
