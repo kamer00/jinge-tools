@@ -15,47 +15,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --navy:#0d1b2e;--blue:#1a3a5c;--mid:#2461a0;--accent:#3a8fd4;
-      --steel:#8fafc8;--silver:#c5d5e3;--white:#f7fafd;
-      --border:rgba(58,143,212,0.25);--shadow:rgba(13,27,46,0.45);
+      --navy:#1e3060;--blue:#253d78;--mid:#2e4a8a;--accent:#3a6fd4;
+      --steel:#5a7aaa;--silver:#3a4a6a;--white:#f4f6fa;
+      --border:rgba(46,74,138,0.18);--shadow:rgba(30,48,96,0.13);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--navy);color:var(--silver);font-family:'Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(58,143,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(58,143,212,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-    .top-stripe{height:4px;background:linear-gradient(90deg,var(--mid),var(--accent),var(--mid))}
-    header{position:relative;z-index:1;padding:32px 48px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--border)}
+    body{background:#e8eaf0;color:#2a3a5a;font-family:'Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(46,74,138,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(46,74,138,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+    .top-stripe{height:4px;background:linear-gradient(90deg,var(--navy),var(--accent),var(--navy))}
+    header{position:relative;z-index:1;padding:32px 48px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--navy) 0%,#253d78 100%)}
     .logo-img{height:52px;width:52px;object-fit:contain;border-radius:8px}
-    .logo-divider{width:1px;height:40px;background:var(--border);margin:0 8px}
-    .logo-zh{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:300;letter-spacing:0.2em;color:var(--steel);text-transform:uppercase;margin-bottom:3px}
-    .logo-en{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.1em;color:var(--white)}
+    .logo-divider{width:1px;height:40px;background:rgba(255,255,255,0.25);margin:0 8px}
+    .logo-zh{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:300;letter-spacing:0.2em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:3px}
+    .logo-en{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.1em;color:#fff}
     .header-right{margin-left:auto;text-align:right}
-    .platform-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.18em;text-transform:uppercase}
-    .version-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--steel);margin-top:4px;opacity:0.6}
-    .hero{position:relative;z-index:1;padding:44px 48px 32px}
+    .platform-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#a8c4e8;letter-spacing:0.18em;text-transform:uppercase}
+    .version-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.4);margin-top:4px;opacity:0.8}
+    .hero{position:relative;z-index:1;padding:44px 48px 32px;background:#e8eaf0}
     .hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
     .hero-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:var(--accent)}
-    .hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,5vw,48px);font-weight:700;color:var(--white);letter-spacing:0.04em;line-height:1.1;margin-bottom:12px}
-    .hero-sub{font-size:13px;font-weight:300;color:var(--steel);letter-spacing:0.03em;line-height:1.75;max-width:500px}
-    .tools-section{position:relative;z-index:1;padding:24px 48px 72px}
-    .section-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:var(--steel);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:14px}
+    .hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,5vw,48px);font-weight:700;color:var(--navy);letter-spacing:0.04em;line-height:1.1;margin-bottom:12px}
+    .hero-sub{font-size:13px;font-weight:400;color:#4a6080;letter-spacing:0.03em;line-height:1.75;max-width:500px}
+    .tools-section{position:relative;z-index:1;padding:24px 48px 72px;background:#e8eaf0}
+    .section-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.25em;color:#5a7aaa;text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:14px}
     .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
     .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .tool-card{position:relative;background:linear-gradient(135deg,rgba(26,58,92,0.7) 0%,rgba(13,27,46,0.9) 100%);border:1px solid var(--border);border-radius:4px;padding:24px 24px 20px;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;overflow:hidden;animation:fadeUp 0.4s ease both}
-    .tool-card:nth-child(1){animation-delay:0.05s}.tool-card:nth-child(2){animation-delay:0.10s}.tool-card:nth-child(3){animation-delay:0.15s}.tool-card:nth-child(4){animation-delay:0.20s}.tool-card:nth-child(5){animation-delay:0.25s}.tool-card:nth-child(6){animation-delay:0.30s}.tool-card:nth-child(7){animation-delay:0.35s}.tool-card:nth-child(8){animation-delay:0.40s}.tool-card:nth-child(9){animation-delay:0.45s}.tool-card:nth-child(10){animation-delay:0.50s}
+    .tool-card{position:relative;background:#fff;border:1px solid #c8d4e8;border-radius:4px;padding:24px 24px 20px;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;overflow:hidden;animation:fadeUp 0.4s ease both}
+    .tool-card:nth-child(1){animation-delay:0.05s}.tool-card:nth-child(2){animation-delay:0.10s}.tool-card:nth-child(3){animation-delay:0.15s}.tool-card:nth-child(4){animation-delay:0.20s}.tool-card:nth-child(5){animation-delay:0.25s}.tool-card:nth-child(6){animation-delay:0.30s}.tool-card:nth-child(7){animation-delay:0.35s}.tool-card:nth-child(8){animation-delay:0.40s}.tool-card:nth-child(9){animation-delay:0.45s}.tool-card:nth-child(10){animation-delay:0.50s}.tool-card:nth-child(11){animation-delay:0.55s}.tool-card:nth-child(12){animation-delay:0.60s}.tool-card:nth-child(13){animation-delay:0.65s}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity 0.3s}
-    .tool-card:hover{border-color:rgba(58,143,212,0.6);transform:translateY(-3px);box-shadow:0 12px 36px var(--shadow)}
+    .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent));opacity:0;transition:opacity 0.3s}
+    .tool-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 24px var(--shadow)}
     .tool-card:hover::before{opacity:1}
-    .card-number{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);opacity:0.55;margin-bottom:10px;letter-spacing:0.1em}
+    .card-number{font-family:'Share Tech Mono',monospace;font-size:10px;color:#8a9aba;margin-bottom:10px;letter-spacing:0.1em}
     .card-icon{font-size:22px;margin-bottom:10px;display:block;line-height:1}
-    .card-title{font-size:16px;font-weight:500;color:var(--white);margin-bottom:7px;letter-spacing:0.04em;line-height:1.3}
-    .card-desc{font-size:12px;font-weight:300;color:var(--steel);line-height:1.65;letter-spacing:0.02em}
+    .card-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:7px;letter-spacing:0.04em;line-height:1.3}
+    .card-desc{font-size:12px;font-weight:400;color:#5a6a8a;line-height:1.65;letter-spacing:0.02em}
     .card-arrow{position:absolute;bottom:20px;right:20px;font-size:14px;color:var(--accent);opacity:0;transform:translateX(-6px);transition:opacity 0.2s,transform 0.2s}
     .tool-card:hover .card-arrow{opacity:1;transform:translateX(0)}
     .title-short{display:none}
-    footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 48px;display:flex;align-items:center;justify-content:space-between}
-    .footer-copy{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--steel);opacity:0.45;letter-spacing:0.1em}
-    .footer-status{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--steel);opacity:0.5}
+    footer{position:relative;z-index:1;border-top:1px solid #c8d4e8;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;background:#dde3ef}
+    .footer-copy{font-family:'Share Tech Mono',monospace;font-size:9px;color:#6a7a9a;letter-spacing:0.1em}
+    .footer-status{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#6a7a9a}
     .status-dot{width:6px;height:6px;border-radius:50%;background:#3fcf8e;animation:pulse 2s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
     @media(max-width:640px){
@@ -104,7 +104,7 @@
         animation:none;
         opacity:1;
         transform:none;
-        background:linear-gradient(160deg,rgba(30,65,105,0.75) 0%,rgba(13,27,46,0.95) 100%);
+        background:#fff;
       }
 
       .tool-card::before{display:none}
@@ -117,8 +117,8 @@
       }
       .card-title{
         font-size:12px;
-        font-weight:500;
-        color:var(--white);
+        font-weight:700;
+        color:var(--navy);
         margin:0;
         line-height:1.35;
         letter-spacing:0.03em;
@@ -157,52 +157,52 @@
   </section>
 
   <section class="tools-section">
-    <div class="section-label">工具總覽 — 10 items</div>
+    <div class="section-label">工具總覽 — 13 items</div>
     <div class="tools-grid">
       <a class="tool-card" href="./材料計算機.html">
-        <div class="card-number">01 / 07</div>
+        <div class="card-number">01 / 13</div>
         <span class="card-icon">📦</span>
         <div class="card-title">材料計算機</div>
         <div class="card-desc">多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./銑床加工計算機.html">
-        <div class="card-number">02 / 07</div>
+        <div class="card-number">02 / 13</div>
         <span class="card-icon">🔩</span>
         <div class="card-title">銑床加工計算機</div>
         <div class="card-desc">銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./膛孔拋光計算機.html">
-        <div class="card-number">03 / 07</div>
+        <div class="card-number">03 / 13</div>
         <span class="card-icon">🔧</span>
         <div class="card-title">膛孔拋光計算機</div>
         <div class="card-desc">依缸管內徑與長度估算膛孔及拋光加工面積與費用。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./宏光電鍍試算.html">
-        <div class="card-number">04 / 07</div>
+        <div class="card-number">04 / 13</div>
         <span class="card-icon">⚗️</span>
         <div class="card-title">電鍍費用計算機</div>
         <div class="card-desc">依缸徑與行程自動計算宏光電鍍加工面積及費用，支援硬鉻與無電鍍鎳。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./恆展加工單價計算機.html">
-        <div class="card-number">05 / 07</div>
+        <div class="card-number">05 / 13</div>
         <span class="card-icon">🏭</span>
         <div class="card-title"><span class="title-full">恆展加工單價計算機</span><span class="title-short">恆展單價計算</span></div>
         <div class="card-desc">恆展廠 SD型 / LA型 加工件單價計算，依規格自動套用計價邏輯。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./軸心整修vs製新.html">
-        <div class="card-number">06 / 07</div>
+        <div class="card-number">06 / 13</div>
         <span class="card-icon">⚖️</span>
         <div class="card-title"><span class="title-full">軸心整修 vs 製新</span><span class="title-short">軸心整修比較</span></div>
         <div class="card-desc">快速比較軸心整修成本與重新製作費用，提供決策依據。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./報價單_勁格科技.html">
-        <div class="card-number">07 / 07</div>
+        <div class="card-number">07 / 13</div>
         <span class="card-icon">📋</span>
         <div class="card-title">報價單產生器</div>
         <div class="card-desc">整合各項加工費用，自動彙整油壓缸完整報價單，支援列印輸出。</div>
@@ -210,24 +210,45 @@
       </a>
 
       <a class="tool-card" href="./鎖緊扭力表.html">
-        <div class="card-number">08 / 10</div>
+        <div class="card-number">08 / 13</div>
         <span class="card-icon">🔩</span>
         <div class="card-title"><span class="title-full">鎖緊扭力表</span><span class="title-short">鎖緊扭力表</span></div>
         <div class="card-desc">M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./螺紋加工計算機.html">
-        <div class="card-number">09 / 10</div>
+        <div class="card-number">09 / 13</div>
         <span class="card-icon">⚙️</span>
         <div class="card-title"><span class="title-full">螺紋加工計算機</span><span class="title-short">螺紋加工</span></div>
         <div class="card-desc">公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。</div>
         <span class="card-arrow">→</span>
       </a>
       <a class="tool-card" href="./硬度換算工具.html">
-        <div class="card-number">10 / 10</div>
+        <div class="card-number">10 / 13</div>
         <span class="card-icon">💎</span>
         <div class="card-title"><span class="title-full">硬度換算工具</span><span class="title-short">硬度換算</span></div>
         <div class="card-desc">HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="tool-card" href="./深孔加工計算機.html">
+        <div class="card-number">11 / 13</div>
+        <span class="card-icon">🕳️</span>
+        <div class="card-title"><span class="title-full">深孔加工計算機</span><span class="title-short">深孔加工</span></div>
+        <div class="card-desc">深孔鑽削加工工時與費用估算，依孔徑、深度及加工材質計算。</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="tool-card" href="./研磨計算機.html">
+        <div class="card-number">12 / 13</div>
+        <span class="card-icon">💿</span>
+        <div class="card-title"><span class="title-full">研磨計算機</span><span class="title-short">研磨計算</span></div>
+        <div class="card-desc">外徑研磨加工費用估算，依直徑與研磨長度計算研磨面積與工時。</div>
+        <span class="card-arrow">→</span>
+      </a>
+      <a class="tool-card" href="./熱處理計算機.html">
+        <div class="card-number">13 / 13</div>
+        <span class="card-icon">🔥</span>
+        <div class="card-title"><span class="title-full">熱處理計算機</span><span class="title-short">熱處理</span></div>
+        <div class="card-desc">依工件重量與熱處理方式（調質、淬火、滲碳等）估算加工費用。</div>
         <span class="card-arrow">→</span>
       </a>
     </div>
