@@ -46,9 +46,8 @@
     .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--accent));opacity:0;transition:opacity 0.3s}
     .tool-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 24px var(--shadow)}
     .tool-card:hover::before{opacity:1}
-    .card-number{font-family:'Share Tech Mono',monospace;font-size:10px;color:#8a9aba;margin-bottom:10px;letter-spacing:0.1em}
-    .card-icon{font-size:22px;margin-bottom:10px;display:block;line-height:1}
-    .card-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:7px;letter-spacing:0.04em;line-height:1.3}
+    .card-icon{font-size:28px;margin-bottom:10px;display:block;line-height:1}
+    .card-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;letter-spacing:0.03em;line-height:1.25}
     .card-desc{font-size:12px;font-weight:400;color:#5a6a8a;line-height:1.65;letter-spacing:0.02em}
     .card-arrow{position:absolute;bottom:20px;right:20px;font-size:14px;color:var(--accent);opacity:0;transform:translateX(-6px);transition:opacity 0.2s,transform 0.2s}
     .tool-card:hover .card-arrow{opacity:1;transform:translateX(0)}
@@ -60,14 +59,18 @@
     }
     #sortBtn:hover{background:var(--accent);color:#fff;}
     #sortBtn.active{background:var(--accent);color:#fff;}
-    .tools-grid.sort-mode .tool-card{cursor:grab;border:2px dashed #3a6fd4;}
-    .tools-grid.sort-mode .tool-card.dragging{opacity:0.35;transform:none;}
-    .tools-grid.sort-mode .tool-card:active{cursor:grabbing;}
-    .tools-grid.sort-mode .tool-card.drag-over{border:2px solid var(--navy);background:#eef2ff;transform:scale(1.02);}
-    .tools-grid.sort-mode .tool-card::after{
-      content:'☰ 拖曳排序';position:absolute;top:8px;right:10px;
-      font-size:10px;color:var(--accent);letter-spacing:0.05em;
+    .tools-grid.sort-mode .tool-card{border:2px dashed #3a6fd4;cursor:default;}
+    .tools-grid.sort-mode .tool-card.dragging{opacity:0.35;}
+    .tools-grid.sort-mode .tool-card.drag-over{border:2px solid var(--navy);background:#eef2ff;}
+    .sort-btns{position:absolute;bottom:12px;right:12px;display:flex;gap:6px;}
+    .sort-btn{
+      width:32px;height:32px;border-radius:4px;border:1px solid var(--accent);
+      background:#fff;color:var(--accent);font-size:14px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:background 0.15s,color 0.15s;
     }
+    .sort-btn:hover:not(:disabled){background:var(--accent);color:#fff;}
+    .sort-btn:disabled{opacity:0.25;cursor:not-allowed;}
     .sort-hint{
       display:none;font-size:11px;color:#5a7aaa;margin-bottom:12px;
       padding:6px 12px;background:#eef2ff;border-left:3px solid var(--accent);border-radius:0 3px 3px 0;
@@ -129,23 +132,9 @@
 
       .tool-card::before{display:none}
       .card-number{display:none}
-      .card-icon{
-        font-size:32px;
-        margin:0 0 10px 0;
-        display:block;
-        line-height:1;
-      }
-      .card-title{
-        font-size:12px;
-        font-weight:700;
-        color:var(--navy);
-        margin:0;
-        line-height:1.35;
-        letter-spacing:0.03em;
-      }
+      .card-icon{font-size:36px;margin:0 0 10px 0;}
+      .card-title{font-size:13px;font-weight:700;color:var(--navy);margin:0;line-height:1.35;letter-spacing:0.02em;}
       .card-desc{display:none}
-      .title-full{display:none}
-      .title-short{display:inline}
       .card-arrow{display:none}
 
       /* ── Footer ── */
@@ -178,7 +167,7 @@
 
   <section class="tools-section">
     <div class="section-label">工具總覽 — 13 items <button id="sortBtn" onclick="toggleSort()">⇅ 調整順序</button></div>
-    <div id="sortHint" class="sort-hint">拖曳卡片以調整順序，完成後再按「儲存順序」。</div>
+    <div id="sortHint" class="sort-hint">按 ▲ ▼ 移動卡片順序，完成後點「✓ 完成排序」儲存。</div>
     <div class="tools-grid" id="toolsGrid">
       <!-- 由 JavaScript 動態產生 -->
     </div>
@@ -187,8 +176,7 @@
   <footer>
     <div class="footer-copy">© 2026 勁格科技股份有限公司 — INTERNAL USE ONLY</div>
     <div class="footer-status"><span class="status-dot"></span>ONLINE</div>
-  </footer>  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
-  <script>
+  </footer>  <script>
     const TOOLS = [
       { no:'01', icon:'📦', title:'材料計算機',         shortTitle:'材料計算',  href:'./材料計算機.html',        desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。' },
       { no:'02', icon:'🔩', title:'銑床加工計算機',     shortTitle:'銑床加工',  href:'./銑床加工計算機.html',    desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
@@ -207,81 +195,78 @@
 
     const STORAGE_KEY = 'jinge_tool_order';
     let sortMode = false;
-    let sortable = null;
+    let order = [];  // href 陣列，代表目前順序
 
-    function buildCard(t, idx) {
-      const a = document.createElement('a');
-      a.className = 'tool-card';
-      a.href = t.href;
-      a.dataset.href = t.href;
-      a.style.animationDelay = (idx * 0.05 + 0.05) + 's';
-      a.innerHTML = `
-        <div class="card-number">${t.no} / 13</div>
-        <span class="card-icon">${t.icon}</span>
-        <div class="card-title">
-          <span class="title-full">${t.title}</span>
-          <span class="title-short">${t.shortTitle}</span>
-        </div>
-        <div class="card-desc">${t.desc}</div>
-        <span class="card-arrow">→</span>`;
-      return a;
+    // ── 載入順序 ──────────────────────────────────────────
+    function loadOrder() {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      const map = Object.fromEntries(TOOLS.map(t => [t.href, t]));
+      if (saved && Array.isArray(saved)) {
+        const reordered = saved.map(h => map[h]).filter(Boolean);
+        const extras = TOOLS.filter(t => !saved.includes(t.href));
+        order = [...reordered, ...extras].map(t => t.href);
+      } else {
+        order = TOOLS.map(t => t.href);
+      }
     }
 
+    // ── 儲存順序 ──────────────────────────────────────────
+    function saveOrder() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+    }
+
+    // ── 渲染 ──────────────────────────────────────────────
     function render() {
       const grid = document.getElementById('toolsGrid');
       grid.innerHTML = '';
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      let ordered = TOOLS;
-      if (saved && Array.isArray(saved)) {
-        const map = Object.fromEntries(TOOLS.map(t => [t.href, t]));
-        const reordered = saved.map(h => map[h]).filter(Boolean);
-        const extras = TOOLS.filter(t => !saved.includes(t.href));
-        ordered = [...reordered, ...extras];
-      }
-      ordered.forEach((t, i) => grid.appendChild(buildCard(t, i)));
-
-      // 初始化 SortableJS（預設停用）
-      sortable = Sortable.create(grid, {
-        disabled: true,
-        animation: 180,
-        ghostClass: 'drag-over',
-        chosenClass: 'dragging',
-        delay: 0,
-        touchStartThreshold: 3,
-        onEnd: () => {
-          // 拖完立即儲存
-          const order = [...grid.children].map(c => c.dataset.href);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-        }
+      const map = Object.fromEntries(TOOLS.map(t => [t.href, t]));
+      order.forEach((href, idx) => {
+        const t = map[href];
+        if (!t) return;
+        const a = document.createElement('a');
+        a.className = 'tool-card';
+        a.href = sortMode ? '#' : t.href;
+        a.dataset.href = t.href;
+        a.style.animationDelay = (idx * 0.05 + 0.05) + 's';
+        a.innerHTML = `
+          <span class="card-icon">${t.icon}</span>
+          <div class="card-title">${t.title}</div>
+          <div class="card-desc">${t.desc}</div>
+          ${sortMode ? `
+            <div class="sort-btns">
+              <button class="sort-btn" onclick="moveCard(event,${idx},-1)" ${idx===0?'disabled':''}>▲</button>
+              <button class="sort-btn" onclick="moveCard(event,${idx},+1)" ${idx===order.length-1?'disabled':''}>▼</button>
+            </div>` : '<span class="card-arrow">→</span>'}`;
+        grid.appendChild(a);
       });
     }
 
+    // ── 移動卡片 ──────────────────────────────────────────
+    function moveCard(e, idx, dir) {
+      e.preventDefault();
+      e.stopPropagation();
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= order.length) return;
+      [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
+      saveOrder();
+      render();
+    }
+
+    // ── 排序模式切換 ──────────────────────────────────────
     function toggleSort() {
       sortMode = !sortMode;
-      const grid = document.getElementById('toolsGrid');
       const btn  = document.getElementById('sortBtn');
       const hint = document.getElementById('sortHint');
-
-      sortable.option('disabled', !sortMode);
+      const grid = document.getElementById('toolsGrid');
       grid.classList.toggle('sort-mode', sortMode);
       btn.classList.toggle('active', sortMode);
       hint.classList.toggle('visible', sortMode);
-
-      if (sortMode) {
-        btn.textContent = '✓ 完成排序';
-        // 排序模式：點卡片不跳頁
-        grid.addEventListener('click', blockClick, true);
-      } else {
-        btn.textContent = '⇅ 調整順序';
-        grid.removeEventListener('click', blockClick, true);
-        // 儲存最終順序
-        const order = [...grid.children].map(c => c.dataset.href);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-      }
+      btn.textContent = sortMode ? '✓ 完成排序' : '⇅ 調整順序';
+      render();
     }
 
-    function blockClick(e) { e.preventDefault(); }
-
+    // 初始化
+    loadOrder();
     render();
   </script>
 </body>
