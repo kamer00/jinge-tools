@@ -51,10 +51,11 @@
     .card-desc{font-size:12px;font-weight:400;color:#5a6a8a;line-height:1.65;letter-spacing:0.02em}
     .card-arrow{position:absolute;bottom:20px;right:20px;font-size:14px;color:var(--accent);opacity:0;transform:translateX(-6px);transition:opacity 0.2s,transform 0.2s}
     .tool-card:hover .card-arrow{opacity:1;transform:translateX(0)}
+    .sort-bar{display:flex;justify-content:flex-end;margin-bottom:14px;}
     #sortBtn{
-      margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:10px;
-      padding:3px 10px;border-radius:3px;border:1px solid var(--accent);
-      background:transparent;color:var(--accent);cursor:pointer;
+      font-family:'Share Tech Mono',monospace;font-size:12px;
+      padding:6px 16px;border-radius:4px;border:1px solid var(--accent);
+      background:#fff;color:var(--accent);cursor:pointer;
       letter-spacing:0.08em;transition:background 0.2s,color 0.2s;
     }
     #sortBtn:hover{background:var(--accent);color:#fff;}
@@ -166,7 +167,10 @@
   </section>
 
   <section class="tools-section">
-    <div class="section-label">工具總覽 — 13 items <button id="sortBtn" onclick="toggleSort()">⇅ 調整順序</button></div>
+    <div class="section-label">工具總覽 — 13 items</div>
+    <div class="sort-bar">
+      <button id="sortBtn" onclick="toggleSort()">⇅ 調整順序</button>
+    </div>
     <div id="sortHint" class="sort-hint">按 ▲ ▼ 移動卡片順序，完成後點「✓ 完成排序」儲存。</div>
     <div class="tools-grid" id="toolsGrid">
       <!-- 由 JavaScript 動態產生 -->
