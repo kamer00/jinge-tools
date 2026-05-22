@@ -61,10 +61,11 @@
     #sortBtn:hover{background:var(--accent);color:#fff;}
     #sortBtn.active{background:var(--accent);color:#fff;}
     .tools-grid.sort-mode .tool-card{cursor:grab;border:2px dashed #3a6fd4;}
+    .tools-grid.sort-mode .tool-card.dragging{opacity:0.35;transform:none;}
     .tools-grid.sort-mode .tool-card:active{cursor:grabbing;}
     .tools-grid.sort-mode .tool-card.drag-over{border:2px solid var(--navy);background:#eef2ff;transform:scale(1.02);}
     .tools-grid.sort-mode .tool-card::after{
-      content:'⠿ 拖曳移動';position:absolute;top:8px;right:10px;
+      content:'⠿ 長按拖曳';position:absolute;top:8px;right:10px;
       font-size:10px;color:var(--accent);letter-spacing:0.05em;
     }
     .sort-hint{
@@ -187,28 +188,26 @@
     <div class="footer-copy">© 2026 勁格科技股份有限公司 — INTERNAL USE ONLY</div>
     <div class="footer-status"><span class="status-dot"></span>ONLINE</div>
   </footer>  <script>
-    // ── 工具卡片資料 ──────────────────────────────────────
     const TOOLS = [
-      { no:'01', icon:'📦', title:'材料計算機',       shortTitle:'材料計算',   href:'./材料計算機.html',       desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。' },
-      { no:'02', icon:'🔩', title:'銑床加工計算機',   shortTitle:'銑床加工',   href:'./銑床加工計算機.html',   desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
-      { no:'03', icon:'🔧', title:'膛孔拋光計算機',   shortTitle:'膛孔拋光',   href:'./膛孔拋光計算機.html',   desc:'依缸管內徑與長度估算膛孔及拋光加工面積與費用。' },
-      { no:'04', icon:'⚗️', title:'電鍍費用計算機',   shortTitle:'電鍍費用',   href:'./宏光電鍍試算.html',     desc:'依缸徑與行程自動計算宏光電鍍加工面積及費用，支援硬鉻與無電鍍鎳。' },
-      { no:'05', icon:'🏭', title:'恆展加工單價計算機', shortTitle:'恆展單價', href:'./恆展加工單價計算機.html', desc:'恆展廠 SD型 / LA型 加工件單價計算，依規格自動套用計價邏輯。' },
-      { no:'06', icon:'⚖️', title:'軸心整修 vs 製新',  shortTitle:'軸心整修',  href:'./軸心整修vs製新.html',   desc:'快速比較軸心整修成本與重新製作費用，提供決策依據。' },
-      { no:'07', icon:'📋', title:'報價單產生器',      shortTitle:'報價單',     href:'./報價單_勁格科技.html',  desc:'整合各項加工費用，自動彙整油壓缸完整報價單，支援列印輸出。因頁面較大，建議於 PC 使用。' },
-      { no:'08', icon:'🔩', title:'鎖緊扭力表',        shortTitle:'鎖緊扭力',   href:'./鎖緊扭力表.html',       desc:'M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。' },
-      { no:'09', icon:'⚙️', title:'螺紋加工計算機',   shortTitle:'螺紋加工',   href:'./螺紋加工計算機.html',   desc:'公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。' },
-      { no:'10', icon:'💎', title:'硬度換算工具',      shortTitle:'硬度換算',   href:'./硬度換算工具.html',     desc:'HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。' },
-      { no:'11', icon:'🕳️', title:'深孔加工計算機',   shortTitle:'深孔加工',   href:'./深孔加工計算機.html',   desc:'深孔鑽削加工工時與費用估算，依孔徑、深度及加工材質計算。' },
-      { no:'12', icon:'💿', title:'研磨計算機',        shortTitle:'研磨計算',   href:'./研磨計算機.html',       desc:'外徑研磨加工費用估算，依直徑與研磨長度計算研磨面積與工時。' },
-      { no:'13', icon:'🔥', title:'熱處理計算機',      shortTitle:'熱處理',     href:'./熱處理計算機.html',     desc:'依工件重量與熱處理方式（調質、淬火、滲碳等）估算加工費用。' },
+      { no:'01', icon:'📦', title:'材料計算機',         shortTitle:'材料計算',  href:'./材料計算機.html',        desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。' },
+      { no:'02', icon:'🔩', title:'銑床加工計算機',     shortTitle:'銑床加工',  href:'./銑床加工計算機.html',    desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
+      { no:'03', icon:'🔧', title:'膛孔拋光計算機',     shortTitle:'膛孔拋光',  href:'./膛孔拋光計算機.html',    desc:'依缸管內徑與長度估算膛孔及拋光加工面積與費用。' },
+      { no:'04', icon:'⚗️', title:'電鍍費用計算機',     shortTitle:'電鍍費用',  href:'./宏光電鍍試算.html',      desc:'依缸徑與行程自動計算宏光電鍍加工面積及費用，支援硬鉻與無電鍍鎳。' },
+      { no:'05', icon:'🏭', title:'恆展加工單價計算機', shortTitle:'恆展單價',  href:'./恆展加工單價計算機.html',desc:'恆展廠 SD型 / LA型 加工件單價計算，依規格自動套用計價邏輯。' },
+      { no:'06', icon:'⚖️', title:'軸心整修 vs 製新',   shortTitle:'軸心整修',  href:'./軸心整修vs製新.html',    desc:'快速比較軸心整修成本與重新製作費用，提供決策依據。' },
+      { no:'07', icon:'📋', title:'報價單產生器',        shortTitle:'報價單',    href:'./報價單_勁格科技.html',   desc:'整合各項加工費用，自動彙整油壓缸完整報價單，支援列印輸出。因頁面較大，建議於 PC 使用。' },
+      { no:'08', icon:'🔩', title:'鎖緊扭力表',          shortTitle:'鎖緊扭力',  href:'./鎖緊扭力表.html',        desc:'M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。' },
+      { no:'09', icon:'⚙️', title:'螺紋加工計算機',     shortTitle:'螺紋加工',  href:'./螺紋加工計算機.html',    desc:'公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。' },
+      { no:'10', icon:'💎', title:'硬度換算工具',        shortTitle:'硬度換算',  href:'./硬度換算工具.html',      desc:'HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。' },
+      { no:'11', icon:'🕳️', title:'深孔加工計算機',     shortTitle:'深孔加工',  href:'./深孔加工計算機.html',    desc:'深孔鑽削加工工時與費用估算，依孔徑、深度及加工材質計算。' },
+      { no:'12', icon:'💿', title:'研磨計算機',          shortTitle:'研磨計算',  href:'./研磨計算機.html',        desc:'外徑研磨加工費用估算，依直徑與研磨長度計算研磨面積與工時。' },
+      { no:'13', icon:'🔥', title:'熱處理計算機',        shortTitle:'熱處理',    href:'./熱處理計算機.html',      desc:'依工件重量與熱處理方式（調質、淬火、滲碳等）估算加工費用。' },
     ];
 
     const STORAGE_KEY = 'jinge_tool_order';
     let sortMode = false;
-    let dragSrc = null;
 
-    // ── 建立卡片 HTML ──────────────────────────────────────
+    // ── 建立卡片 ──────────────────────────────────────────
     function buildCard(t, idx) {
       const a = document.createElement('a');
       a.className = 'tool-card';
@@ -224,16 +223,10 @@
         </div>
         <div class="card-desc">${t.desc}</div>
         <span class="card-arrow">→</span>`;
-      // drag events
-      a.addEventListener('dragstart', onDragStart);
-      a.addEventListener('dragover',  onDragOver);
-      a.addEventListener('dragleave', onDragLeave);
-      a.addEventListener('drop',      onDrop);
-      a.addEventListener('dragend',   onDragEnd);
       return a;
     }
 
-    // ── 載入順序並渲染 ────────────────────────────────────
+    // ── 渲染 ──────────────────────────────────────────────
     function render() {
       const grid = document.getElementById('toolsGrid');
       grid.innerHTML = '';
@@ -248,31 +241,93 @@
       ordered.forEach((t, i) => grid.appendChild(buildCard(t, i)));
     }
 
-    // ── 拖曳邏輯 ──────────────────────────────────────────
-    function onDragStart(e) {
+    // ── 拖曳：同時支援 mouse（PC）與 touch（手機）─────────
+    let dragEl = null;       // 正在拖的卡片
+    let ghost  = null;       // 跟手的複製品
+    let lastOver = null;     // 上次 hover 的目標
+
+    function getCards() {
+      return [...document.getElementById('toolsGrid').children];
+    }
+
+    function cardAt(x, y) {
+      // 找座標下的卡片（排除 ghost）
+      if (ghost) ghost.style.display = 'none';
+      const el = document.elementFromPoint(x, y);
+      if (ghost) ghost.style.display = '';
+      return el ? el.closest('.tool-card') : null;
+    }
+
+    function startDrag(el, clientX, clientY) {
       if (!sortMode) return;
-      dragSrc = this;
-      e.dataTransfer.effectAllowed = 'move';
+      dragEl = el;
+      dragEl.classList.add('dragging');
+
+      // 建立跟手 ghost
+      ghost = dragEl.cloneNode(true);
+      const rect = dragEl.getBoundingClientRect();
+      ghost.style.cssText = `
+        position:fixed;width:${rect.width}px;pointer-events:none;opacity:0.85;
+        z-index:9999;top:${rect.top}px;left:${rect.left}px;
+        box-shadow:0 12px 32px rgba(30,48,96,0.3);transform:scale(1.04);
+        transition:none;border:2px solid var(--accent);border-radius:4px;`;
+      document.body.appendChild(ghost);
     }
-    function onDragOver(e) {
-      if (!sortMode || !dragSrc || dragSrc === this) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      this.classList.add('drag-over');
+
+    function moveDrag(clientX, clientY) {
+      if (!dragEl || !ghost) return;
+      const rect = dragEl.getBoundingClientRect();
+      ghost.style.top  = (clientY - rect.height / 2) + 'px';
+      ghost.style.left = (clientX - rect.width  / 2) + 'px';
+
+      const target = cardAt(clientX, clientY);
+      if (lastOver && lastOver !== target) lastOver.classList.remove('drag-over');
+      if (target && target !== dragEl) {
+        target.classList.add('drag-over');
+        lastOver = target;
+        // 即時插入
+        const grid = document.getElementById('toolsGrid');
+        const cards = getCards();
+        const si = cards.indexOf(dragEl);
+        const ti = cards.indexOf(target);
+        if (si < ti) grid.insertBefore(dragEl, target.nextSibling);
+        else          grid.insertBefore(dragEl, target);
+      }
     }
-    function onDragLeave() { this.classList.remove('drag-over'); }
-    function onDrop(e) {
-      if (!sortMode || !dragSrc || dragSrc === this) return;
-      e.preventDefault();
-      this.classList.remove('drag-over');
-      const grid = document.getElementById('toolsGrid');
-      const cards = [...grid.children];
-      const srcIdx  = cards.indexOf(dragSrc);
-      const destIdx = cards.indexOf(this);
-      if (srcIdx < destIdx) grid.insertBefore(dragSrc, this.nextSibling);
-      else                  grid.insertBefore(dragSrc, this);
+
+    function endDrag() {
+      if (!dragEl) return;
+      dragEl.classList.remove('dragging');
+      if (lastOver) lastOver.classList.remove('drag-over');
+      if (ghost) { ghost.remove(); ghost = null; }
+      dragEl = null; lastOver = null;
     }
-    function onDragEnd() { this.classList.remove('drag-over'); }
+
+    // Mouse events
+    document.addEventListener('mousedown', e => {
+      const card = e.target.closest('.tool-card');
+      if (card && sortMode) { e.preventDefault(); startDrag(card, e.clientX, e.clientY); }
+    });
+    document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+    document.addEventListener('mouseup', endDrag);
+
+    // Touch events
+    document.addEventListener('touchstart', e => {
+      const card = e.target.closest('.tool-card');
+      if (card && sortMode) {
+        e.preventDefault();
+        const t = e.touches[0];
+        startDrag(card, t.clientX, t.clientY);
+      }
+    }, { passive: false });
+    document.addEventListener('touchmove', e => {
+      if (dragEl) {
+        e.preventDefault();
+        const t = e.touches[0];
+        moveDrag(t.clientX, t.clientY);
+      }
+    }, { passive: false });
+    document.addEventListener('touchend', endDrag);
 
     // ── 排序模式切換 ──────────────────────────────────────
     function toggleSort() {
@@ -286,16 +341,23 @@
 
       if (sortMode) {
         btn.textContent = '✓ 儲存順序';
-        [...grid.children].forEach(c => { c.draggable = true; c.onclick = e => e.preventDefault(); });
+        // 停用點擊連結
+        grid.querySelectorAll('.tool-card').forEach(c => {
+          c.addEventListener('click', stopClick, true);
+        });
       } else {
         btn.textContent = '⇅ 調整順序';
-        // 儲存目前順序
-        const order = [...grid.children].map(c => c.dataset.href);
+        // 儲存
+        const order = getCards().map(c => c.dataset.href);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-        // 恢復點擊連結
-        [...grid.children].forEach(c => { c.draggable = false; c.onclick = null; });
+        // 恢復點擊
+        grid.querySelectorAll('.tool-card').forEach(c => {
+          c.removeEventListener('click', stopClick, true);
+        });
       }
     }
+
+    function stopClick(e) { e.preventDefault(); e.stopPropagation(); }
 
     // 初始化
     render();
