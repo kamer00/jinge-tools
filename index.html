@@ -65,7 +65,7 @@
     .tools-grid.sort-mode .tool-card:active{cursor:grabbing;}
     .tools-grid.sort-mode .tool-card.drag-over{border:2px solid var(--navy);background:#eef2ff;transform:scale(1.02);}
     .tools-grid.sort-mode .tool-card::after{
-      content:'⠿ 長按拖曳';position:absolute;top:8px;right:10px;
+      content:'☰ 拖曳排序';position:absolute;top:8px;right:10px;
       font-size:10px;color:var(--accent);letter-spacing:0.05em;
     }
     .sort-hint{
@@ -187,7 +187,8 @@
   <footer>
     <div class="footer-copy">© 2026 勁格科技股份有限公司 — INTERNAL USE ONLY</div>
     <div class="footer-status"><span class="status-dot"></span>ONLINE</div>
-  </footer>  <script>
+  </footer>  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <script>
     const TOOLS = [
       { no:'01', icon:'📦', title:'材料計算機',         shortTitle:'材料計算',  href:'./材料計算機.html',        desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。' },
       { no:'02', icon:'🔩', title:'銑床加工計算機',     shortTitle:'銑床加工',  href:'./銑床加工計算機.html',    desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
@@ -206,8 +207,8 @@
 
     const STORAGE_KEY = 'jinge_tool_order';
     let sortMode = false;
+    let sortable = null;
 
-    // ── 建立卡片 ──────────────────────────────────────────
     function buildCard(t, idx) {
       const a = document.createElement('a');
       a.className = 'tool-card';
@@ -226,7 +227,6 @@
       return a;
     }
 
-    // ── 渲染 ──────────────────────────────────────────────
     function render() {
       const grid = document.getElementById('toolsGrid');
       grid.innerHTML = '';
@@ -239,127 +239,49 @@
         ordered = [...reordered, ...extras];
       }
       ordered.forEach((t, i) => grid.appendChild(buildCard(t, i)));
+
+      // 初始化 SortableJS（預設停用）
+      sortable = Sortable.create(grid, {
+        disabled: true,
+        animation: 180,
+        ghostClass: 'drag-over',
+        chosenClass: 'dragging',
+        delay: 0,
+        touchStartThreshold: 3,
+        onEnd: () => {
+          // 拖完立即儲存
+          const order = [...grid.children].map(c => c.dataset.href);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+        }
+      });
     }
 
-    // ── 拖曳：同時支援 mouse（PC）與 touch（手機）─────────
-    let dragEl = null;       // 正在拖的卡片
-    let ghost  = null;       // 跟手的複製品
-    let lastOver = null;     // 上次 hover 的目標
-
-    function getCards() {
-      return [...document.getElementById('toolsGrid').children];
-    }
-
-    function cardAt(x, y) {
-      // 找座標下的卡片（排除 ghost）
-      if (ghost) ghost.style.display = 'none';
-      const el = document.elementFromPoint(x, y);
-      if (ghost) ghost.style.display = '';
-      return el ? el.closest('.tool-card') : null;
-    }
-
-    function startDrag(el, clientX, clientY) {
-      if (!sortMode) return;
-      dragEl = el;
-      dragEl.classList.add('dragging');
-
-      // 建立跟手 ghost
-      ghost = dragEl.cloneNode(true);
-      const rect = dragEl.getBoundingClientRect();
-      ghost.style.cssText = `
-        position:fixed;width:${rect.width}px;pointer-events:none;opacity:0.85;
-        z-index:9999;top:${rect.top}px;left:${rect.left}px;
-        box-shadow:0 12px 32px rgba(30,48,96,0.3);transform:scale(1.04);
-        transition:none;border:2px solid var(--accent);border-radius:4px;`;
-      document.body.appendChild(ghost);
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!dragEl || !ghost) return;
-      const rect = dragEl.getBoundingClientRect();
-      ghost.style.top  = (clientY - rect.height / 2) + 'px';
-      ghost.style.left = (clientX - rect.width  / 2) + 'px';
-
-      const target = cardAt(clientX, clientY);
-      if (lastOver && lastOver !== target) lastOver.classList.remove('drag-over');
-      if (target && target !== dragEl) {
-        target.classList.add('drag-over');
-        lastOver = target;
-        // 即時插入
-        const grid = document.getElementById('toolsGrid');
-        const cards = getCards();
-        const si = cards.indexOf(dragEl);
-        const ti = cards.indexOf(target);
-        if (si < ti) grid.insertBefore(dragEl, target.nextSibling);
-        else          grid.insertBefore(dragEl, target);
-      }
-    }
-
-    function endDrag() {
-      if (!dragEl) return;
-      dragEl.classList.remove('dragging');
-      if (lastOver) lastOver.classList.remove('drag-over');
-      if (ghost) { ghost.remove(); ghost = null; }
-      dragEl = null; lastOver = null;
-    }
-
-    // Mouse events
-    document.addEventListener('mousedown', e => {
-      const card = e.target.closest('.tool-card');
-      if (card && sortMode) { e.preventDefault(); startDrag(card, e.clientX, e.clientY); }
-    });
-    document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-    document.addEventListener('mouseup', endDrag);
-
-    // Touch events
-    document.addEventListener('touchstart', e => {
-      const card = e.target.closest('.tool-card');
-      if (card && sortMode) {
-        e.preventDefault();
-        const t = e.touches[0];
-        startDrag(card, t.clientX, t.clientY);
-      }
-    }, { passive: false });
-    document.addEventListener('touchmove', e => {
-      if (dragEl) {
-        e.preventDefault();
-        const t = e.touches[0];
-        moveDrag(t.clientX, t.clientY);
-      }
-    }, { passive: false });
-    document.addEventListener('touchend', endDrag);
-
-    // ── 排序模式切換 ──────────────────────────────────────
     function toggleSort() {
       sortMode = !sortMode;
       const grid = document.getElementById('toolsGrid');
       const btn  = document.getElementById('sortBtn');
       const hint = document.getElementById('sortHint');
+
+      sortable.option('disabled', !sortMode);
       grid.classList.toggle('sort-mode', sortMode);
       btn.classList.toggle('active', sortMode);
       hint.classList.toggle('visible', sortMode);
 
       if (sortMode) {
-        btn.textContent = '✓ 儲存順序';
-        // 停用點擊連結
-        grid.querySelectorAll('.tool-card').forEach(c => {
-          c.addEventListener('click', stopClick, true);
-        });
+        btn.textContent = '✓ 完成排序';
+        // 排序模式：點卡片不跳頁
+        grid.addEventListener('click', blockClick, true);
       } else {
         btn.textContent = '⇅ 調整順序';
-        // 儲存
-        const order = getCards().map(c => c.dataset.href);
+        grid.removeEventListener('click', blockClick, true);
+        // 儲存最終順序
+        const order = [...grid.children].map(c => c.dataset.href);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-        // 恢復點擊
-        grid.querySelectorAll('.tool-card').forEach(c => {
-          c.removeEventListener('click', stopClick, true);
-        });
       }
     }
 
-    function stopClick(e) { e.preventDefault(); e.stopPropagation(); }
+    function blockClick(e) { e.preventDefault(); }
 
-    // 初始化
     render();
   </script>
 </body>
