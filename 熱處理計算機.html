@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熱處理計算機 — 勁格科技</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500&family=Share+Tech+Mono&display=swap');
+  :root{
+    --bg:#0f1117;--card:#1a1f2e;--border:#3a4060;
+    --accent:#f0a832;--accent2:#5bb8f5;
+    --text:#eef0f8;--sub:#a0a8c8;--muted:#6a73a0;
+    --green:#4ecb8d;
+    --mono:"Share Tech Mono",monospace;--sans:"Noto Sans TC",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:20px 16px 48px;}
+  .wrap{width:100%;max-width:440px;}
+
+  /* Header */
+  header{display:flex;align-items:center;gap:12px;
+    padding-bottom:16px;margin-bottom:24px;border-bottom:1px solid var(--border);}
+  .logo-img{width:40px;height:40px;border-radius:8px;background:#fff;
+    padding:1px;object-fit:contain;flex-shrink:0;}
+  header h1{font-size:16px;font-weight:500;color:var(--text);}
+  header p{font-size:11px;color:var(--sub);font-family:var(--mono);margin-top:3px;}
+
+  /* Field */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--sub);margin-bottom:7px;font-weight:500;}
+  select,input[type=number]{
+    width:100%;background:#141824;border:1px solid var(--border);
+    color:var(--text);border-radius:8px;padding:13px 14px;
+    font-family:var(--sans);font-size:15px;outline:none;
+    transition:border-color .15s;-webkit-appearance:none;appearance:none;
+  }
+  select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(240,168,50,.12);}
+  input[type=number]{font-family:var(--mono);font-size:16px;}
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  input[type=number]{-moz-appearance:textfield;}
+  .hint{font-size:12px;color:var(--accent2);font-family:var(--mono);margin-top:6px;min-height:18px;}
+
+  /* Shape toggle */
+  .shape-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;}
+  .shape-tab{background:#141824;border:1px solid var(--border);color:var(--sub);
+    border-radius:8px;padding:10px 4px;font-size:12px;font-family:var(--sans);
+    cursor:pointer;transition:all .15s;text-align:center;line-height:1.4;}
+  .shape-tab.active{border-color:var(--accent2);color:var(--accent2);background:rgba(91,184,245,.1);}
+  .shape-tab span{font-size:10px;color:var(--muted);display:block;margin-top:2px;}
+  .shape-tab.active span{color:var(--accent2);opacity:.7;}
+
+  /* Dim grid */
+  .dim-grid{display:grid;gap:10px;margin-bottom:12px;}
+  .dim-grid.g2{grid-template-columns:1fr 1fr;}
+  .dim-grid.g3{grid-template-columns:1fr 1fr 1fr;}
+  .dim-field label{display:block;font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--sub);margin-bottom:6px;font-weight:500;}
+  .dim-field input{width:100%;background:#141824;border:1px solid var(--border);
+    color:var(--text);border-radius:7px;padding:11px 10px;
+    font-family:var(--mono);font-size:16px;outline:none;text-align:right;
+    transition:border-color .15s;}
+  .dim-field input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(240,168,50,.12);}
+  .dim-field input::-webkit-inner-spin-button,
+  .dim-field input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .dim-field input{-moz-appearance:textfield;}
+  .dim-unit{font-size:11px;color:var(--muted);text-align:right;margin-top:4px;font-family:var(--mono);}
+
+  /* Weight result */
+  .wt-result{display:flex;align-items:center;justify-content:space-between;
+    background:rgba(91,184,245,.08);border:1px solid rgba(91,184,245,.3);
+    border-radius:8px;padding:13px 16px;margin-bottom:16px;}
+  .wt-label{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;font-weight:500;}
+  .wt-val{font-family:var(--mono);font-size:24px;color:var(--accent2);font-weight:bold;}
+  .wt-unit{font-size:13px;color:var(--sub);margin-left:4px;}
+
+  .divider{height:1px;background:var(--border);margin:22px 0;}
+  .sec-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--sub);display:flex;align-items:center;gap:8px;margin-bottom:14px;font-weight:500;}
+  .sec-label::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  /* HT result */
+  .result-box{background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:20px;margin-bottom:24px;text-align:center;}
+  .result-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--sub);margin-bottom:10px;font-weight:500;}
+  .result-val{font-family:var(--mono);font-size:44px;font-weight:bold;
+    color:var(--accent);line-height:1;}
+  .result-unit{font-size:15px;color:var(--sub);margin-left:4px;}
+  .result-formula{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:10px;}
+
+  /* Reference notes */
+  .ref-box{background:#141824;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+  .ref-title{font-size:12px;font-weight:500;color:var(--sub);
+    padding:10px 14px;border-bottom:1px solid var(--border);letter-spacing:.05em;}
+  .ref-row{display:flex;justify-content:space-between;align-items:center;
+    padding:9px 14px;border-bottom:1px solid rgba(58,64,96,.5);}
+  .ref-row:last-child{border-bottom:none;}
+  .ref-name{font-size:13px;color:var(--text);}
+  .ref-price{font-family:var(--mono);font-size:13px;color:var(--sub);}
+
+  /* Grand */
+  .grand-box{background:linear-gradient(135deg,#15192899,#1c2240);
+    border:1px solid #3a4870;border-radius:10px;padding:20px 22px;}
+  .grand-row{display:flex;justify-content:space-between;align-items:baseline;}
+  .grand-label{font-size:12px;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+  .grand-val{font-family:var(--mono);font-size:36px;font-weight:bold;color:var(--accent);}
+  .grand-unit{font-size:14px;color:var(--sub);margin-left:4px;}
+
+  footer{width:100%;max-width:440px;text-align:center;font-size:11px;
+    color:var(--muted);font-family:var(--mono);margin-top:22px;
+    padding-top:12px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img class="logo-img" src="data:image/png;base64,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" alt="Jinger Technology">
+  <div>
+    <h1>熱處理計算機</h1>
+    <p>勁格科技 JINGER TECHNOLOGY</p>
+  </div>
+</header>
+
+<!-- 熱處理種類 -->
+<div class="field">
+  <label>熱處理種類</label>
+  <select id="selHt" onchange="onHtChange()"></select>
+</div>
+
+<!-- 材料 -->
+<div class="field">
+  <label>材料</label>
+  <select id="selMat" onchange="onMatChange()"></select>
+  <div class="hint" id="densityHint"></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 形狀 -->
+<div class="field">
+  <label>零件形狀</label>
+  <div class="shape-tabs">
+    <button class="shape-tab active" data-shape="cyl" onclick="setShape(this)">
+      ⬤ 實心圓柱<span>外徑 × 長</span>
+    </button>
+    <button class="shape-tab" data-shape="box" onclick="setShape(this)">
+      ▬ 矩形塊<span>長 × 寬 × 高</span>
+    </button>
+    <button class="shape-tab" data-shape="ring" onclick="setShape(this)">
+      ◎ 空心圓柱<span>外徑×內徑×長</span>
+    </button>
+  </div>
+</div>
+
+<div id="dims-cyl">
+  <div class="dim-grid g2">
+    <div class="dim-field">
+      <label>外徑 Ø</label>
+      <input id="cyl-d" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+    <div class="dim-field">
+      <label>長度 L</label>
+      <input id="cyl-l" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+  </div>
+</div>
+
+<div id="dims-box" style="display:none">
+  <div class="dim-grid g3">
+    <div class="dim-field">
+      <label>長 L</label>
+      <input id="box-l" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+    <div class="dim-field">
+      <label>寬 W</label>
+      <input id="box-w" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+    <div class="dim-field">
+      <label>高 H</label>
+      <input id="box-h" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+  </div>
+</div>
+
+<div id="dims-ring" style="display:none">
+  <div class="dim-grid g3">
+    <div class="dim-field">
+      <label>外徑 Ø</label>
+      <input id="ring-d" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+    <div class="dim-field">
+      <label>內徑 Ø</label>
+      <input id="ring-di" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+    <div class="dim-field">
+      <label>長度 L</label>
+      <input id="ring-l" type="number" min="0" step="0.1" placeholder="0.0" oninput="calcWeight()">
+      <div class="dim-unit">mm</div>
+    </div>
+  </div>
+</div>
+
+<div class="wt-result">
+  <span class="wt-label">計算重量</span>
+  <span><span class="wt-val" id="wtVal">—</span><span class="wt-unit" id="wtUnit"></span></span>
+</div>
+
+<div class="divider"></div>
+
+<!-- 熱處理費用 -->
+<div class="result-box">
+  <div class="result-label">熱處理費用</div>
+  <div>
+    <span class="result-val" id="htVal">—</span>
+    <span class="result-unit" id="htUnit"></span>
+  </div>
+  <div class="result-formula" id="htFormula"></div>
+</div>
+
+<!-- 固定柱備註 -->
+<div class="sec-label">固定柱 計價參考</div>
+<div class="ref-box" style="margin-bottom:20px;">
+  <div class="ref-title">依零件長度計費（元 / 支）</div>
+  <div class="ref-row"><span class="ref-name">1M 以內</span><span class="ref-price">120 元／支</span></div>
+  <div class="ref-row"><span class="ref-name">1M – 2.5M</span><span class="ref-price">240 元／支</span></div>
+  <div class="ref-row"><span class="ref-name">2.5M – 3M</span><span class="ref-price">360 元／支</span></div>
+</div>
+
+<!-- 去氫裂備註 -->
+<div class="sec-label">去氫裂 計價參考</div>
+<div class="ref-box" style="margin-bottom:24px;">
+  <div class="ref-title">依處理批次計費</div>
+  <div class="ref-row"><span class="ref-name">單支</span><span class="ref-price">1,200 元</span></div>
+  <div class="ref-row"><span class="ref-name">1 爐</span><span class="ref-price">7,200 元</span></div>
+</div>
+
+<div class="grand-box">
+  <div class="grand-row">
+    <span class="grand-label">熱處理合計</span>
+    <span><span class="grand-val" id="grandVal">—</span><span class="grand-unit" id="grandUnit"></span></span>
+  </div>
+</div>
+
+</div>
+<footer>價格依廠商新報價 ／ 如有調整請聯繫廠長確認</footer>
+
+<script>
+const HT = [
+  {id:"norm",   label:"正常化、回火",   price:8,    mats:["S45C","SCM440","SCM415","其他"]},
+  {id:"qt",     label:"調質",           price:13.5, mats:["S45C","SCM440","SCM415"]},
+  {id:"qt_suj", label:"調質（SUJ2）",   price:18,   mats:["SUJ2"]},
+  {id:"qt_blu", label:"調質（藍十字）", price:30,   mats:["藍十字"]},
+  {id:"qt_sus", label:"調質 / 固溶化", price:36,   mats:["SUS420J2"]},
+  {id:"carb",   label:"滲碳",           price:42,   mats:["SCM415","其他"]},
+  {id:"qt_skd", label:"調質（SKD61）",  price:48,   mats:["SKD61"]},
+];
+const DENSITY = {
+  "S45C":7.85,"SCM440":7.85,"SCM415":7.85,"SUJ2":7.85,
+  "SUS420J2":7.75,"SKD61":7.76,"藍十字":7.85,"其他":7.85
+};
+
+const fmt    = n => parseFloat(n.toFixed(3)).toLocaleString("zh-TW");
+const fmtInt = n => Math.round(n).toLocaleString("zh-TW");
+
+let currentShape = "cyl";
+let currentKg    = 0;
+
+const selHt = document.getElementById("selHt");
+HT.forEach(h => {
+  const o = document.createElement("option");
+  o.value = h.id; o.textContent = h.label;
+  selHt.appendChild(o);
+});
+
+function onHtChange() {
+  const ht = HT.find(h => h.id === selHt.value);
+  const selMat = document.getElementById("selMat");
+  selMat.innerHTML = "";
+  (ht?.mats || []).forEach(m => {
+    const o = document.createElement("option");
+    o.value = m; o.textContent = m; selMat.appendChild(o);
+  });
+  onMatChange();
+}
+
+function onMatChange() {
+  const mat = document.getElementById("selMat").value;
+  const d   = DENSITY[mat] || 7.85;
+  document.getElementById("densityHint").textContent = "密度：" + d + " g/cm³";
+  calcWeight();
+}
+
+function setShape(btn) {
+  document.querySelectorAll(".shape-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  currentShape = btn.dataset.shape;
+  ["cyl","box","ring"].forEach(s =>
+    document.getElementById("dims-"+s).style.display = s === currentShape ? "" : "none"
+  );
+  calcWeight();
+}
+
+function calcWeight() {
+  const mat    = document.getElementById("selMat").value;
+  const rhoMM  = (DENSITY[mat] || 7.85) / 1000; // g/mm³
+  let vol = 0;
+
+  if (currentShape === "cyl") {
+    const D = parseFloat(document.getElementById("cyl-d").value) || 0;
+    const L = parseFloat(document.getElementById("cyl-l").value) || 0;
+    vol = Math.PI / 4 * D * D * L;
+  } else if (currentShape === "box") {
+    const L = parseFloat(document.getElementById("box-l").value) || 0;
+    const W = parseFloat(document.getElementById("box-w").value) || 0;
+    const H = parseFloat(document.getElementById("box-h").value) || 0;
+    vol = L * W * H;
+  } else if (currentShape === "ring") {
+    const D  = parseFloat(document.getElementById("ring-d").value)  || 0;
+    const Di = parseFloat(document.getElementById("ring-di").value) || 0;
+    const L  = parseFloat(document.getElementById("ring-l").value)  || 0;
+    vol = Math.PI / 4 * (D*D - Di*Di) * L;
+  }
+
+  const kg = vol * rhoMM / 1000;
+  currentKg = kg;
+
+  if (kg > 0) {
+    document.getElementById("wtVal").textContent  = fmt(kg);
+    document.getElementById("wtUnit").textContent = "kg";
+  } else {
+    document.getElementById("wtVal").textContent  = "—";
+    document.getElementById("wtUnit").textContent = "";
+  }
+  calcCost();
+}
+
+function calcCost() {
+  const ht = HT.find(h => h.id === selHt.value);
+  const kg = currentKg;
+
+  if (ht && kg > 0) {
+    const htCost = ht.price * kg;
+    document.getElementById("htVal").textContent     = fmtInt(htCost);
+    document.getElementById("htUnit").textContent    = "元";
+    document.getElementById("htFormula").textContent = fmt(kg) + " kg × " + ht.price + " 元/kg";
+    document.getElementById("grandVal").textContent  = fmtInt(htCost);
+    document.getElementById("grandUnit").textContent = "元";
+  } else {
+    document.getElementById("htVal").textContent     = "—";
+    document.getElementById("htUnit").textContent    = "";
+    document.getElementById("htFormula").textContent = "";
+    document.getElementById("grandVal").textContent  = "—";
+    document.getElementById("grandUnit").textContent = "";
+  }
+}
+
+onHtChange();
+</script>
+</body>
+</html>
