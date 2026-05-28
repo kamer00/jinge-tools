@@ -213,8 +213,8 @@
 
   <div class="formula-box">
     面積 = <span>π × Ø(in) × L(in)</span>｜
-    第一次 = <span>面積 × 2.5</span>｜
-    第二次 = <span>面積 × 2.5 × 1.5</span>
+    第一次 = <span>面積 × 2</span>｜
+    第二次 = <span>面積 × 2 × 1.5</span>
   </div>
   <br>
   <button class="btn-reset" onclick="resetAll()">⟳ 清除重填</button>
@@ -240,8 +240,8 @@ function calculate() {
     return;
   }
   const area  = Math.PI * mm2in(D) * mm2in(L);
-  const cost1 = area * 2.5;
-  const cost2 = area * 2.5 * 1.5;
+  const cost1 = area * 2;
+  const cost2 = area * 2 * 1.5;
   const total = Math.max(300, passes === 1 ? cost1 : cost1 + cost2);
   let rows = `
     <div class="result-row">
@@ -249,13 +249,13 @@ function calculate() {
       <span class="result-value accent">${area.toFixed(2)} in²</span>
     </div>
     <div class="result-row">
-      <span class="result-label">第一次研磨費（× 2.5）</span>
+      <span class="result-label">第一次研磨費（× 2）</span>
       <span class="result-value">${fmt(cost1)}</span>
     </div>`;
   if (passes === 2) {
     rows += `
     <div class="result-row">
-      <span class="result-label">第二次研磨費（× 2.5 × 1.5）</span>
+      <span class="result-label">第二次研磨費（× 2 × 1.5）</span>
       <span class="result-value">${fmt(cost2)}</span>
     </div>`;
   }
