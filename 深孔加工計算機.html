@@ -70,41 +70,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 <div class="main">
 
   <div class="card">
-    <div class="card-title">01 ／ 選擇孔徑</div>
-    <div class="field">
+    <div class="card-title">輸入參數</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
         <button class="mat-btn active" id="btn-std" onclick="setMat('std',this)">一般</button>
-        <button class="mat-btn" id="btn-alloy" onclick="setMat('alloy',this)">中碳 / 紅十字<span style="display:block;font-size:9px;opacity:.7">S45C / SCM440　φ3~φ30 → 2.50/mm</span></button>
+        <button class="mat-btn" id="btn-alloy" onclick="setMat('alloy',this)">調質<span style="display:block;font-size:9px;opacity:.7">φ3 ~ φ30 → 2.50/mm</span></button>
       </div>
-      <label>孔徑（mm）</label>
-      <select id="dia-sel" onchange="onDiaChange()">
-        <option value="">— 選擇孔徑 —</option>
-      </select>
-      <div id="alloy-note" style="display:none;margin-top:8px;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:3px;padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--accent)">
-        φ3 ～ φ30：固定 2.50 元/mm（中碳 / 紅十字）
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field">
+          <label>孔徑（mm）</label>
+          <select id="dia-sel" onchange="onDiaChange()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:14px;padding:10px 12px;border-radius:3px;width:100%;transition:border-color .15s">
+            <option value="">— 選擇 —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>深度 L（mm）</label>
+          <input type="number" id="depth" placeholder="加工深度" step="1" min="1">
+        </div>
       </div>
-    </div>
   </div>
-
-  <div class="card">
-    <div class="card-title">02 ／ 加工參數</div>
-    <div>
-      <div class="field">
-        <label>深度 L（mm）</label>
-        <input type="number" id="depth" placeholder="加工深度" step="1" min="1">
-      </div>
-    </div>
-    <div class="info">💡 費用 ＝ 單價（元/mm）× 深度（mm）</div>
-  </div>
-
-  <button class="calc-btn" onclick="calculate()">▶ 計算加工費用</button>
-
-  <div class="result-card" id="result-card">
-    <div class="res-header" id="res-header">RESULT</div>
-    <div class="res-body" id="res-body"></div>
-  </div>
-
-</div>
 <script>
 const RATES = [
   {d:3,    p:2.50},
@@ -151,20 +134,31 @@ function setMat(mat, btn) {
   document.querySelectorAll('.mat-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   rebuildSelect(mat);
-  const note = document.getElementById('alloy-note');
-  note.style.display = (mat === 'alloy') ? 'block' : 'none';
+  
 }
 
 function rebuildSelect(mat) {
   const sel = document.getElementById('dia-sel');
   sel.innerHTML = '<option value="">— 選擇孔徑 —</option>';
-  const list = (mat === 'alloy') ? RATES.filter(r => r.d > 30) : RATES;
-  list.forEach(r => {
+  if(mat === 'alloy') {
     const o = document.createElement('option');
-    o.value = r.d;
-    o.textContent = 'φ' + r.d + ' mm　—　' + r.p + ' 元/mm';
+    o.value = 'alloy_30';
+    o.textContent = 'φ3 ~ φ30　—　2.50 元/mm';
     sel.appendChild(o);
-  });
+    RATES.filter(r => r.d > 30).forEach(r => {
+      const o = document.createElement('option');
+      o.value = r.d;
+      o.textContent = 'φ' + r.d + ' mm　—　' + r.p + ' 元/mm';
+      sel.appendChild(o);
+    });
+  } else {
+    RATES.forEach(r => {
+      const o = document.createElement('option');
+      o.value = r.d;
+      o.textContent = 'φ' + r.d + ' mm　—　' + r.p + ' 元/mm';
+      sel.appendChild(o);
+    });
+  }
   selDia = null; selPx = null;
 }
 rebuildSelect('std');
@@ -173,12 +167,15 @@ rebuildSelect('std');
 
 
 function onDiaChange() {
-  const v = parseFloat(document.getElementById('dia-sel').value);
+  const v = document.getElementById('dia-sel').value;
   if(!v) { selDia = null; selPx = null; return; }
-  const r = RATES.find(x => x.d === v);
+  if(v === 'alloy_30') {
+    selDia = 'φ3~φ30'; selPx = 2.50; return;
+  }
+  const r = RATES.find(x => x.d === parseFloat(v));
   if(!r) return;
   selDia = r.d;
-  selPx = (selMat === 'alloy' && r.d <= 30) ? 2.50 : r.p;
+  selPx = r.p;
 }
 
 function calculate() {
@@ -193,7 +190,7 @@ function calculate() {
   const fmtNT = n => Math.round(n).toLocaleString('zh-TW');
 
   document.getElementById('res-header').textContent =
-    `深孔加工費用　φ${selDia} × ${depth}mm　${selMat==='alloy'?'中碳/紅十字':''}`;
+    `深孔加工費用　φ${selDia} × ${depth}mm　${selMat==='alloy'?'調質':''}`;
   document.getElementById('res-body').innerHTML = `
     <div class="res-big">
       <div class="label">TOTAL COST</div>
