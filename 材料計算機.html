@@ -348,6 +348,7 @@ function setMode(m) {
   document.getElementById('result').innerHTML =
     '<div class="result-empty"><div class="big-icon">'+(m==='reverse'?'⇄':'⚙')+'</div><p>'
     +(m==='reverse'?'填入規格與廠商報價後反查':'填入尺寸後按計算')+'</p></div>';
+  renderDims();
 }
 function mainAction() {
   if(currentMode === 'reverse') reverseCalc();
@@ -716,8 +717,7 @@ function lookupPlatePrice(thickness, matCode, plateType) {
 
   // 特殊鋼板：顯示參考單價，提示須詢問供應商確認規格
   if(mc==='S45C_B'||mc==='S45C_L'||mc==='S45C') {
-    const cands=[{name:'梧濟',px:33}];
-    return {best:cands[0], all:cands, confirm:true};
+    return {inquiry:true};
   }
   if(mc==='S50C') {
     const cands=[{name:'高碳',px:37},{name:'梧濟',px:38}];
@@ -794,7 +794,7 @@ function onMatChange() {
   const val = document.getElementById('mat').value;
   const density = val.split('|')[1];
   document.getElementById('density-tag').textContent = '密度：'+density+' g/cm³';
-  renderDims(); // 重新建立規格選單（依材質更新選項）
+  renderDims();
   autoFillUnitPrice();
 }
 
@@ -843,7 +843,7 @@ function autoFillUnitPrice() {
 // ══════════════════════════════════════════════════
 // 各形狀對應材質清單
 const SHAPE_MATS = {
-  plate:   [['SS400|7.85','SS400'],['S45C_B|7.85','S50C'],['SCM440|7.85','SCM440']],
+  plate:   [['SS400|7.85','SS400'],['S50C|7.85','S50C'],['SCM440|7.85','SCM440']],
   // bar_rnd 使用群組格式：{group:'群組名', items:[...]}
   bar_rnd: [
     {group:'碳鋼', items:[
@@ -1103,7 +1103,9 @@ function renderDims() {
     const copperBarMats0 = ['C3604','BC6','PBC3','ALBC3','HBrass'];
     if(copperBarMats0.includes(matCode0)) {
       const copperHint = mk('div',{style:'margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)'});
-      copperHint.textContent = '※ 請輸入實寸（完成尺寸），程式自動加計餘量';
+      copperHint.textContent = currentMode==='reverse'
+        ? '※ 請輸入實際進料尺寸'
+        : '※ 請輸入實寸（完成尺寸），程式自動加計餘量';
       area.appendChild(copperHint);
     }
 
@@ -1925,9 +1927,9 @@ function reverseCalc() {
 
     // 計算重量
     if(isCopperBar) {
-      const adjDims={...dims,D:dims.D+7,L:dims.L+5,...(dims.ID&&dims.ID>0?{ID:Math.max(dims.ID-7,1)}:{})};
-      const {kg:k}=calcWeight(currentShape,adjDims,9);
-      weight=Math.round(k*1.03*10000)/10000;
+      // 反查：輸入實際進料尺寸，直接計重（不加預留量）
+      const {kg:k} = calcWeight(currentShape, dims, 9);
+      weight = Math.round(k * 1.03 * 10000) / 10000;
     } else {
       const {kg:k}=calcWeight(currentShape,dims,density);
       weight=currentShape==='plate'&&k<1?1:k;
