@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勁格科技 — 報價系統</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f2f5;
+  --white: #ffffff;
+  --border: #d0d4da;
+  --border-dark: #b0b8c1;
+  --text: #1a1e24;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --accent: #1a56a0;
+  --accent-light: #e8f0fb;
+  --accent-hover: #154490;
+  --green: #166534;
+  --green-bg: #dcfce7;
+  --red: #991b1b;
+  --red-bg: #fee2e2;
+  --yellow: #92400e;
+  --yellow-bg: #fef3c7;
+  --header-bg: #1e2633;
+  --header-text: #e2e8f0;
+  --row-even: #f8fafc;
+  --row-hover: #eff6ff;
+  --section-header: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+body {
+  font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── 頂部導覽 ── */
+.top-bar {
+  background: var(--header-bg);
+  color: var(--header-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 42px;
+  border-bottom: 2px solid var(--accent);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.top-bar-logo {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+}
+.top-bar-logo span { color: #60a5fa; }
+.top-bar-title {
+  font-size: 12px;
+  color: #94a3b8;
+  border-left: 1px solid #374151;
+  padding-left: 12px;
+}
+.top-bar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ── 按鈕 ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary {
+  background: var(--white);
+  color: var(--text);
+  border-color: var(--border-dark);
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border-color: #fca5a5;
+}
+.btn-danger:hover { background: #fecaca; }
+.btn-success {
+  background: #15803d;
+  color: #fff;
+  border-color: #15803d;
+}
+.btn-success:hover { background: #166534; }
+.btn-sm { padding: 3px 8px; font-size: 11px; }
+.btn-icon {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--header-text);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+.btn-icon:hover { background: rgba(255,255,255,0.1); }
+
+/* ── 主容器 ── */
+.main-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ── 區塊卡片 ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-header {
+  background: var(--section-header);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 12px;
+  color: #374151;
+  letter-spacing: 0.5px;
+}
+.card-header-icon {
+  margin-right: 6px;
+  opacity: 0.7;
+}
+.card-body { padding: 14px; }
+
+/* ── 表單格線 ── */
+.form-grid {
+  display: grid;
+  gap: 10px;
+}
+.form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.form-grid-5 { grid-template-columns: repeat(5, 1fr); }
+.form-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+.form-group { display: flex; flex-direction: column; gap: 3px; }
+.form-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.form-label .required { color: #dc2626; }
+
+.form-control {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--white);
+  transition: border-color .15s;
+  width: 100%;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(26,86,160,0.1);
+}
+.form-control:read-only {
+  background: var(--row-even);
+  color: var(--text-muted);
+}
+select.form-control { cursor: pointer; }
+
+/* ── 全局設定區 ── */
+.global-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.settings-divider {
+  border-top: 1px dashed var(--border);
+  margin: 10px 0;
+}
+.toggle-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.toggle-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border-dark);
+  border-radius: 3px;
+  background: var(--white);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all .15s;
+}
+.toggle-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.toggle-btn:hover:not(.active) { background: var(--bg); }
+
+/* ── 零件清單表格 ── */
+.parts-table-wrap { overflow-x: auto; }
+.parts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.parts-table th {
+  background: var(--header-bg);
+  color: var(--header-text);
+  padding: 7px 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 11px;
+  white-space: nowrap;
+  border-right: 1px solid #374151;
+  letter-spacing: 0.3px;
+}
+.parts-table th:first-child { border-left: none; text-align: left; padding-left: 12px; }
+.parts-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid #f0f0f0;
+  vertical-align: middle;
+  text-align: center;
+}
+.parts-table td:first-child { text-align: left; padding-left: 12px; }
+.parts-table tr:nth-child(even) td { background: var(--row-even); }
+.parts-table tr:hover td { background: var(--row-hover); }
+
+/* 群組列 */
+.parts-table tr.group-row td {
+  background: #dbeafe !important;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 11px;
+  padding: 5px 12px;
+  letter-spacing: 0.5px;
+}
+
+/* 合計列 */
+.parts-table tr.subtotal-row td {
+  background: #f1f5f9 !important;
+  font-weight: 700;
+  color: var(--text);
+  border-top: 2px solid var(--border-dark);
+}
+.parts-table tr.total-row td {
+  background: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.td-name {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 80px;
+}
+.td-spec { color: var(--text-muted); font-size: 11px; min-width: 120px; }
+.td-num { font-family: 'Courier New', monospace; text-align: right !important; padding-right: 10px !important; }
+.td-amt { font-family: 'Courier New', monospace; text-align: right !important; padding-right: 10px !important; font-weight: 600; color: var(--accent); }
+
+/* 行內輸入 */
+.inline-input {
+  width: 80px;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  text-align: right;
+  background: #fffdf0;
+  color: var(--text);
+}
+.inline-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+}
+.inline-input.auto-calc {
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 勾選欄 */
+.part-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+
+/* ── 零件展開詳細 ── */
+.part-detail {
+  display: none;
+  background: #f8faff;
+  border-top: 1px dashed var(--border);
+}
+.part-detail.open { display: table-row; }
+.part-detail-inner {
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.detail-section-title {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+}
+.detail-field { display: flex; flex-direction: column; gap: 2px; }
+.detail-label { font-size: 10px; color: var(--text-muted); }
+.detail-value { font-size: 12px; font-weight: 500; }
+
+/* ── 選配勾選群組 ── */
+.option-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.option-check-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--white);
+  user-select: none;
+  transition: all .1s;
+}
+.option-check-item:hover { background: var(--accent-light); border-color: var(--accent); }
+.option-check-item input { accent-color: var(--accent); width: 13px; height: 13px; }
+.option-check-item.checked { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+/* ── 底部費用區 ── */
+.bottom-fees {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.fee-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fee-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+/* ── 彙總欄 ── */
+.summary-panel {
+  background: linear-gradient(135deg, #1e2633, #2d3748);
+  color: #e2e8f0;
+  border-radius: 4px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.summary-item { display: flex; flex-direction: column; gap: 2px; }
+.summary-label { font-size: 10px; color: #94a3b8; letter-spacing: 0.5px; text-transform: uppercase; }
+.summary-value { font-size: 18px; font-weight: 700; font-family: 'Courier New', monospace; color: #60a5fa; }
+.summary-value.total { font-size: 24px; color: #fbbf24; }
+.summary-actions { display: flex; flex-direction: column; gap: 6px; }
+
+/* ── 新增零件區 ── */
+.add-part-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--row-even);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.add-part-bar select { width: 140px; }
+
+/* ── 備註 tag ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.tag-blue { background: #dbeafe; color: #1d4ed8; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-orange { background: #ffedd5; color: #c2410c; }
+.tag-gray { background: #f1f5f9; color: #475569; }
+
+/* ── 分隔線標題 ── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.section-divider::before, .section-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Modal / 彈窗 ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  width: 520px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  background: var(--header-bg);
+  color: var(--header-text);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--header-text);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.modal-body { padding: 16px; }
+.modal-footer {
+  padding: 10px 16px;
+  background: var(--row-even);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── 狀態標記 ── */
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+}
+.dot-green { background: #22c55e; }
+.dot-yellow { background: #f59e0b; }
+.dot-red { background: #ef4444; }
+
+/* ── 列印樣式 ── */
+@media print {
+  body { background: white; font-size: 11px; }
+  .top-bar, .no-print, .add-part-bar, .summary-actions { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 8px; }
+  .parts-table th { background: #333 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .parts-table tr.group-row td { background: #dbeafe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .parts-table tr.total-row td { background: #1a56a0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .main-container { padding: 0; max-width: 100%; }
+  .global-settings { grid-template-columns: 1fr 1fr; }
+  .bottom-fees { grid-template-columns: repeat(4, 1fr); }
+  .print-header { display: block !important; }
+}
+
+.print-header {
+  display: none;
+  text-align: center;
+  padding: 20px 0 10px;
+  border-bottom: 2px solid #333;
+  margin-bottom: 16px;
+}
+.print-header h1 { font-size: 18px; font-weight: 700; }
+.print-header p { font-size: 12px; color: #666; margin-top: 4px; }
+
+/* ── 響應式 ── */
+@media (max-width: 768px) {
+  .global-settings { grid-template-columns: 1fr; }
+  .form-grid-6 { grid-template-columns: repeat(3, 1fr); }
+  .form-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .summary-panel { grid-template-columns: 1fr 1fr; }
+  .bottom-fees { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── 計算機 iframe 彈窗 ── */
+.calc-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+.calc-overlay.open { display: flex; }
+.calc-frame-wrap {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  width: 540px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.calc-frame-header {
+  background: #1e2633;
+  color: #e2e8f0;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.calc-frame-close {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.calc-iframe {
+  border: none;
+  height: 580px;
+  width: 100%;
+}
+</style>
+</head>
+<body>
+
+<!-- 計算機 iframe 彈窗 -->
+<div class="calc-overlay" id="calc-overlay">
+  <div class="calc-frame-wrap">
+    <div class="calc-frame-header">
+      <span id="calc-frame-title">材料計算機</span>
+      <button class="calc-frame-close" onclick="closeCalc()">✕</button>
+    </div>
+    <iframe class="calc-iframe" id="calc-iframe" src=""></iframe>
+  </div>
+</div>
+
+<!-- 列印標頭（僅列印可見） -->
+<div class="print-header">
+  <h1>勁格科技股份有限公司</h1>
+  <p>Jinger Technology Co., Ltd. ｜ 報價單</p>
+</div>
+
+<!-- 頂部導覽 -->
+<div class="top-bar no-print">
+  <div class="top-bar-left">
+    <div class="top-bar-logo">JINGER<span>·</span>TECH</div>
+    <div class="top-bar-title">油缸報價系統 — Mill Type</div>
+  </div>
+  <div class="top-bar-right">
+    <button class="btn-icon" onclick="clearAll()" title="清除重設">↺ 重設</button>
+    <button class="btn btn-secondary btn-sm no-print" onclick="window.print()">🖨 列印 PDF</button>
+    <button class="btn btn-success btn-sm no-print" onclick="exportSummary()">📋 輸出彙整</button>
+  </div>
+</div>
+
+<div class="main-container">
+
+  <!-- ① 基本資料 -->
+  <div class="card">
+    <div class="card-header">
+      <span><span class="card-header-icon">📋</span>基本資料</span>
+      <span id="quote-id-display" style="font-size:11px; color:var(--text-muted); font-weight:400;"></span>
+    </div>
+    <div class="card-body">
+      <div class="global-settings">
+        <!-- 左：客戶資訊 -->
+        <div>
+          <div class="form-grid form-grid-3" style="margin-bottom:10px;">
+            <div class="form-group">
+              <label class="form-label">案號 <span class="required">*</span></label>
+              <input type="text" class="form-control" id="f-case-no" placeholder="客戶提供案號" oninput="updateHeader()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">客戶名稱</label>
+              <input type="text" class="form-control" id="f-customer" placeholder="客戶名稱" oninput="updateHeader()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">報價日期</label>
+              <input type="date" class="form-control" id="f-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">品名／說明</label>
+            <input type="text" class="form-control" id="f-desc" placeholder="例：Mill Type 油缸 Ø125×Ø71×500">
+          </div>
+        </div>
+
+        <!-- 右：油缸規格 -->
+        <div>
+          <div class="form-grid form-grid-3" style="margin-bottom:10px;">
+            <div class="form-group">
+              <label class="form-label">缸徑 (mm) <span class="required">*</span></label>
+              <select class="form-control" id="f-bore" onchange="onSpecChange()">
+                <option value="">-- 選擇 --</option>
+                <option>32</option><option>40</option><option>50</option><option>63</option>
+                <option>80</option><option>100</option><option>125</option><option>150</option>
+                <option>180</option><option>200</option><option>250</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">軸徑 (mm)</label>
+              <input type="number" class="form-control" id="f-rod" placeholder="例：71" oninput="onSpecChange()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">行程 (mm)</label>
+              <input type="number" class="form-control" id="f-stroke" placeholder="例：500" oninput="onSpecChange()">
+            </div>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">管路形式</label>
+              <div class="toggle-group">
+                <button class="toggle-btn active" id="tb-lock" onclick="setToggle('pipe-type','lock',this)">🔩 鎖牙式</button>
+                <button class="toggle-btn" id="tb-weld" onclick="setToggle('pipe-type','weld',this)">🔥 焊接式</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">緩衝設計</label>
+              <div class="toggle-group">
+                <button class="toggle-btn active" id="tb-no-buf" onclick="setToggle('buffer','none',this)">無緩衝</button>
+                <button class="toggle-btn" id="tb-buf" onclick="setToggle('buffer','yes',this)">有緩衝</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 零件清單 -->
+  <div class="card">
+    <div class="card-header">
+      <span><span class="card-header-icon">⚙️</span>零件明細</span>
+      <div style="display:flex; gap:6px;" class="no-print">
+        <button class="btn btn-secondary btn-sm" onclick="openAddPart()">＋ 新增零件</button>
+        <button class="btn btn-secondary btn-sm" onclick="recalcAll()">↻ 重新計算</button>
+      </div>
+    </div>
+    <div class="parts-table-wrap">
+      <table class="parts-table" id="parts-table">
+        <thead>
+          <tr>
+            <th style="width:28px;" class="no-print"></th>
+            <th style="min-width:90px; text-align:left; padding-left:12px;">零件名稱</th>
+            <th style="min-width:140px;">材料規格</th>
+            <th style="width:90px;">材料費</th>
+            <th style="width:70px;">銑床</th>
+            <th style="width:70px;">車床</th>
+            <th style="width:70px;">鑽孔</th>
+            <th style="width:70px;">研磨</th>
+            <th style="width:70px;">電鍍</th>
+            <th style="width:70px;">其他</th>
+            <th style="width:90px;">小計</th>
+            <th style="width:60px;" class="no-print">操作</th>
+          </tr>
+        </thead>
+        <tbody id="parts-tbody">
+          <!-- 動態產生 -->
+        </tbody>
+        <tfoot id="parts-tfoot">
+          <!-- 合計列 -->
+        </tfoot>
+      </table>
+    </div>
+    <!-- 新增零件工具列 -->
+    <div class="add-part-bar no-print" id="add-part-bar" style="display:none;">
+      <select class="form-control" id="add-part-sel" style="width:160px;">
+        <option value="">-- 選擇零件 --</option>
+        <option value="front-cover">前蓋</option>
+        <option value="rear-cover">後蓋</option>
+        <option value="plate">套板</option>
+        <option value="bushing">襯套</option>
+        <option value="piston">活塞</option>
+        <option value="rod">軸心</option>
+        <option value="tube">鋼管</option>
+        <option value="flange">管凸緣</option>
+        <option value="buf-front">前緩衝塊</option>
+        <option value="buf-rear">後緩衝塊</option>
+        <option value="fa">FA 前法蘭</option>
+        <option value="fb">FB 後法蘭</option>
+        <option value="ca">CA 前耳環</option>
+        <option value="cb">CB 後耳環</option>
+        <option value="tc">TC 拉桿</option>
+        <option value="y">Y 接頭</option>
+        <option value="seal">油封組</option>
+        <option value="hardware">五金配件</option>
+        <option value="assemble">組立</option>
+        <option value="test">測試</option>
+        <option value="paint">噴漆</option>
+        <option value="pack">包裝</option>
+        <option value="other">其他項目</option>
+      </select>
+      <input type="text" class="form-control" id="add-part-name" placeholder="自訂名稱（可選）" style="width:140px;">
+      <button class="btn btn-primary btn-sm" onclick="addPartFromBar()">確認新增</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('add-part-bar').style.display='none'">取消</button>
+    </div>
+  </div>
+
+  <!-- ③ 底部費用 -->
+  <div class="card">
+    <div class="card-header">
+      <span><span class="card-header-icon">💰</span>附加費用</span>
+    </div>
+    <div class="card-body">
+      <div class="bottom-fees">
+        <div class="fee-item">
+          <span class="fee-label">組立費</span>
+          <input type="number" class="form-control" id="fee-assemble" placeholder="0" oninput="calcSummary()">
+        </div>
+        <div class="fee-item">
+          <span class="fee-label">測試費</span>
+          <input type="number" class="form-control" id="fee-test" placeholder="0" oninput="calcSummary()">
+        </div>
+        <div class="fee-item">
+          <span class="fee-label">噴漆費</span>
+          <input type="number" class="form-control" id="fee-paint" placeholder="0" oninput="calcSummary()">
+        </div>
+        <div class="fee-item">
+          <span class="fee-label">包裝費</span>
+          <input type="number" class="form-control" id="fee-pack" placeholder="0" oninput="calcSummary()">
+        </div>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <div class="fee-item" style="flex-direction:row; align-items:center; gap:8px;">
+          <span class="fee-label" style="white-space:nowrap;">行程加價</span>
+          <input type="number" class="form-control" id="fee-stroke-add" placeholder="0" style="width:100px;" oninput="calcSummary()">
+        </div>
+        <div class="fee-item" style="flex-direction:row; align-items:center; gap:8px;">
+          <span class="fee-label" style="white-space:nowrap;">其他費用</span>
+          <input type="number" class="form-control" id="fee-other" placeholder="0" style="width:100px;" oninput="calcSummary()">
+        </div>
+        <div class="fee-item" style="flex-direction:row; align-items:center; gap:8px;">
+          <span class="fee-label" style="white-space:nowrap;">備註</span>
+          <input type="text" class="form-control" id="fee-note" placeholder="備註說明" style="width:200px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 彙總 -->
+  <div class="summary-panel no-print">
+    <div class="summary-item">
+      <span class="summary-label">零件合計</span>
+      <span class="summary-value" id="sum-parts">NT$ 0</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">附加費用</span>
+      <span class="summary-value" id="sum-fees">NT$ 0</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">報價總計</span>
+      <span class="summary-value total" id="sum-total">NT$ 0</span>
+    </div>
+    <div class="summary-actions">
+      <button class="btn btn-primary" onclick="window.print()">🖨 列印 PDF</button>
+      <button class="btn btn-secondary" onclick="exportSummary()">📋 複製彙整</button>
+    </div>
+  </div>
+
+  <!-- 列印用合計區 -->
+  <div style="display:none;" class="print-only" id="print-summary">
+  </div>
+
+</div><!-- /main-container -->
+
+<!-- 零件設定 Modal -->
+<div class="modal-overlay" id="part-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="modal-title">零件設定</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- 動態內容 -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="applyModal()">套用</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// 查表資料
+// ══════════════════════════════════════════════════
+
+const BORE_IDX = [32,40,50,63,80,100,125,150,180,200,250];
+
+// 前蓋加工費查表
+const FRONT_COVER = {
+  sleeve:  [250,250,250,300,400,500,600,700,900,1200,1500], // 襯套式（銑床）
+  groove:  [400,400,400,450,550,600,750,950,1200,1500,1800], // 內槽式
+  face:    [100,100,100,130,150,150,200,200,250,250,250], // 端面槽
+  flange:  [200,200,200,250,250,300,350,400,450,600,800], // 前凸緣
+  drill:   [120,120,120,140,140,160,180,200,240,300,400], // 一般鑽孔
+  buf_drill:[160,160,160,160,160,200,200,240,280,320,400], // 緩衝鑽
+  oil_drill:[60,60,60,60,80,80,100,100,120,150,200],      // 入油口鑽
+  // 車床加價
+  lathe_sleeve:[0,0,0,50,100,100,100,100,200,300,300],
+  lathe_groove:[0,0,0,50,100,50,150,200,250,300,300],
+  lathe_face:  [0,0,0,30,20,0,50,0,50,0,0],
+  lathe_flange:[0,0,0,50,0,50,50,50,50,150,200],
+  lathe_drill: [0,0,0,20,0,20,20,20,40,60,100],
+  lathe_buf:   [0,0,0,0,0,40,0,40,40,40,80],
+  lathe_oil:   [0,0,0,0,20,0,20,0,20,30,50],
+};
+
+// 後蓋加工費查表
+const REAR_COVER = {
+  base:    [200,200,200,250,300,400,500,600,750,900,1200],
+  face:    [100,100,100,130,150,150,200,200,250,250,250],
+  drill:   [120,120,120,140,140,160,180,200,240,300,400],
+  buf_drill:[160,160,160,160,200,160,200,240,280,320,400],
+  oil_drill:[60,60,60,60,80,80,100,100,120,150,200],
+  lathe_base:[0,0,0,50,50,100,100,100,150,150,300],
+  lathe_face:[0,0,0,30,20,0,50,0,50,0,0],
+  lathe_drill:[0,0,0,20,0,20,20,20,40,60,100],
+  lathe_buf:  [0,0,0,0,0,-40,40,40,40,40,80],
+  lathe_oil:  [0,0,0,0,20,0,20,0,20,30,50],
+};
+
+// 套板
+const PLATE_COVER = {
+  base:  [100,100,100,100,120,150,150,180,200,250,300],
+  lathe: [0,0,0,0,20,30,0,30,20,50,50],
+  drill: [60,60,60,60,80,100,120,140,160,200,280],
+  drill_add:[0,0,0,0,20,20,20,20,20,40,80],
+};
+
+// 管凸緣
+const FLANGE_COVER = {
+  base:  [120,120,120,150,150,150,180,200,250,300,400],
+  lathe: [0,0,0,30,0,0,30,20,50,50,100],
+  drill: [80,80,80,80,80,120,140,160,200,240,320],
+  drill_add:[0,0,0,0,0,40,20,20,40,40,80],
+};
+
+// 活塞
+const PISTON = {
+  base:  [180,180,180,200,220,250,300,400,550,650,750],
+  add:   [0,0,0,20,20,30,50,100,150,100,100],
+  inner_thread:[0,0,30,0,30,0,40,0,40,0,60],
+  pt_seal:[0,0,0,0,50,0,20,0,30,0,50],
+  pcb_seal:[0,0,0,0,60,20,20,30,30,40,50],
+};
+
+// 襯套
+const BUSHING = {
+  lathe: [250,250,250,250,300,350,450,550,650,750,850],
+  lathe_add:[0,0,0,0,50,50,100,100,100,100,100],
+};
+
+// 軸心車床費
+const ROD_LATHE = {
+  20:120,25:150,30:180,35:200,40:250,45:280,50:300,55:350,60:400,65:0,70:450,
+  71:450,75:0,80:0,85:500,90:0,95:550,100:600,101.6:0,110:700
+};
+// 軸心銑床費
+const ROD_MILL = {
+  30:30,40:40,50:50,60:60,80:80,90:90,100:100,101.6:120
+};
+
+// 配件
+const ACCESSORY = {
+  fa: { lathe:[0,0,0,120,150,180,200,250,300,350,400], drill:[0,0,0,120,140,180,220,280,360,460,600] },
+  ca: [500,550,550,600,800,940,1300,2000,2800,5800,12000],
+  cb: [650,700,750,800,1000,1200,1700,2600,3800,8000,16000],
+  tc: { lathe:[350,350,400,400,450,550,650,850,950,1200,1600], drill:[120,120,120,140,180,200,240,300,400,600,800] },
+  y:  { thread:[50,50,80,100,150,250,350,450,600,900,1200], hole:[50,50,80,200,250,300,400,600,800,1000,1400] },
+  cu: [700,700,700,700,800,900,1200,1400,1600,1800,2200],
+  air:[0,0,0,600,650,700,750,800,850,900,1000],
+};
+
+// ══════════════════════════════════════════════════
+// 狀態管理
+// ══════════════════════════════════════════════════
+
+let state = {
+  bore: null,
+  rod: null,
+  stroke: null,
+  pipeType: 'lock', // lock / weld
+  buffer: 'none',   // none / yes
+  parts: [],        // 零件陣列
+  nextId: 1,
+};
+
+let modalEditId = null;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  initDefaultParts();
+  renderParts();
+  calcSummary();
+});
+
+// ══════════════════════════════════════════════════
+// 預設零件清單（Mill Type）
+// ══════════════════════════════════════════════════
+
+function initDefaultParts() {
+  state.parts = [
+    makePart('front-cover', '前蓋'),
+    makePart('rear-cover', '後蓋'),
+    makePart('plate', '套板'),
+    makePart('bushing', '襯套'),
+    makePart('piston', '活塞'),
+    makePart('rod', '軸心'),
+    makePart('tube', '鋼管'),
+    makePart('flange', '管凸緣'),
+    makePart('seal', '油封組'),
+    makePart('hardware', '五金配件'),
+  ];
+}
+
+function makePart(type, name) {
+  const id = state.nextId++;
+  const base = { id, type, name, enabled: true, matCost: 0, millCost: 0, latheCost: 0, drillCost: 0, grindCost: 0, plateCost: 0, otherCost: 0, note: '', matSpec: '' };
+
+  switch(type) {
+    case 'front-cover':
+      return { ...base, sealType: 'sleeve', hasDrill: true, hasBufDrill: false, hasOilDrill: true };
+    case 'rear-cover':
+      return { ...base, hasFace: false, hasDrill: true, hasBufDrill: false, hasOilDrill: true };
+    case 'plate':
+      return { ...base, hasLathe: true, hasDrill: true };
+    case 'bushing':
+      return { ...base, matType: 'BC6', outerD: 0, innerD: 0, length: 0 };
+    case 'piston':
+      return { ...base, matType: 'S45C', hasInnerThread: false, hasPTseal: false, hasPCBseal: false };
+    case 'rod':
+      return { ...base, rodType: 'process', matType: 'S45C', rodD: 0, processL: 0, matL: 0, hasGrind: true, hasPlate: true, grindL: 0, plateL: 0, hasQT: false };
+    case 'tube':
+      return { ...base, tubeType: 'ready', hasPlate: false };
+    case 'flange':
+      return { ...base, hasDrill: true };
+    case 'buf-front':
+      return { ...base, hasDrill: false };
+    case 'buf-rear':
+      return { ...base, hasDrill: true };
+    default:
+      return base;
+  }
+}
+
+// ══════════════════════════════════════════════════
+// 工具函數
+// ══════════════════════════════════════════════════
+
+function getBoreIdx() {
+  const b = parseInt(state.bore);
+  const idx = BORE_IDX.indexOf(b);
+  return idx >= 0 ? idx : -1;
+}
+
+function lookupByBore(table) {
+  const i = getBoreIdx();
+  return i >= 0 ? (table[i] || 0) : 0;
+}
+
+function fmt(n) {
+  if (!n || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString();
+}
+
+function fmtNT(n) {
+  if (!n || isNaN(n) || n === 0) return '—';
+  return 'NT$ ' + Math.round(n).toLocaleString();
+}
+
+function getV(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
+function getS(id) { return document.getElementById(id)?.value || ''; }
+
+// ══════════════════════════════════════════════════
+// 規格變更
+// ══════════════════════════════════════════════════
+
+function onSpecChange() {
+  state.bore   = getS('f-bore');
+  state.rod    = getV('f-rod');
+  state.stroke = getV('f-stroke');
+  autoFillFees();
+  recalcAll();
+}
+
+// 依規格自動填入底部費用（查表）
+function autoFillFees() {
+  // 這裡可以之後加入依缸徑的費用自動填入
+}
+
+function setToggle(group, val, btn) {
+  const siblings = btn.parentElement.querySelectorAll('.toggle-btn');
+  siblings.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (group === 'pipe-type') {
+    state.pipeType = val;
+    updateBufferParts();
+  } else if (group === 'buffer') {
+    state.buffer = val;
+    updateBufferParts();
+  }
+  renderParts();
+  calcSummary();
+}
+
+function updateBufferParts() {
+  // 有緩衝時：確保前後緩衝塊存在
+  if (state.buffer === 'yes') {
+    if (!state.parts.find(p => p.type === 'buf-front')) {
+      const idx = state.parts.findIndex(p => p.type === 'flange');
+      const insert = idx >= 0 ? idx + 1 : state.parts.length;
+      state.parts.splice(insert, 0, makePart('buf-front', '前緩衝塊'), makePart('buf-rear', '後緩衝塊'));
+    }
+    // 前後蓋標記有緩衝鑽
+    state.parts.filter(p => ['front-cover','rear-cover'].includes(p.type)).forEach(p => p.hasBufDrill = true);
+  } else {
+    // 無緩衝時移除緩衝塊
+    state.parts = state.parts.filter(p => !['buf-front','buf-rear'].includes(p.type));
+    state.parts.filter(p => ['front-cover','rear-cover'].includes(p.type)).forEach(p => p.hasBufDrill = false);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// 計算邏輯
+// ══════════════════════════════════════════════════
+
+function calcPartCost(part) {
+  const bi = getBoreIdx();
+  if (bi < 0) return;
+
+  switch(part.type) {
+    case 'front-cover': calcFrontCover(part, bi); break;
+    case 'rear-cover':  calcRearCover(part, bi); break;
+    case 'plate':       calcPlate(part, bi); break;
+    case 'bushing':     calcBushing(part, bi); break;
+    case 'piston':      calcPiston(part, bi); break;
+    case 'rod':         calcRod(part); break;
+    case 'flange':      calcFlange(part, bi); break;
+  }
+}
+
+function calcFrontCover(p, bi) {
+  let mill = 0, lathe = 0, drill = 0;
+  const st = p.sealType || 'sleeve';
+  if (st === 'sleeve') {
+    mill  = FRONT_COVER.sleeve[bi];
+    lathe = FRONT_COVER.lathe_sleeve[bi];
+  } else if (st === 'groove') {
+    mill  = FRONT_COVER.groove[bi];
+    lathe = FRONT_COVER.lathe_groove[bi];
+  } else if (st === 'face') {
+    mill  = FRONT_COVER.face[bi];
+    lathe = FRONT_COVER.lathe_face[bi];
+  } else if (st === 'flange') {
+    mill  = FRONT_COVER.flange[bi];
+    lathe = FRONT_COVER.lathe_flange[bi];
+  }
+  if (p.hasDrill) {
+    drill += FRONT_COVER.drill[bi];
+    lathe += FRONT_COVER.lathe_drill[bi];
+  }
+  if (p.hasBufDrill) {
+    drill += FRONT_COVER.buf_drill[bi];
+    lathe += FRONT_COVER.lathe_buf[bi];
+  }
+  if (p.hasOilDrill) {
+    drill += FRONT_COVER.oil_drill[bi];
+    lathe += FRONT_COVER.lathe_oil[bi];
+  }
+  p.millCost  = mill;
+  p.latheCost = lathe;
+  p.drillCost = drill;
+}
+
+function calcRearCover(p, bi) {
+  let lathe = REAR_COVER.base[bi] + REAR_COVER.lathe_base[bi];
+  let drill = 0;
+  if (p.hasFace) { lathe += REAR_COVER.face[bi] + REAR_COVER.lathe_face[bi]; }
+  if (p.hasDrill) { drill += REAR_COVER.drill[bi]; lathe += REAR_COVER.lathe_drill[bi]; }
+  if (p.hasBufDrill) { drill += REAR_COVER.buf_drill[bi]; lathe += REAR_COVER.lathe_buf[bi]; }
+  if (p.hasOilDrill) { drill += REAR_COVER.oil_drill[bi]; lathe += REAR_COVER.lathe_oil[bi]; }
+  p.latheCost = lathe;
+  p.drillCost = drill;
+  p.millCost  = 0;
+}
+
+function calcPlate(p, bi) {
+  let lathe = PLATE_COVER.base[bi] + PLATE_COVER.lathe[bi];
+  let drill  = p.hasDrill ? PLATE_COVER.drill[bi] + PLATE_COVER.drill_add[bi] : 0;
+  p.latheCost = lathe;
+  p.drillCost = drill;
+  p.millCost  = 0;
+}
+
+function calcBushing(p, bi) {
+  p.latheCost = BUSHING.lathe[bi] + BUSHING.lathe_add[bi];
+  p.millCost  = 0;
+  p.drillCost = 0;
+}
+
+function calcPiston(p, bi) {
+  let lathe = PISTON.base[bi] + PISTON.add[bi];
+  if (p.hasInnerThread) lathe += PISTON.inner_thread[bi];
+  if (p.hasPTseal)      lathe += PISTON.pt_seal[bi];
+  if (p.hasPCBseal)     lathe += PISTON.pcb_seal[bi];
+  p.latheCost = lathe;
+  p.millCost  = 0;
+  p.drillCost = 0;
+}
+
+function calcRod(p) {
+  const dia = p.rodD || state.rod || 0;
+  // 軸心車床費（依軸徑查表）
+  const diaN = Math.round(dia);
+  let lathe = 0;
+  const lathePx = ROD_LATHE[diaN] || ROD_LATHE[Object.keys(ROD_LATHE).find(k => parseInt(k) >= diaN)] || 0;
+  lathe = lathePx;
+
+  // 銑床費
+  const millPx = ROD_MILL[diaN] || 0;
+
+  // 研磨費（IN²）: π × D(in) × L(in) × 單價/IN²
+  let grind = 0;
+  if (p.rodType === 'process' && p.hasGrind && p.grindL > 0) {
+    const dIn = dia / 25.4;
+    const lIn = p.grindL / 25.4;
+    const area = Math.PI * dIn * lIn;
+    grind = area * 2; // 預設 2元/IN²，可調整
+  }
+
+  // 電鍍費（IN²）
+  let plate = 0;
+  if (p.rodType === 'process' && p.hasPlate && p.plateL > 0) {
+    const dIn = dia / 25.4;
+    const lIn = p.plateL / 25.4;
+    const area = Math.PI * dIn * lIn;
+    plate = area * 3; // 預設 3元/IN²，可調整
+  }
+
+  if (p.rodType === 'ready') {
+    // 成品硬鉻軸：只有車床+銑床
+    p.latheCost = lathe;
+    p.millCost  = millPx;
+    p.grindCost = 0;
+    p.plateCost = 0;
+  } else {
+    p.latheCost = lathe;
+    p.millCost  = millPx;
+    p.grindCost = grind;
+    p.plateCost = plate;
+  }
+}
+
+function calcFlange(p, bi) {
+  let lathe = FLANGE_COVER.base[bi] + FLANGE_COVER.lathe[bi];
+  let drill  = p.hasDrill ? FLANGE_COVER.drill[bi] + FLANGE_COVER.drill_add[bi] : 0;
+  // 焊接式：加上焊接費用（手動）
+  p.latheCost = lathe;
+  p.drillCost = drill;
+  p.millCost  = 0;
+}
+
+function getPartTotal(p) {
+  return (p.matCost||0) + (p.millCost||0) + (p.latheCost||0) + (p.drillCost||0) + (p.grindCost||0) + (p.plateCost||0) + (p.otherCost||0);
+}
+
+function recalcAll() {
+  state.parts.forEach(p => { if (p.enabled) calcPartCost(p); });
+  renderParts();
+  calcSummary();
+}
+
+// ══════════════════════════════════════════════════
+// 渲染零件表格
+// ══════════════════════════════════════════════════
+
+function renderParts() {
+  const tbody = document.getElementById('parts-tbody');
+  const tfoot = document.getElementById('parts-tfoot');
+
+  tbody.innerHTML = '';
+  let partsTotal = 0;
+
+  state.parts.forEach(p => {
+    const total = getPartTotal(p);
+    if (p.enabled) partsTotal += total;
+
+    const tr = document.createElement('tr');
+    if (!p.enabled) tr.style.opacity = '0.4';
+
+    tr.innerHTML = `
+      <td class="no-print">
+        <input type="checkbox" class="part-check" ${p.enabled ? 'checked' : ''}
+          onchange="togglePart(${p.id}, this.checked)">
+      </td>
+      <td>
+        <span class="td-name">${p.name}</span>
+        ${p.type === 'rod' ? `<span class="tag tag-${p.rodType==='ready'?'green':'blue'} no-print" style="margin-left:4px;">${p.rodType==='ready'?'成品':'流程'}</span>` : ''}
+        ${state.pipeType === 'weld' && p.type === 'tube' ? '<span class="tag tag-orange no-print" style="margin-left:4px;">焊接</span>' : ''}
+      </td>
+      <td class="td-spec">${p.matSpec || getDefaultSpec(p)}</td>
+      <td class="td-num" style="white-space:nowrap;">
+        <input class="inline-input" type="number" value="${p.matCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'matCost',this.value)" title="材料費" style="width:65px;">
+        <button class="btn btn-secondary no-print" style="padding:2px 5px;font-size:11px;margin-left:2px;" 
+          onclick="openCalc(${p.id},'matCost','https://jinge-tools.vercel.app/材料計算機.html')" title="開啟材料計算機">🔧</button>
+      </td>
+      <td class="td-num">
+        <input class="inline-input ${p.millCost?'auto-calc':''}" type="number" value="${p.millCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'millCost',this.value)" title="銑床費">
+      </td>
+      <td class="td-num">
+        <input class="inline-input ${p.latheCost?'auto-calc':''}" type="number" value="${p.latheCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'latheCost',this.value)" title="車床費">
+      </td>
+      <td class="td-num">
+        <input class="inline-input ${p.drillCost?'auto-calc':''}" type="number" value="${p.drillCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'drillCost',this.value)" title="鑽孔費">
+      </td>
+      <td class="td-num">
+        <input class="inline-input ${p.grindCost?'auto-calc':''}" type="number" value="${p.grindCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'grindCost',this.value)" title="研磨費">
+      </td>
+      <td class="td-num">
+        <input class="inline-input ${p.plateCost?'auto-calc':''}" type="number" value="${p.plateCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'plateCost',this.value)" title="電鍍費">
+      </td>
+      <td class="td-num">
+        <input class="inline-input" type="number" value="${p.otherCost||''}" placeholder="0"
+          onchange="updateCost(${p.id},'otherCost',this.value)" title="其他">
+      </td>
+      <td class="td-amt">${total ? 'NT$ '+fmt(total) : '—'}</td>
+      <td class="no-print" style="white-space:nowrap;">
+        <button class="btn btn-secondary btn-sm" onclick="openPartModal(${p.id})" title="設定">⚙</button>
+        <button class="btn btn-danger btn-sm" onclick="removePart(${p.id})" title="刪除">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 合計列
+  tfoot.innerHTML = `
+    <tr class="total-row">
+      <td colspan="3" style="text-align:left; padding-left:12px; font-size:12px;">零件合計</td>
+      <td colspan="8" style="text-align:right; padding-right:10px; font-size:14px; font-family:'Courier New',monospace;">
+        NT$ ${partsTotal.toLocaleString()}
+      </td>
+      <td class="no-print"></td>
+    </tr>
+  `;
+
+  state._partsTotal = partsTotal;
+  calcSummary();
+}
+
+function getDefaultSpec(p) {
+  switch(p.type) {
+    case 'front-cover': return p.sealType === 'sleeve' ? '襯套式' : p.sealType === 'groove' ? '內槽式' : p.sealType === 'face' ? '端面槽' : '前凸緣';
+    case 'rear-cover':  return '標準';
+    case 'bushing':     return p.matType || 'BC6';
+    case 'piston':      return p.matType || 'S45C';
+    case 'rod':         return p.rodType === 'ready' ? `成品硬鉻 Ø${p.rodD||state.rod||'?'}` : `${p.matType||'S45C'} Ø${p.rodD||state.rod||'?'}×${p.processL||'?'}mm`;
+    case 'tube':        return p.tubeType === 'ready' ? '成品鋼管' : '跑流程';
+    default: return '';
+  }
+}
+
+// ══════════════════════════════════════════════════
+// 費用更新
+// ══════════════════════════════════════════════════
+
+function updateCost(id, field, val) {
+  const p = state.parts.find(p => p.id === id);
+  if (!p) return;
+  p[field] = parseFloat(val) || 0;
+  const total = getPartTotal(p);
+  // 更新小計欄（不重新渲染，只更新數字）
+  calcSummary();
+  // 更新合計列
+  const allTotal = state.parts.filter(p=>p.enabled).reduce((s,p)=>s+getPartTotal(p),0);
+  const tfoot = document.getElementById('parts-tfoot');
+  tfoot.querySelector('.total-row td:nth-child(2)').textContent = '';
+  const lastTd = tfoot.querySelector('.total-row td:last-child, .total-row td:nth-last-child(2)');
+  // 重新渲染 tfoot
+  document.getElementById('parts-tfoot').innerHTML = `
+    <tr class="total-row">
+      <td colspan="3" style="text-align:left; padding-left:12px; font-size:12px;">零件合計</td>
+      <td colspan="8" style="text-align:right; padding-right:10px; font-size:14px; font-family:'Courier New',monospace;">
+        NT$ ${allTotal.toLocaleString()}
+      </td>
+      <td class="no-print"></td>
+    </tr>
+  `;
+  state._partsTotal = allTotal;
+  calcSummary();
+}
+
+function togglePart(id, enabled) {
+  const p = state.parts.find(p => p.id === id);
+  if (p) { p.enabled = enabled; renderParts(); calcSummary(); }
+}
+
+function removePart(id) {
+  if (!confirm('確定要刪除這個零件？')) return;
+  state.parts = state.parts.filter(p => p.id !== id);
+  renderParts();
+  calcSummary();
+}
+
+// ══════════════════════════════════════════════════
+// 彙總計算
+// ══════════════════════════════════════════════════
+
+function calcSummary() {
+  const partsTotal = state.parts.filter(p=>p.enabled).reduce((s,p)=>s+getPartTotal(p),0);
+  const fees = getV('fee-assemble') + getV('fee-test') + getV('fee-paint') + getV('fee-pack') + getV('fee-stroke-add') + getV('fee-other');
+  const total = partsTotal + fees;
+
+  document.getElementById('sum-parts').textContent = 'NT$ ' + partsTotal.toLocaleString();
+  document.getElementById('sum-fees').textContent  = 'NT$ ' + fees.toLocaleString();
+  document.getElementById('sum-total').textContent = 'NT$ ' + total.toLocaleString();
+}
+
+// ══════════════════════════════════════════════════
+// 新增零件
+// ══════════════════════════════════════════════════
+
+function openAddPart() {
+  const bar = document.getElementById('add-part-bar');
+  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+}
+
+function addPartFromBar() {
+  const type = document.getElementById('add-part-sel').value;
+  const customName = document.getElementById('add-part-name').value.trim();
+  if (!type) { alert('請選擇零件類型'); return; }
+
+  const nameMap = {
+    'front-cover':'前蓋','rear-cover':'後蓋','plate':'套板','bushing':'襯套',
+    'piston':'活塞','rod':'軸心','tube':'鋼管','flange':'管凸緣',
+    'buf-front':'前緩衝塊','buf-rear':'後緩衝塊',
+    'fa':'FA 前法蘭','fb':'FB 後法蘭','ca':'CA 前耳環','cb':'CB 後耳環',
+    'tc':'TC 拉桿','y':'Y 接頭','seal':'油封組','hardware':'五金配件',
+    'assemble':'組立','test':'測試','paint':'噴漆','pack':'包裝','other':'其他'
+  };
+  const name = customName || nameMap[type] || type;
+  const part = makePart(type, name);
+  state.parts.push(part);
+  recalcAll();
+  document.getElementById('add-part-bar').style.display = 'none';
+  document.getElementById('add-part-sel').value = '';
+  document.getElementById('add-part-name').value = '';
+}
+
+// ══════════════════════════════════════════════════
+// 零件設定 Modal
+// ══════════════════════════════════════════════════
+
+function openPartModal(id) {
+  const p = state.parts.find(p => p.id === id);
+  if (!p) return;
+  modalEditId = id;
+  document.getElementById('modal-title').textContent = p.name + ' — 設定';
+  const body = document.getElementById('modal-body');
+  body.innerHTML = buildModalContent(p);
+  document.getElementById('part-modal').classList.add('open');
+}
+
+function buildModalContent(p) {
+  let html = '';
+
+  // 材料費
+  html += `<div class="section-divider">材料</div>
+  <div class="form-grid form-grid-2" style="margin-bottom:12px;">
+    <div class="form-group">
+      <label class="form-label">材料費 (NT$)</label>
+      <input type="number" class="form-control" id="m-matCost" value="${p.matCost||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">材料規格說明</label>
+      <input type="text" class="form-control" id="m-matSpec" value="${p.matSpec||''}">
+    </div>
+  </div>`;
+
+  // 依零件類型加入特定設定
+  switch(p.type) {
+    case 'front-cover':
+      html += `<div class="section-divider">油封溝型式（選一）</div>
+      <div class="toggle-group" style="margin-bottom:12px;">
+        ${['sleeve:襯套式','groove:內槽式','face:端面槽','flange:前凸緣'].map(x=>{
+          const [v,label] = x.split(':');
+          return `<button class="toggle-btn ${p.sealType===v?'active':''}" onclick="modalToggle('m-sealType','${v}',this)">${label}</button>`;
+        }).join('')}
+      </div>
+      <input type="hidden" id="m-sealType" value="${p.sealType||'sleeve'}">
+      <div class="section-divider">選配項目</div>
+      <div class="option-checks" style="margin-bottom:12px;">
+        ${optCheck('m-hasDrill','一般鑽孔',p.hasDrill)}
+        ${optCheck('m-hasBufDrill','緩衝鑽孔',p.hasBufDrill)}
+        ${optCheck('m-hasOilDrill','入油口鑽',p.hasOilDrill)}
+      </div>`;
+      break;
+
+    case 'rear-cover':
+      html += `<div class="section-divider">選配項目</div>
+      <div class="option-checks" style="margin-bottom:12px;">
+        ${optCheck('m-hasFace','端面槽',p.hasFace)}
+        ${optCheck('m-hasDrill','一般鑽孔',p.hasDrill)}
+        ${optCheck('m-hasBufDrill','緩衝鑽孔',p.hasBufDrill)}
+        ${optCheck('m-hasOilDrill','入油口鑽',p.hasOilDrill)}
+      </div>`;
+      break;
+
+    case 'piston':
+      html += `<div class="section-divider">材質</div>
+      <div class="toggle-group" style="margin-bottom:12px;">
+        ${['FCD45','S45C','SS400'].map(v=>`<button class="toggle-btn ${p.matType===v?'active':''}" onclick="modalToggle('m-matType','${v}',this)">${v}</button>`).join('')}
+      </div>
+      <input type="hidden" id="m-matType" value="${p.matType||'S45C'}">
+      <div class="section-divider">選配</div>
+      <div class="option-checks" style="margin-bottom:12px;">
+        ${optCheck('m-hasInnerThread','內牙',p.hasInnerThread)}
+        ${optCheck('m-hasPTseal','PT油封槽',p.hasPTseal)}
+        ${optCheck('m-hasPCBseal','PCB油封槽',p.hasPCBseal)}
+      </div>`;
+      break;
+
+    case 'rod':
+      html += `<div class="section-divider">軸心類型</div>
+      <div class="toggle-group" style="margin-bottom:12px;">
+        <button class="toggle-btn ${p.rodType==='ready'?'active':''}" onclick="modalToggle('m-rodType','ready',this)">成品硬鉻軸</button>
+        <button class="toggle-btn ${p.rodType==='process'?'active':''}" onclick="modalToggle('m-rodType','process',this)">素材跑流程</button>
+      </div>
+      <input type="hidden" id="m-rodType" value="${p.rodType||'process'}">
+      <div class="form-grid form-grid-2" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label class="form-label">軸徑 (mm)</label>
+          <input type="number" class="form-control" id="m-rodD" value="${p.rodD||state.rod||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">加工長度 (mm)</label>
+          <input type="number" class="form-control" id="m-processL" value="${p.processL||''}">
+        </div>
+      </div>
+      <div id="m-rod-process-section" style="${p.rodType==='ready'?'display:none':''}">
+        <div class="section-divider">材質</div>
+        <div class="toggle-group" style="margin-bottom:12px;">
+          ${['S45C','SCM440'].map(v=>`<button class="toggle-btn ${p.matType===v?'active':''}" onclick="modalToggle('m-rodMat','${v}',this)">${v}</button>`).join('')}
+        </div>
+        <input type="hidden" id="m-rodMat" value="${p.matType||'S45C'}">
+        <div class="section-divider">研磨 / 電鍍</div>
+        <div class="option-checks" style="margin-bottom:8px;">
+          ${optCheck('m-hasGrind','研磨',p.hasGrind)}
+          ${optCheck('m-hasPlate','電鍍',p.hasPlate)}
+          ${optCheck('m-hasQT','調質(QT)',p.hasQT)}
+        </div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label class="form-label">研磨範圍長度 (mm)</label>
+            <input type="number" class="form-control" id="m-grindL" value="${p.grindL||''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">電鍍範圍長度 (mm)</label>
+            <input type="number" class="form-control" id="m-plateL" value="${p.plateL||''}">
+          </div>
+        </div>
+      </div>`;
+      break;
+
+    case 'tube':
+      html += `<div class="section-divider">鋼管類型</div>
+      <div class="toggle-group" style="margin-bottom:12px;">
+        <button class="toggle-btn ${p.tubeType==='ready'?'active':''}" onclick="modalToggle('m-tubeType','ready',this)">成品鋼管（13C）</button>
+        <button class="toggle-btn ${p.tubeType==='process'?'active':''}" onclick="modalToggle('m-tubeType','process',this)">跑流程</button>
+      </div>
+      <input type="hidden" id="m-tubeType" value="${p.tubeType||'ready'}">
+      <div class="section-divider">選配</div>
+      <div class="option-checks">
+        ${optCheck('m-hasPlate','電鍍',p.hasPlate)}
+      </div>`;
+      break;
+
+    case 'bushing':
+      html += `<div class="section-divider">材質</div>
+      <div class="toggle-group" style="margin-bottom:12px;">
+        ${['FCD45','S45C','BC6'].map(v=>`<button class="toggle-btn ${p.matType===v?'active':''}" onclick="modalToggle('m-matType','${v}',this)">${v}</button>`).join('')}
+      </div>
+      <input type="hidden" id="m-matType" value="${p.matType||'BC6'}">
+      <div class="form-grid form-grid-3">
+        <div class="form-group">
+          <label class="form-label">外徑 (mm)</label>
+          <input type="number" class="form-control" id="m-outerD" value="${p.outerD||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">內徑 (mm)</label>
+          <input type="number" class="form-control" id="m-innerD" value="${p.innerD||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">長度 (mm)</label>
+          <input type="number" class="form-control" id="m-length" value="${p.length||''}">
+        </div>
+      </div>`;
+      break;
+  }
+
+  // 備註
+  html += `<div class="section-divider" style="margin-top:12px;">備註</div>
+  <div class="form-group">
+    <input type="text" class="form-control" id="m-note" value="${p.note||''}" placeholder="備註說明">
+  </div>`;
+
+  return html;
+}
+
+function optCheck(id, label, checked) {
+  return `<label class="option-check-item ${checked?'checked':''}">
+    <input type="checkbox" id="${id}" ${checked?'checked':''} onchange="this.parentElement.classList.toggle('checked',this.checked)">
+    ${label}
+  </label>`;
+}
+
+function modalToggle(hiddenId, val, btn) {
+  const siblings = btn.parentElement.querySelectorAll('.toggle-btn');
+  siblings.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById(hiddenId);
+  if (el) el.value = val;
+  // 軸心類型切換顯示/隱藏
+  if (hiddenId === 'm-rodType') {
+    const sec = document.getElementById('m-rod-process-section');
+    if (sec) sec.style.display = val === 'ready' ? 'none' : '';
+  }
+}
+
+function applyModal() {
+  const p = state.parts.find(p => p.id === modalEditId);
+  if (!p) return;
+
+  const gv = id => { const el = document.getElementById(id); return el ? el.value : null; };
+  const gn = id => parseFloat(gv(id)) || 0;
+  const gb = id => { const el = document.getElementById(id); return el ? el.checked : false; };
+
+  p.matCost = gn('m-matCost');
+  p.matSpec = gv('m-matSpec') || '';
+  p.note    = gv('m-note') || '';
+
+  switch(p.type) {
+    case 'front-cover':
+      p.sealType    = gv('m-sealType') || 'sleeve';
+      p.hasDrill    = gb('m-hasDrill');
+      p.hasBufDrill = gb('m-hasBufDrill');
+      p.hasOilDrill = gb('m-hasOilDrill');
+      break;
+    case 'rear-cover':
+      p.hasFace     = gb('m-hasFace');
+      p.hasDrill    = gb('m-hasDrill');
+      p.hasBufDrill = gb('m-hasBufDrill');
+      p.hasOilDrill = gb('m-hasOilDrill');
+      break;
+    case 'piston':
+      p.matType        = gv('m-matType') || 'S45C';
+      p.hasInnerThread = gb('m-hasInnerThread');
+      p.hasPTseal      = gb('m-hasPTseal');
+      p.hasPCBseal     = gb('m-hasPCBseal');
+      break;
+    case 'rod':
+      p.rodType  = gv('m-rodType') || 'process';
+      p.matType  = gv('m-rodMat') || 'S45C';
+      p.rodD     = gn('m-rodD');
+      p.processL = gn('m-processL');
+      p.matL     = p.processL + 5;
+      p.hasGrind = gb('m-hasGrind');
+      p.hasPlate = gb('m-hasPlate');
+      p.hasQT    = gb('m-hasQT');
+      p.grindL   = gn('m-grindL');
+      p.plateL   = gn('m-plateL');
+      break;
+    case 'tube':
+      p.tubeType = gv('m-tubeType') || 'ready';
+      p.hasPlate = gb('m-hasPlate');
+      break;
+    case 'bushing':
+      p.matType = gv('m-matType') || 'BC6';
+      p.outerD  = gn('m-outerD');
+      p.innerD  = gn('m-innerD');
+      p.length  = gn('m-length');
+      break;
+  }
+
+  closeModal();
+  recalcAll();
+}
+
+function closeModal() {
+  document.getElementById('part-modal').classList.remove('open');
+  modalEditId = null;
+}
+
+// ══════════════════════════════════════════════════
+// 標題更新
+// ══════════════════════════════════════════════════
+
+function updateHeader() {
+  const caseNo = getS('f-case-no');
+  const customer = getS('f-customer');
+  const display = [caseNo, customer].filter(Boolean).join(' ／ ');
+  document.getElementById('quote-id-display').textContent = display;
+}
+
+// ══════════════════════════════════════════════════
+// 清除
+// ══════════════════════════════════════════════════
+
+function clearAll() {
+  if (!confirm('確定要清除所有資料重新開始？')) return;
+  state.parts = [];
+  state.nextId = 1;
+  state.bore = null; state.rod = null; state.stroke = null;
+  state.pipeType = 'lock'; state.buffer = 'none';
+  document.getElementById('f-bore').value = '';
+  document.getElementById('f-rod').value = '';
+  document.getElementById('f-stroke').value = '';
+  document.getElementById('f-case-no').value = '';
+  document.getElementById('f-customer').value = '';
+  document.getElementById('f-desc').value = '';
+  ['fee-assemble','fee-test','fee-paint','fee-pack','fee-stroke-add','fee-other'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
+  // 重設 toggle
+  document.querySelectorAll('#tb-lock, #tb-no-buf').forEach(b => b.classList.add('active'));
+  document.querySelectorAll('#tb-weld, #tb-buf').forEach(b => b.classList.remove('active'));
+  initDefaultParts();
+  renderParts();
+  calcSummary();
+  updateHeader();
+}
+
+// ══════════════════════════════════════════════════
+// 輸出彙整
+// ══════════════════════════════════════════════════
+
+function exportSummary() {
+  const caseNo = getS('f-case-no') || '未填';
+  const customer = getS('f-customer') || '未填';
+  const date = getS('f-date') || '';
+  const bore = getS('f-bore'); const rod = getS('f-rod'); const stroke = getS('f-stroke');
+  const partsTotal = state.parts.filter(p=>p.enabled).reduce((s,p)=>s+getPartTotal(p),0);
+  const fees = getV('fee-assemble')+getV('fee-test')+getV('fee-paint')+getV('fee-pack')+getV('fee-stroke-add')+getV('fee-other');
+  const total = partsTotal + fees;
+
+  let text = `【勁格科技 報價彙整】\n`;
+  text += `案號：${caseNo}　客戶：${customer}　日期：${date}\n`;
+  text += `規格：Mill Type Ø${bore}×Ø${rod}×${stroke}mm\n`;
+  text += `${'─'.repeat(40)}\n`;
+  state.parts.filter(p=>p.enabled).forEach(p=>{
+    const t = getPartTotal(p);
+    text += `${p.name.padEnd(8)}　NT$ ${Math.round(t).toLocaleString()}\n`;
+  });
+  text += `${'─'.repeat(40)}\n`;
+  text += `零件合計　NT$ ${partsTotal.toLocaleString()}\n`;
+  text += `附加費用　NT$ ${fees.toLocaleString()}\n`;
+  text += `報價總計　NT$ ${total.toLocaleString()}\n`;
+
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('已複製到剪貼板！');
+  }).catch(()=>{
+    prompt('請手動複製：', text);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// 計算機 iframe 整合
+// ══════════════════════════════════════════════════
+
+let calcTargetPartId = null;
+let calcTargetField = 'matCost';
+
+function openCalc(partId, field, toolUrl) {
+  calcTargetPartId = partId;
+  calcTargetField = field || 'matCost';
+  const p = state.parts.find(p => p.id === partId);
+  const title = p ? p.name + ' — 材料計算機' : '材料計算機';
+  document.getElementById('calc-frame-title').textContent = title;
+  document.getElementById('calc-iframe').src = toolUrl || 'https://jinge-tools.vercel.app/材料計算機.html';
+  document.getElementById('calc-overlay').classList.add('open');
+}
+
+function closeCalc() {
+  document.getElementById('calc-overlay').classList.remove('open');
+  document.getElementById('calc-iframe').src = '';
+  calcTargetPartId = null;
+}
+
+// 接收計算機傳回的金額
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'MATERIAL_COST') {
+    const amount = e.data.amount;
+    if (calcTargetPartId !== null) {
+      const p = state.parts.find(p => p.id === calcTargetPartId);
+      if (p) {
+        p[calcTargetField] = amount;
+        closeCalc();
+        renderParts();
+        calcSummary();
+      }
+    }
+  }
+});
+
+</script>
+</body>
+</html>
