@@ -96,6 +96,15 @@ input[type=number]::-webkit-inner-spin-button{opacity:0;}
     <button class="sel-btn" data-type="y" onclick="setType(this)">Y接頭</button>
   </div>
 
+  <div id="chamferSection" style="display:none;">
+    <span class="sec-label">倒角大小</span>
+    <div class="btn-group" id="chamferGroup">
+      <button class="sel-btn active" data-chamfer="c4" onclick="setChamfer(this)">C4 以下</button>
+      <button class="sel-btn" data-chamfer="c10" onclick="setChamfer(this)">C5 ~ C10</button>
+      <button class="sel-btn" data-chamfer="c15" onclick="setChamfer(this)">C11 ~ C15</button>
+    </div>
+  </div>
+
   <span class="sec-label">材質</span>
   <div class="btn-group" id="matGroup">
     <button class="sel-btn active" data-mat="normal" onclick="setMat(this)">一般料</button>
@@ -119,8 +128,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:0;}
 <div class="notes">
   <div class="notes-title">⚠ 說明</div>
   <ul>
-    <li>銑六面尺寸係數：≤450→×1.0｜450~600→×1.25｜≥600→×1.35</li>
-    <li>I/Y接頭尺寸係數：≤450→×1.0｜450~600→×1.5｜>600→×1.8</li>
+    <li>銑六面尺寸係數（最大邊）：&lt;450→×1.0｜450~599→×1.25｜≥600→×1.35</li>
+    <li>I接頭/LA、Y接頭尺寸係數（最大邊）：≤299→×1.0｜300~499→×1.5｜500~699→×1.8｜≥700→須報價</li>
+    <li>I接頭/LA 單價：C4以下→2.5元/in²（最低200）｜C5-C10→2.6元/in²（最低230）｜C11-C15→2.7元/in²（最低250）</li>
+    <li>Y接頭 單價：C4以下→4.3元/in²（最低250）｜C5-C10→4.4元/in²（最低280）｜C11-C15→4.5元/in²（最低300）</li>
     <li>材質係數：一般→×1｜調質/特殊→×2｜白鐵→×3.5</li>
     <li>基本單價可手動修改，修改後自動重新計算</li>
   </ul>
@@ -129,6 +140,19 @@ input[type=number]::-webkit-inner-spin-button{opacity:0;}
 </div>
 <script>
 // 工件設定
+// 有形狀工件的倒角單價設定
+const CHAMFER_CONFIG = {
+  i: {
+    c4:  { unitPrice:2.5, minPrice:200 },
+    c10: { unitPrice:2.6, minPrice:230 },
+    c15: { unitPrice:2.7, minPrice:250 },
+  },
+  y: {
+    c4:  { unitPrice:4.3, minPrice:250 },
+    c10: { unitPrice:4.4, minPrice:280 },
+    c15: { unitPrice:4.5, minPrice:300 },
+  },
+};
 const TYPE_CONFIG = {
   six: { name:'銑六面',   unitPrice:0.9, minPrice:100 },
   i:   { name:'I接頭/LA', unitPrice:2.5, minPrice:200 },
@@ -140,14 +164,25 @@ const MAT_CONFIG = {
   sus:    { name:'白鐵（SUS）',  mult:3.5 },
 };
 
-let currentType = 'six';
-let currentMat  = 'normal';
-let customBase  = null; // 使用者覆蓋的基本單價
+let currentType    = 'six';
+let currentMat     = 'normal';
+let currentChamfer = 'c4';
+let customBase     = null; // 使用者覆蓋的基本單價
 
 function setType(btn){
   document.querySelectorAll('#typeGroup .sel-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   currentType = btn.dataset.type;
+  customBase = null;
+  // 顯示/隱藏倒角區
+  const cs = document.getElementById('chamferSection');
+  cs.style.display = (currentType === 'six') ? 'none' : 'block';
+  run();
+}
+function setChamfer(btn){
+  document.querySelectorAll('#chamferGroup .sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentChamfer = btn.dataset.chamfer;
   customBase = null;
   run();
 }
@@ -178,7 +213,14 @@ function run(skipBaseReset=false){
     return;
   }
 
-  const tc = TYPE_CONFIG[currentType];
+  // 取工件設定（有形狀工件依倒角選擇單價）
+  let tc;
+  if (currentType === 'six') {
+    tc = TYPE_CONFIG[currentType];
+  } else {
+    const cc = CHAMFER_CONFIG[currentType][currentChamfer];
+    tc = { name: TYPE_CONFIG[currentType].name, unitPrice: cc.unitPrice, minPrice: cc.minPrice };
+  }
   const mc = MAT_CONFIG[currentMat];
 
   // 六面積
@@ -197,13 +239,18 @@ function run(skipBaseReset=false){
   const maxDim = Math.max(L, W, H);
   let sizeCoeff, sizeLabel;
   if(currentType === 'six'){
-    if(maxDim <= 450)       { sizeCoeff=1.0;  sizeLabel='≤450mm → ×1.0'; }
-    else if(maxDim < 600)   { sizeCoeff=1.25; sizeLabel='450~600mm → ×1.25'; }
+    if(maxDim < 450)        { sizeCoeff=1.0;  sizeLabel='<450mm → ×1.0'; }
+    else if(maxDim < 600)   { sizeCoeff=1.25; sizeLabel='450~599mm → ×1.25'; }
     else                    { sizeCoeff=1.35; sizeLabel='≥600mm → ×1.35'; }
   } else {
-    if(maxDim <= 450)       { sizeCoeff=1.0;  sizeLabel='≤450mm → ×1.0'; }
-    else if(maxDim <= 600)  { sizeCoeff=1.5;  sizeLabel='450~600mm → ×1.5'; }
-    else                    { sizeCoeff=1.8;  sizeLabel='>600mm → ×1.8'; }
+    if(maxDim <= 299)       { sizeCoeff=1.0;  sizeLabel='≤299mm → ×1.0'; }
+    else if(maxDim <= 499)  { sizeCoeff=1.5;  sizeLabel='300~499mm → ×1.5'; }
+    else if(maxDim <= 699)  { sizeCoeff=1.8;  sizeLabel='500~699mm → ×1.8'; }
+    else {
+      // 須報價，顯示警告並停止計算
+      out.innerHTML=`<div class="detail-card anim"><div class="empty" style="color:var(--yellow);">⚠ 尺寸 ≥700mm，須另行報價</div></div>`;
+      return;
+    }
   }
 
   // 材質係數
