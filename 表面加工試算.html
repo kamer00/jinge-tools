@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="表面加工試算">
+<title>表面加工試算｜勁格科技</title>
+<style>
+:root {
+  --bg:#0d1117; --s1:#161b22; --s2:#1c2330; --border:#30363d;
+  --blue:#58a6ff; --green:#3fb950; --yellow:#e3b341; --red:#f85149;
+  --purple:#bc8cff; --orange:#e8a020;
+  --text:#e6edf3; --muted:#8b949e; --text3:#484f58;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;min-height:100dvh;display:flex;flex-direction:column;}
+header{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;}
+.logo-wrap{width:38px;height:38px;border-radius:6px;overflow:hidden;flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center;}
+.logo-wrap img{width:100%;height:100%;object-fit:contain;}
+.header-text h1{font-size:15px;font-weight:700;}
+.header-text p{font-size:11px;color:var(--muted);margin-top:1px;}
+main{flex:1;padding:20px 16px 60px;max-width:560px;width:100%;margin:0 auto;}
+
+/* 卡片 */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* 類型切換 */
+.type-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.type-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;font-size:14px;font-weight:600;padding:12px 8px;cursor:pointer;transition:all .15s;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;}
+.type-btn .icon{font-size:22px;}
+.type-btn:hover{border-color:var(--blue);color:var(--text);}
+.type-btn.active{background:rgba(88,166,255,.1);border-color:var(--blue);color:var(--text);}
+
+/* 輸入 */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500;}
+.field label .unit{color:var(--orange);margin-left:4px;}
+.input-wrap{position:relative;display:flex;align-items:center;}
+.input-prefix{position:absolute;left:11px;font-size:13px;color:var(--orange);font-weight:700;pointer-events:none;}
+input[type=number]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-weight:600;padding:9px 44px 9px 30px;outline:none;transition:border-color .15s;-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,166,255,.12);}
+.input-unit{position:absolute;right:10px;font-size:12px;color:var(--muted);pointer-events:none;}
+input[type=number]:disabled{opacity:.35;cursor:not-allowed;}
+
+/* 工序區塊 */
+.process-section{margin-bottom:12px;}
+.process-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.process-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.process-title{font-size:13px;font-weight:700;letter-spacing:.5px;}
+.process-inactive{opacity:.35;pointer-events:none;}
+
+/* CR 選擇 */
+.cr-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.cr-btn{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer;transition:all .15s;}
+.cr-btn:hover{border-color:var(--purple);color:var(--text);}
+.cr-btn.active{background:rgba(188,140,255,.12);border-color:var(--purple);color:var(--text);}
+.mode-btn{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer;transition:all .15s;}
+.mode-btn:hover{border-color:var(--blue);color:var(--text);}
+.mode-btn.active{background:rgba(88,166,255,.12);border-color:var(--blue);color:var(--text);}
+
+/* 結果列 */
+.result-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;}
+.result-row:last-child{border-bottom:none;}
+.rl{color:var(--muted);}
+.rv{font-weight:700;font-family:'Courier New',monospace;font-size:13px;}
+.rv.green{font-size:17px;}
+.rv.green{color:var(--green);}
+.rv.yellow{color:var(--yellow);}
+.rv.red{color:var(--red);}
+.rv.muted{color:var(--muted);}
+
+/* 廠商比較 */
+.vendor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.vendor-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.vendor-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.vendor-card.best{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.vendor-card.na{opacity:.4;}
+.v-name{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.v-badge{font-size:9px;padding:1px 6px;border-radius:10px;}
+.badge-best{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3);}
+.badge-na{background:rgba(139,148,158,.1);color:var(--text3);border:1px solid var(--border);}
+.v-price{font-size:18px;font-weight:900;color:var(--green);font-family:'Courier New',monospace;}
+.vendor-card.na .v-price{color:var(--muted);}
+.v-detail{font-size:10px;color:var(--text3);margin-top:4px;}
+
+/* 合計 */
+.total-card{background:linear-gradient(135deg,#0e2a4a,#0d1a2e);border:1px solid var(--blue);border-radius:var(--radius);padding:20px;text-align:center;margin-top:4px;}
+.total-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.total-value{font-size:34px;font-weight:900;color:var(--orange);letter-spacing:-1px;font-family:'Courier New',monospace;}
+.total-note{font-size:11px;color:var(--muted);margin-top:6px;}
+
+/* 提示 */
+.hint{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--yellow);border-radius:0 8px 8px 0;padding:10px 14px;font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:12px;}
+.hint span{color:var(--yellow);font-weight:700;}
+
+.empty{text-align:center;padding:24px;color:var(--text3);font-size:12px;}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:pop .18s ease;}
+
+footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-wrap"><img src="data:image/png;base64,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" alt="勁格科技"></div>
+  <div class="header-text">
+    <h1>表面加工試算</h1>
+    <p>勁格科技股份有限公司</p>
+  </div>
+</header>
+<main>
+
+<!-- Step 1: 零件種類 -->
+<div class="card">
+  <div class="sec-label">零件種類</div>
+  <div class="type-group">
+    <button class="type-btn" id="btn-shaft" onclick="setType('shaft')">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin-bottom:2px">
+        <!-- 軸心：圓柱橫躺側視圖 -->
+        <ellipse cx="6" cy="14" rx="4" ry="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <line x1="6" y1="6" x2="22" y2="6" stroke="currentColor" stroke-width="1.6"/>
+        <line x1="6" y1="22" x2="22" y2="22" stroke="currentColor" stroke-width="1.6"/>
+        <ellipse cx="22" cy="14" rx="4" ry="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <line x1="10" y1="14" x2="18" y2="14" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/>
+      </svg>軸心
+    </button>
+    <button class="type-btn" id="btn-cylinder" onclick="setType('cylinder')">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin-bottom:2px">
+        <!-- 鋼管：空心圓柱側視圖 -->
+        <ellipse cx="6" cy="14" rx="4" ry="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <ellipse cx="6" cy="14" rx="2" ry="4.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 1.5"/>
+        <line x1="6" y1="6" x2="22" y2="6" stroke="currentColor" stroke-width="1.6"/>
+        <line x1="6" y1="22" x2="22" y2="22" stroke="currentColor" stroke-width="1.6"/>
+        <ellipse cx="22" cy="14" rx="4" ry="8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <ellipse cx="22" cy="14" rx="2" ry="4.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </svg>鋼管
+    </button>
+  </div>
+</div>
+
+<!-- Step 2: 尺寸 -->
+<div class="card" id="sizeCard">
+  <div class="sec-label">工件尺寸</div>
+  <div class="grid-2">
+    <div class="field">
+      <label id="diaLabel">直徑 <span class="unit">mm</span></label>
+      <div class="input-wrap">
+        <span class="input-prefix">Ø</span>
+        <input type="number" id="dia" min="1" step="0.1" placeholder="0.0" oninput="calculate()">
+        <span class="input-unit">mm</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>長度 <span class="unit">mm</span></label>
+      <div class="input-wrap">
+        <span class="input-prefix">L</span>
+        <input type="number" id="len" min="1" step="1" placeholder="0" oninput="calculate()">
+        <span class="input-unit">mm</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 工序區 -->
+<div id="processArea"></div>
+
+
+<!-- 合計 -->
+<div id="totalArea"></div>
+
+</main>
+<footer>勁格科技股份有限公司 · 表面加工試算工具</footer>
+
+<script>
+// ── 狀態 ──
+let workType = null; // 'shaft' | 'cylinder'
+let crSel = null;
+let grindPasses = 1;
+let plateMode = null; // 'plate' | 'strip' | 'replate'
+let surfaceSel = null; // 軸心:'grind'|'polish'  鋼管:'bore'|'polish'
+
+// ── 常數 ──
+const MM2IN2 = 645;
+function areaIN2(d, l){ return Math.PI * d * l / MM2IN2; }
+function nt(n){ return 'NT$ ' + Math.round(n).toLocaleString('zh-TW'); }
+function fee(area, unit, minP){ return Math.max(area * unit, minP); }
+
+// 研磨（外圓）
+function grindFee(d, l, passes){
+  const a = Math.PI * (d/25.4) * (l/25.4);
+  const c1 = a * 2;
+  const c2 = a * 2 * 1.5;
+  const ld = l / d;
+  const isLong = passes===1 && ld > 25;
+  const sub = passes===1 ? c1 : c1 + c2;
+  const total = Math.max(300, isLong ? sub * 2 : sub);
+  return { area: a, c1, c2, isLong, ld, total, passes };
+}
+
+// 膛孔
+function boreVendors(d, l){
+  const a = areaIN2(d, l);
+  const lf = { name:'利峰', unit:2.5, min:400, outOfRange: false };
+  const yc = { name:'益川', unit:1.2, min:300, outOfRange: d < 20 || d > 160 };
+  return [lf, yc].map(v => ({
+    ...v,
+    area: a,
+    calc: a * v.unit,
+    total: v.outOfRange ? null : Math.max(a * v.unit, v.min)
+  }));
+}
+
+// 拋光（軸心）→ 只有宏光
+function polishShaft(d, l){
+  const a = areaIN2(d, l);
+  return { area: a, unit: 1.725, min: 140, total: Math.max(a * 1.725, 140) };
+}
+
+// 拋光（鋼管）→ 利峰 + 益川 + 宏光
+function polishCylinderVendors(d, l){
+  const a = areaIN2(d, l);
+  const lf = { name:'利峰', unit:2.0, min:400, outOfRange:false };
+  const yc = { name:'益川', unit:1.2, min:300, outOfRange: d < 20 || d > 160 };
+  const hg = { name:'宏光', unit:1.35, min:200, outOfRange: d > 150 && l > 1200 };
+  return [lf, yc, hg].map(v => ({
+    ...v, area: a, calc: a * v.unit,
+    total: v.outOfRange ? null : Math.max(a * v.unit, v.min)
+  }));
+}
+
+// 電鍍查表
+const CR_SHAFT = ['cr4_6','cr6_8','cr15','cr20','cr25'];
+const CR_CYLINDER = ['cr4_6','cr6_8','cr10','cr20'];
+const CR_LABELS = { cr4_6:'CR 4-6條', cr6_8:'CR 6-8條', cr10:'CR 10條', cr15:'CR 15條', cr20:'CR 20條', cr25:'CR 25條' };
+
+function plateFee(type, cr, d, l){
+  if(!type||!cr||!d||!l) return null;
+  const a = areaIN2(d, l);
+  let unit, minP;
+  if(type==='shaft'){
+    if(d>400) return 'estimate';
+    if(cr==='cr4_6'){ unit=d<=250?3.5:d<=400?4.5:null; minP=300; }
+    else if(cr==='cr6_8'){ unit=d<=250?4.2:d<=400?5.2:null; minP=400; }
+    else if(cr==='cr15'){
+      if(d<=80){unit=5.4;minP=500;}
+      else if(d<=120){if(l>3000)return 'estimate';unit=8.4;minP=500;}
+      else if(d<=300){if(l>3000)return 'estimate';unit=11.4;minP=500;}
+      else return 'estimate';
+    }
+    else if(cr==='cr20'){
+      if(d<=80){unit=6.3;minP=1000;}
+      else if(d<=120){if(l>3000)return 'estimate';unit=9.2;minP=1000;}
+      else if(d<=300){if(l>3000)return 'estimate';unit=12.2;minP=1000;}
+      else return 'estimate';
+    }
+    else if(cr==='cr25'){
+      if(d<=80){unit=7.2;minP=1200;}
+      else if(d<=120){if(l>3000)return 'estimate';unit=10;minP=1200;}
+      else if(d<=300){if(l>3000)return 'estimate';unit=13;minP=1200;}
+      else return 'estimate';
+    }
+  }
+  if(type==='cylinder'){
+    if(d>400||l>=3000) return 'estimate';
+    if(cr==='cr4_6'){ unit=d<=300?3.5:d<=400?4.5:null; minP=380; }
+    else if(cr==='cr6_8'){ unit=d<=300?4.2:d<=400?5.2:null; minP=550; }
+    else if(cr==='cr10'){ unit=d<=300?5.7:d<=400?6.7:null; minP=720; }
+    else if(cr==='cr20'){ unit=d<=300?6.3:d<=400?7.3:null; minP=1000; }
+  }
+  if(unit==null) return 'estimate';
+  return { area:a, unit, minP, total: Math.max(a*unit, minP) };
+}
+
+// ── 設定零件類型 ──
+function setType(t){
+  workType = t;
+  crSel = null;
+  plateMode = null;
+  surfaceSel = null;
+  document.getElementById('btn-shaft').classList.toggle('active', t==='shaft');
+  document.getElementById('btn-cylinder').classList.toggle('active', t==='cylinder');
+  document.getElementById('diaLabel').innerHTML = t==='shaft'
+    ? '外徑 <span class="unit">mm</span>'
+    : '內徑 <span class="unit">mm</span>';
+  renderProcessArea();
+  calculate();
+}
+
+// ── 渲染工序區 ──
+function renderProcessArea(){
+  const pa = document.getElementById('processArea');
+  if(!workType){ pa.innerHTML=''; return; }
+  const crOpts = workType==='shaft' ? CR_SHAFT : CR_CYLINDER;
+
+  // 上方：表面加工二選一
+  const surfaceOpts = workType==='shaft'
+    ? [{id:'grind', color:'#58a6ff', label:'研磨'}, {id:'polish', color:'#bc8cff', label:'拋光'}]
+    : [{id:'bore',  color:'#3fb950', label:'膛孔'},         {id:'polish', color:'#bc8cff', label:'拋光'}];
+  const plateProc = {id:'plate', color:'#e3b341', label:'電鍍（宏光）'};
+
+  let html = '';
+
+  // 表面加工切換卡
+  html += `<div class="card">
+    <div class="sec-label">表面加工</div>
+    <div class="type-group">`;
+  surfaceOpts.forEach(s => {
+    html += `<button class="type-btn${surfaceSel===s.id?' active':''}" style="border-color:${surfaceSel===s.id?s.color:''};" onclick="setSurface('${s.id}')">
+      <span style="font-size:13px;font-weight:700;color:${s.color}">${s.label}</span>
+    </button>`;
+  });
+  html += `</div>
+    <div id="result-surface" style="margin-top:10px;"></div>
+  </div>`;
+
+  // 電鍍卡
+  const processes = [plateProc];
+  processes.forEach(p => {
+    html += `<div class="card process-section" id="proc-${p.id}">
+      <div class="process-header">
+        <div class="process-dot" style="background:${p.color}"></div>
+        <div class="process-title" style="color:${p.color}">${p.label}</div>
+      </div>`;
+
+        if(p.id==='plate'){
+      html += `<div class="sec-label">電鍍工序</div>
+      <div class="cr-grid" style="margin-bottom:10px;">
+        <button class="mode-btn${plateMode==='plate'?' active':''}" onclick="setPlateMode('plate')">電鍍</button>
+        <button class="mode-btn${plateMode==='strip'?' active':''}" onclick="setPlateMode('strip')">純退電</button>
+        <button class="mode-btn${plateMode==='replate'?' active':''}" onclick="setPlateMode('replate')">退電再電</button>
+      </div>`;
+      if(plateMode==='plate'||plateMode==='replate'){
+        html += `<div class="sec-label">CR 條數</div><div class="cr-grid">`;
+        crOpts.forEach(c => {
+          html += `<button class="cr-btn${crSel===c?' active':''}" onclick="setCR('${c}')">${CR_LABELS[c]}</button>`;
+        });
+        html += `</div>`;
+      }
+    }
+
+    html += `<div id="result-${p.id}" class="anim"></div></div>`;
+  });
+  pa.innerHTML = html;
+}
+
+function setSurface(id){
+  surfaceSel = surfaceSel===id ? null : id;
+  renderProcessArea();
+  calculate();
+}
+
+function setGrindPasses(n){
+  grindPasses = n;
+  document.querySelectorAll('.pass-toggle .cr-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim()===(n===1?'一次研磨':'二次研磨'));
+  });
+  calculate();
+}
+
+function setPlateMode(mode){
+  plateMode = plateMode===mode ? null : mode;
+  if(plateMode!=='plate' && plateMode!=='replate') crSel = null;
+  renderProcessArea();
+  calculate();
+}
+
+function setCR(val){
+  crSel = crSel===val ? null : val;
+  document.querySelectorAll('.cr-grid .cr-btn').forEach(b => {
+    b.classList.remove('active');
+  });
+  if(crSel){
+    document.querySelectorAll('.cr-grid .cr-btn').forEach(b => {
+      if(b.textContent.trim()===CR_LABELS[crSel]) b.classList.add('active');
+    });
+  }
+  calculate();
+}
+
+// ── 主計算 ──
+function calculate(){
+  if(!workType) return;
+  const d = parseFloat(document.getElementById('dia').value)||0;
+  const l = parseFloat(document.getElementById('len').value)||0;
+
+  // 表面加工（二選一）
+  const rs = document.getElementById('result-surface');
+  if(rs){
+    if(!surfaceSel){
+      rs.innerHTML='<div class="empty">請選擇研磨或拋光</div>';
+    } else if(d<=0||l<=0){
+      rs.innerHTML='<div class="empty">輸入尺寸後自動計算</div>';
+    } else if(surfaceSel==='grind'){
+      // 研磨（軸心）
+      const g = grindFee(d,l,grindPasses);
+      let rows = `<div class="cr-grid" style="margin-bottom:10px;">
+        <button class="cr-btn${grindPasses===1?' active':''}" onclick="setGrindPasses(1)">一次研磨</button>
+        <button class="cr-btn${grindPasses===2?' active':''}" onclick="setGrindPasses(2)">二次研磨</button>
+      </div>
+      <div class="result-card anim">
+        <div class="result-row"><span class="rl">研磨面積（單件）</span><span class="rv yellow">${g.area.toFixed(2)} in²</span></div>
+        <div class="result-row"><span class="rl">L/D 比值</span><span class="rv ${g.isLong?'red':''}">${g.ld.toFixed(1)}${g.isLong?' ⚠️ 細長加倍':''}</span></div>
+        <div class="result-row"><span class="rl">第一次研磨費（×2）</span><span class="rv">${nt(g.c1)}</span></div>`;
+      if(g.passes===2) rows += `<div class="result-row"><span class="rl">第二次研磨費（×2×1.5）</span><span class="rv">${nt(g.c2)}</span></div>`;
+      if(g.isLong)     rows += `<div class="result-row"><span class="rl">細長附加（L/D>25，×2）</span><span class="rv red">${nt(g.passes===1?g.c1:g.c1+g.c2)}</span></div>`;
+      rows += `<div class="result-row"><span class="rl">費用${g.total===300?' (最低計費)':''}</span><span class="rv green">${nt(g.total)}</span></div></div>`;
+      rs.innerHTML = rows;
+    } else if(surfaceSel==='bore'){
+      // 膛孔（鋼管）
+      const vs = boreVendors(d,l);
+      const valid = vs.filter(v=>!v.outOfRange);
+      const bestTotal = valid.length ? Math.min(...valid.map(v=>v.total)) : Infinity;
+      rs.innerHTML = renderVendorGrid(vs, bestTotal, false);
+    } else if(surfaceSel==='polish'){
+      // 拋光
+      if(workType==='shaft'){
+        const p = polishShaft(d,l);
+        rs.innerHTML = `<div class="result-card anim">
+          <div class="result-row"><span class="rl">面積</span><span class="rv yellow">${p.area.toFixed(2)} in²</span></div>
+          <div class="result-row"><span class="rl">宏光 @${p.unit}元/in²，最低NT$${p.min}</span><span class="rv green">${nt(p.total)}</span></div>
+        </div>`;
+      } else {
+        const vs = polishCylinderVendors(d,l);
+        const valid = vs.filter(v=>!v.outOfRange);
+        const bestTotal = valid.length ? Math.min(...valid.map(v=>v.total)) : Infinity;
+        rs.innerHTML = renderVendorGrid(vs, bestTotal, true);
+      }
+    }
+  }
+
+  // 電鍍（共用）
+  const rpl = document.getElementById('result-plate');
+  if(rpl){
+    if(d>0&&l>0){
+      if(!plateMode){
+        rpl.innerHTML='<div class="empty">請選擇電鍍工序</div>';
+      } else if(plateMode==='strip'){
+        // 純退電
+        const a = areaIN2(d,l);
+        const stripTotal = a * 1.6;
+        rpl.innerHTML=`<div class="result-card anim">
+          <div class="result-row"><span class="rl">面積</span><span class="rv yellow">${a.toFixed(2)} in²</span></div>
+          <div class="result-row"><span class="rl">純退電 @1.6元/in²</span><span class="rv green">${nt(stripTotal)}</span></div>
+        </div>`;
+      } else if(plateMode==='plate'){
+        // 電鍍
+        if(!crSel){
+          rpl.innerHTML='<div class="empty">請選擇 CR 條數</div>';
+        } else {
+          const info = plateFee(workType, crSel, d, l);
+          if(info==='estimate'){
+            rpl.innerHTML=`<div class="result-card anim">
+              <div class="result-row"><span class="rl">超出尺寸範圍</span><span class="rv red">需洽宏光估價</span></div>
+            </div>`;
+          } else if(info){
+            rpl.innerHTML=`<div class="result-card anim">
+              <div class="result-row"><span class="rl">面積</span><span class="rv yellow">${info.area.toFixed(2)} in²</span></div>
+              <div class="result-row"><span class="rl">單價 ${info.unit}元/in²，最低NT$${info.minP}</span><span class="rv green">${nt(info.total)}</span></div>
+            </div>`;
+          }
+        }
+      } else if(plateMode==='replate'){
+        // 退電再電
+        if(!crSel){
+          rpl.innerHTML='<div class="empty">請選擇 CR 條數</div>';
+        } else {
+          const info = plateFee(workType, crSel, d, l);
+          const a = areaIN2(d,l);
+          const stripFee = a * 1.0;
+          if(info==='estimate'){
+            rpl.innerHTML=`<div class="result-card anim">
+              <div class="result-row"><span class="rl">退電費 @1元/in²</span><span class="rv">${nt(stripFee)}</span></div>
+              <div class="result-row"><span class="rl">電鍍費（超出範圍）</span><span class="rv red">需洽宏光估價</span></div>
+            </div>`;
+          } else if(info){
+            rpl.innerHTML=`<div class="result-card anim">
+              <div class="result-row"><span class="rl">面積</span><span class="rv yellow">${a.toFixed(2)} in²</span></div>
+              <div class="result-row"><span class="rl">退電費 @1元/in²</span><span class="rv">${nt(stripFee)}</span></div>
+              <div class="result-row"><span class="rl">電鍍費 @${info.unit}元/in²，最低NT$${info.minP}</span><span class="rv">${nt(info.total)}</span></div>
+              <div class="result-row"><span class="rl">合計</span><span class="rv green">${nt(stripFee+info.total)}</span></div>
+            </div>`;
+          }
+        }
+      }
+    } else { rpl.innerHTML='<div class="empty">輸入尺寸後自動計算</div>'; }
+  }
+
+  // 合計
+  const ta = document.getElementById('totalArea');
+  if(ta){
+    if(d>0 && l>0){
+      let total = 0;
+      let hasEstimate = false;
+
+      // 表面加工費
+      if(surfaceSel==='grind'){
+        total += grindFee(d,l,grindPasses).total;
+      } else if(surfaceSel==='bore'){
+        const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
+        if(vs.length) total += Math.min(...vs.map(v=>v.total));
+      } else if(surfaceSel==='polish'){
+        if(workType==='shaft'){
+          total += polishShaft(d,l).total;
+        } else {
+          const vs = polishCylinderVendors(d,l).filter(v=>!v.outOfRange);
+          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+        }
+      }
+
+      // 電鍍費
+      if(plateMode==='strip'){
+        total += areaIN2(d,l) * 1.6;
+      } else if(plateMode==='plate' && crSel){
+        const info = plateFee(workType, crSel, d, l);
+        if(info==='estimate') hasEstimate=true;
+        else if(info) total += info.total;
+      } else if(plateMode==='replate' && crSel){
+        const info = plateFee(workType, crSel, d, l);
+        const stripFee = areaIN2(d,l) * 1.0;
+        total += stripFee;
+        if(info==='estimate') hasEstimate=true;
+        else if(info) total += info.total;
+      }
+
+      if(total>0){
+        const note = hasEstimate ? '⚠ 部分工序需估價，合計不含估價項目' : `Ø${d} × L${l} mm`;
+        ta.innerHTML=`<div class="total-card anim">
+          <div class="total-label">各工序合計</div>
+          <div class="total-value">${nt(total)}</div>
+          <div class="total-note">${note}</div>
+        </div>`;
+      } else {
+        ta.innerHTML='';
+      }
+    } else {
+      ta.innerHTML='';
+    }
+  }
+
+}
+
+function renderVendorGrid(vendors, bestTotal, isThree){
+  const gridClass = isThree ? 'vendor-grid three' : 'vendor-grid';
+  let html = `<div class="${gridClass} anim">`;
+  vendors.forEach(v => {
+    const isBest = !v.outOfRange && v.total === bestTotal;
+    const naClass = v.outOfRange ? ' na' : '';
+    const bestClass = isBest ? ' best' : '';
+    const badge = v.outOfRange
+      ? `<span class="v-badge badge-na">不適用</span>`
+      : (isBest ? `<span class="v-badge badge-best">最優</span>` : '');
+    const priceStr = v.outOfRange ? '—' : nt(v.total);
+    let detail = v.outOfRange ? '' : `${v.unit}元/in² · 最低NT$${v.min}`;
+    if(v.name==='宏光' && !v.outOfRange) detail += '（Ø≤150 或 L≤1200）';
+    html += `<div class="vendor-card${naClass}${bestClass}">
+      <div class="v-name">${v.name}${badge}</div>
+      <div class="v-price">${priceStr}</div>
+      <div class="v-detail">${detail}</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+</script>
+</body>
+</html>
