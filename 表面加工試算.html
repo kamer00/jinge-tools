@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0d1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="表面加工試算">
-<title>表面加工試算｜勁格科技</title>
+<meta name="apple-mobile-web-app-title" content="表面處理試算">
+<title>表面處理試算｜勁格科技</title>
 <style>
 :root {
   --bg:#0d1117; --s1:#161b22; --s2:#1c2330; --border:#30363d;
@@ -32,6 +32,7 @@ main{flex:1;padding:20px 16px 60px;max-width:560px;width:100%;margin:0 auto;}
 
 /* 類型切換 */
 .type-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.type-group.four{grid-template-columns:1fr 1fr;}
 .type-btn{background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;font-size:14px;font-weight:600;padding:12px 8px;cursor:pointer;transition:all .15s;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;}
 .type-btn .icon{font-size:22px;}
 .type-btn:hover{border-color:var(--blue);color:var(--text);}
@@ -77,15 +78,13 @@ input[type=number]:disabled{opacity:.35;cursor:not-allowed;}
 .rv.red{color:var(--red);}
 .rv.muted{color:var(--muted);}
 
-/* 廠商比較 */
+/* 廠商列表 */
 .vendor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .vendor-grid.three{grid-template-columns:1fr 1fr 1fr;}
 .vendor-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;}
-.vendor-card.best{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
 .vendor-card.na{opacity:.4;}
 .v-name{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
 .v-badge{font-size:9px;padding:1px 6px;border-radius:10px;}
-.badge-best{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3);}
 .badge-na{background:rgba(139,148,158,.1);color:var(--text3);border:1px solid var(--border);}
 .v-price{font-size:18px;font-weight:900;color:var(--green);font-family:'Courier New',monospace;}
 .vendor-card.na .v-price{color:var(--muted);}
@@ -112,7 +111,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-t
 <header>
   <div class="logo-wrap"><img src="data:image/png;base64,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" alt="勁格科技"></div>
   <div class="header-text">
-    <h1>表面加工試算</h1>
+    <h1>表面處理試算</h1>
     <p>勁格科技股份有限公司</p>
   </div>
 </header>
@@ -154,7 +153,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-t
       <label id="diaLabel">直徑 <span class="unit">mm</span></label>
       <div class="input-wrap">
         <span class="input-prefix">Ø</span>
-        <input type="number" id="dia" min="1" step="0.1" placeholder="0.0" oninput="calculate()">
+        <input type="number" id="dia" min="1" step="0.1" placeholder="0.0" oninput="renderProcessArea();calculate()">
         <span class="input-unit">mm</span>
       </div>
     </div>
@@ -162,7 +161,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-t
       <label>長度 <span class="unit">mm</span></label>
       <div class="input-wrap">
         <span class="input-prefix">L</span>
-        <input type="number" id="len" min="1" step="1" placeholder="0" oninput="calculate()">
+        <input type="number" id="len" min="1" step="1" placeholder="0" oninput="renderProcessArea();calculate()">
         <span class="input-unit">mm</span>
       </div>
     </div>
@@ -177,7 +176,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-t
 <div id="totalArea"></div>
 
 </main>
-<footer>勁格科技股份有限公司 · 表面加工試算工具</footer>
+<footer>勁格科技股份有限公司 · 表面處理試算工具</footer>
 
 <script>
 // ── 狀態 ──
@@ -185,7 +184,8 @@ let workType = null; // 'shaft' | 'cylinder'
 let crSel = null;
 let grindPasses = 1;
 let plateMode = null; // 'plate' | 'strip' | 'replate'
-let surfaceSel = null; // 軸心:'grind'|'polish'  鋼管:'bore'|'polish'
+let surfaceSel = null;      // 軸心單選: 'grind'|'polish'
+let cylinderSel = new Set(); // 鋼管複選: 'bore'|'polish'|'epolish'|'eplating'
 
 // ── 常數 ──
 const MM2IN2 = 645;
@@ -285,6 +285,7 @@ function setType(t){
   crSel = null;
   plateMode = null;
   surfaceSel = null;
+  cylinderSel = new Set();
   document.getElementById('btn-shaft').classList.toggle('active', t==='shaft');
   document.getElementById('btn-cylinder').classList.toggle('active', t==='cylinder');
   document.getElementById('diaLabel').innerHTML = t==='shaft'
@@ -300,26 +301,56 @@ function renderProcessArea(){
   if(!workType){ pa.innerHTML=''; return; }
   const crOpts = workType==='shaft' ? CR_SHAFT : CR_CYLINDER;
 
-  // 上方：表面加工二選一
-  const surfaceOpts = workType==='shaft'
-    ? [{id:'grind', color:'#58a6ff', label:'研磨'}, {id:'polish', color:'#bc8cff', label:'拋光'}]
-    : [{id:'bore',  color:'#3fb950', label:'膛孔'},         {id:'polish', color:'#bc8cff', label:'拋光'}];
+  // 上方：表面處理選項
+  const d0 = parseFloat(document.getElementById('dia').value)||0;
+  const l0 = parseFloat(document.getElementById('len').value)||0;
+  const needsExtra = workType==='cylinder' && (d0 > 200 || l0 > 1200);
+
+  const shaftOpts = [{id:'grind', color:'#58a6ff', label:'研磨'}, {id:'polish', color:'#bc8cff', label:'拋光'}];
+  const cylAllOpts = [
+    {id:'bore',     color:'#3fb950', label:'膛孔'},
+    {id:'polish',   color:'#bc8cff', label:'拋光'},
+    {id:'epolish',  color:'#e8a020', label:'電鍍後拋光'},
+    {id:'eplating', color:'#f85149', label:'電鍍後膛孔'},
+  ];
   const plateProc = {id:'plate', color:'#e3b341', label:'電鍍（宏光）'};
 
   let html = '';
 
-  // 表面加工切換卡
-  html += `<div class="card">
-    <div class="sec-label">表面加工</div>
-    <div class="type-group">`;
-  surfaceOpts.forEach(s => {
-    html += `<button class="type-btn${surfaceSel===s.id?' active':''}" style="border-color:${surfaceSel===s.id?s.color:''};" onclick="setSurface('${s.id}')">
-      <span style="font-size:13px;font-weight:700;color:${s.color}">${s.label}</span>
-    </button>`;
-  });
-  html += `</div>
-    <div id="result-surface" style="margin-top:10px;"></div>
-  </div>`;
+  // 表面處理切換卡
+  if(workType==='shaft'){
+    html += `<div class="card">
+      <div class="sec-label">表面處理</div>
+      <div class="type-group">`;
+    shaftOpts.forEach(s => {
+      html += `<button class="type-btn${surfaceSel===s.id?' active':''}" style="border-color:${surfaceSel===s.id?s.color:''};" onclick="setSurface('${s.id}')">
+        <span style="font-size:13px;font-weight:700;color:${s.color}">${s.label}</span>
+      </button>`;
+    });
+    html += `</div>
+      <div id="result-surface" style="margin-top:10px;"></div>
+    </div>`;
+  } else {
+    // 鋼管：四個選項永遠顯示，全部可複選
+    html += `<div class="card">
+      <div class="sec-label">表面處理（可複選）</div>
+      <div class="type-group four">`;
+    cylAllOpts.forEach(s => {
+      const act = cylinderSel.has(s.id);
+      const isExtra = s.id==='epolish' || s.id==='eplating';
+      const hint = isExtra && needsExtra ? `<span style="font-size:9px;color:var(--yellow);margin-top:2px;">⚠ 建議</span>` : '';
+      html += `<button class="type-btn${act?' active':''}" style="border-color:${act?s.color:''};" onclick="toggleCylinder('${s.id}')">
+        <span style="font-size:13px;font-weight:700;color:${s.color}">${s.label}</span>
+        ${hint}
+      </button>`;
+    });
+    html += `</div>`;
+    if(needsExtra){
+      html += `<div class="hint" style="margin-top:10px;margin-bottom:0;"><span>⚠ 提示</span>　Ø${d0} × L${l0} mm 超出宏光可處理範圍（Ø≤200 且 L≤1200），建議選擇電鍍後拋光或電鍍後膛孔</div>`;
+    }
+    html += `<div id="result-surface" style="margin-top:10px;"></div>
+    </div>`;
+  }
 
   // 電鍍卡
   const processes = [plateProc];
@@ -353,6 +384,13 @@ function renderProcessArea(){
 
 function setSurface(id){
   surfaceSel = surfaceSel===id ? null : id;
+  renderProcessArea();
+  calculate();
+}
+
+function toggleCylinder(id){
+  if(cylinderSel.has(id)) cylinderSel.delete(id);
+  else cylinderSel.add(id);
   renderProcessArea();
   calculate();
 }
@@ -391,47 +429,61 @@ function calculate(){
   const d = parseFloat(document.getElementById('dia').value)||0;
   const l = parseFloat(document.getElementById('len').value)||0;
 
-  // 表面加工（二選一）
+  // 表面處理
   const rs = document.getElementById('result-surface');
   if(rs){
-    if(!surfaceSel){
-      rs.innerHTML='<div class="empty">請選擇研磨或拋光</div>';
-    } else if(d<=0||l<=0){
-      rs.innerHTML='<div class="empty">輸入尺寸後自動計算</div>';
-    } else if(surfaceSel==='grind'){
-      // 研磨（軸心）
-      const g = grindFee(d,l,grindPasses);
-      let rows = `<div class="cr-grid" style="margin-bottom:10px;">
-        <button class="cr-btn${grindPasses===1?' active':''}" onclick="setGrindPasses(1)">一次研磨</button>
-        <button class="cr-btn${grindPasses===2?' active':''}" onclick="setGrindPasses(2)">二次研磨</button>
-      </div>
-      <div class="result-card anim">
-        <div class="result-row"><span class="rl">研磨面積（單件）</span><span class="rv yellow">${g.area.toFixed(2)} in²</span></div>
-        <div class="result-row"><span class="rl">L/D 比值</span><span class="rv ${g.isLong?'red':''}">${g.ld.toFixed(1)}${g.isLong?' ⚠️ 細長加倍':''}</span></div>
-        <div class="result-row"><span class="rl">第一次研磨費（×2）</span><span class="rv">${nt(g.c1)}</span></div>`;
-      if(g.passes===2) rows += `<div class="result-row"><span class="rl">第二次研磨費（×2×1.5）</span><span class="rv">${nt(g.c2)}</span></div>`;
-      if(g.isLong)     rows += `<div class="result-row"><span class="rl">細長附加（L/D>25，×2）</span><span class="rv red">${nt(g.passes===1?g.c1:g.c1+g.c2)}</span></div>`;
-      rows += `<div class="result-row"><span class="rl">費用${g.total===300?' (最低計費)':''}</span><span class="rv green">${nt(g.total)}</span></div></div>`;
-      rs.innerHTML = rows;
-    } else if(surfaceSel==='bore'){
-      // 膛孔（鋼管）
-      const vs = boreVendors(d,l);
-      const valid = vs.filter(v=>!v.outOfRange);
-      const bestTotal = valid.length ? Math.min(...valid.map(v=>v.total)) : Infinity;
-      rs.innerHTML = renderVendorGrid(vs, bestTotal, false);
-    } else if(surfaceSel==='polish'){
-      // 拋光
-      if(workType==='shaft'){
+    if(workType==='shaft'){
+      // 軸心單選
+      if(!surfaceSel){
+        rs.innerHTML='<div class="empty">請選擇研磨或拋光</div>';
+      } else if(d<=0||l<=0){
+        rs.innerHTML='<div class="empty">輸入尺寸後自動計算</div>';
+      } else if(surfaceSel==='grind'){
+        const g = grindFee(d,l,grindPasses);
+        let rows = `<div class="cr-grid" style="margin-bottom:10px;">
+          <button class="cr-btn${grindPasses===1?' active':''}" onclick="setGrindPasses(1)">一次研磨</button>
+          <button class="cr-btn${grindPasses===2?' active':''}" onclick="setGrindPasses(2)">二次研磨</button>
+        </div>
+        <div class="result-card anim">
+          <div class="result-row"><span class="rl">研磨面積（單件）</span><span class="rv yellow">${g.area.toFixed(2)} in²</span></div>
+          <div class="result-row"><span class="rl">L/D 比值</span><span class="rv ${g.isLong?'red':''}">${g.ld.toFixed(1)}${g.isLong?' ⚠️ 細長加倍':''}</span></div>
+          <div class="result-row"><span class="rl">第一次研磨費（×2）</span><span class="rv">${nt(g.c1)}</span></div>`;
+        if(g.passes===2) rows += `<div class="result-row"><span class="rl">第二次研磨費（×2×1.5）</span><span class="rv">${nt(g.c2)}</span></div>`;
+        if(g.isLong)     rows += `<div class="result-row"><span class="rl">細長附加（L/D>25，×2）</span><span class="rv red">${nt(g.passes===1?g.c1:g.c1+g.c2)}</span></div>`;
+        rows += `<div class="result-row"><span class="rl">費用${g.total===300?' (最低計費)':''}</span><span class="rv green">${nt(g.total)}</span></div></div>`;
+        rs.innerHTML = rows;
+      } else if(surfaceSel==='polish'){
         const p = polishShaft(d,l);
         rs.innerHTML = `<div class="result-card anim">
           <div class="result-row"><span class="rl">面積</span><span class="rv yellow">${p.area.toFixed(2)} in²</span></div>
           <div class="result-row"><span class="rl">宏光 @${p.unit}元/in²，最低NT$${p.min}</span><span class="rv green">${nt(p.total)}</span></div>
         </div>`;
+      }
+    } else {
+      // 鋼管複選：各項目分段顯示
+      if(d<=0||l<=0){
+        rs.innerHTML='<div class="empty">輸入尺寸後自動計算</div>';
+      } else if(cylinderSel.size===0){
+        rs.innerHTML='<div class="empty">請選擇表面處理項目</div>';
       } else {
-        const vs = polishCylinderVendors(d,l);
-        const valid = vs.filter(v=>!v.outOfRange);
-        const bestTotal = valid.length ? Math.min(...valid.map(v=>v.total)) : Infinity;
-        rs.innerHTML = renderVendorGrid(vs, bestTotal, true);
+        let html = '';
+        if(cylinderSel.has('bore')){
+          const vs = boreVendors(d,l);
+          html += `<div class="sec-label" style="margin-top:8px;">膛孔</div>` + renderVendorGrid(vs, false);
+        }
+        if(cylinderSel.has('polish')){
+          const vs = polishCylinderVendors(d,l);
+          html += `<div class="sec-label" style="margin-top:8px;">拋光</div>` + renderVendorGrid(vs, true);
+        }
+        if(cylinderSel.has('epolish')){
+          const vs = polishCylinderVendors(d,l).filter(v=>v.name!=='宏光');
+          html += `<div class="sec-label" style="margin-top:8px;">電鍍後拋光</div>` + renderVendorGrid(vs, false);
+        }
+        if(cylinderSel.has('eplating')){
+          const vs = boreVendors(d,l);
+          html += `<div class="sec-label" style="margin-top:8px;">電鍍後膛孔</div>` + renderVendorGrid(vs, false);
+        }
+        rs.innerHTML = html;
       }
     }
   }
@@ -500,17 +552,25 @@ function calculate(){
       let total = 0;
       let hasEstimate = false;
 
-      // 表面加工費
-      if(surfaceSel==='grind'){
-        total += grindFee(d,l,grindPasses).total;
-      } else if(surfaceSel==='bore'){
-        const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
-        if(vs.length) total += Math.min(...vs.map(v=>v.total));
-      } else if(surfaceSel==='polish'){
-        if(workType==='shaft'){
-          total += polishShaft(d,l).total;
-        } else {
+      // 表面處理費
+      if(workType==='shaft'){
+        if(surfaceSel==='grind') total += grindFee(d,l,grindPasses).total;
+        else if(surfaceSel==='polish') total += polishShaft(d,l).total;
+      } else {
+        if(cylinderSel.has('bore')){
+          const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
+          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+        }
+        if(cylinderSel.has('polish')){
           const vs = polishCylinderVendors(d,l).filter(v=>!v.outOfRange);
+          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+        }
+        if(cylinderSel.has('epolish')){
+          const vs = polishCylinderVendors(d,l).filter(v=>!v.outOfRange && v.name!=='宏光');
+          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+        }
+        if(cylinderSel.has('eplating')){
+          const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
           if(vs.length) total += Math.min(...vs.map(v=>v.total));
         }
       }
@@ -547,20 +607,17 @@ function calculate(){
 
 }
 
-function renderVendorGrid(vendors, bestTotal, isThree){
+function renderVendorGrid(vendors, isThree, unused, subLabel){
   const gridClass = isThree ? 'vendor-grid three' : 'vendor-grid';
   let html = `<div class="${gridClass} anim">`;
   vendors.forEach(v => {
-    const isBest = !v.outOfRange && v.total === bestTotal;
     const naClass = v.outOfRange ? ' na' : '';
-    const bestClass = isBest ? ' best' : '';
-    const badge = v.outOfRange
-      ? `<span class="v-badge badge-na">不適用</span>`
-      : (isBest ? `<span class="v-badge badge-best">最優</span>` : '');
+    const badge = v.outOfRange ? `<span class="v-badge badge-na">不適用</span>` : '';
     const priceStr = v.outOfRange ? '—' : nt(v.total);
     let detail = v.outOfRange ? '' : `${v.unit}元/in² · 最低NT$${v.min}`;
+    if(v.label2) detail += ` · ${v.label2}`;
     if(v.name==='宏光' && !v.outOfRange) detail += '（Ø≤150 或 L≤1200）';
-    html += `<div class="vendor-card${naClass}${bestClass}">
+    html += `<div class="vendor-card${naClass}">
       <div class="v-name">${v.name}${badge}</div>
       <div class="v-price">${priceStr}</div>
       <div class="v-detail">${detail}</div>
