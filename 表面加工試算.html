@@ -304,7 +304,7 @@ function renderProcessArea(){
   // 上方：表面處理選項
   const d0 = parseFloat(document.getElementById('dia').value)||0;
   const l0 = parseFloat(document.getElementById('len').value)||0;
-  const needsExtra = workType==='cylinder' && (d0 > 200 || l0 > 1200);
+  const needsExtra = workType==='cylinder' && (d0 >= 200 || l0 > 1200);
 
   const shaftOpts = [{id:'grind', color:'#58a6ff', label:'研磨'}, {id:'polish', color:'#bc8cff', label:'拋光'}];
   const cylAllOpts = [
@@ -346,7 +346,7 @@ function renderProcessArea(){
     });
     html += `</div>`;
     if(needsExtra){
-      html += `<div class="hint" style="margin-top:10px;margin-bottom:0;"><span>⚠ 提示</span>　Ø${d0} × L${l0} mm 超出宏光可處理範圍（Ø≤200 且 L≤1200），建議選擇電鍍後拋光或電鍍後膛孔</div>`;
+      html += `<div class="hint" style="margin-top:10px;margin-bottom:0;"><span>⚠ 提示</span>　Ø${d0} × L${l0} mm 超出宏光可處理範圍（Ø&lt;200 且 L≤1200），建議選擇電鍍後拋光或電鍍後膛孔</div>`;
     }
     html += `<div id="result-surface" style="margin-top:10px;"></div>
     </div>`;
