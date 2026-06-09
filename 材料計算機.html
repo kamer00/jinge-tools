@@ -332,6 +332,7 @@ const STKM_PRICES = [{"id":18,"od":31,"yi_fin":0.723,"yi_raw":null,"yi_plt":null
 // ══════════════════════════════════════════════════
 let currentShape = 'plate';
 let currentMode  = 'calc';   // 'calc' | 'reverse'
+let currentPlateInputMode = 'purchase'; // 'purchase'（採購尺寸）| 'finish'（完成尺寸）
 
 // ── 模式切換 ──
 function setMode(m) {
@@ -623,8 +624,8 @@ function getSpecArr(matCode, shape) {
   if(!grp) return null;
   const key = shape.replace('bar_','');
   // 不鏽鋼、鋁合金、銅合金：無內建規格，回傳 null（modal 顯示「無規格資料」）
-  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass'];
-  if(noSpec.includes(matCode)) return null;
+  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass',
+    'A6061_PL','A7075_PL','C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL'];
   if(matCode==='SS400'||matCode==='ST52'||matCode==='STKM13A') return grp['SS400']||grp['default_'+key];
   if(matCode==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key];
   if(matCode==='S45C_B'||matCode==='S50C') return grp['S45C_B']||grp['default_'+key];
@@ -785,6 +786,331 @@ function checkSpec(shape, dims, matCode) {
 // 材質切換
 // ══════════════════════════════════════════════════
 
+// ── 板材輸入模式切換（採購尺寸 / 完成尺寸）──
+function setPlateInputMode(mode) {
+  currentPlateInputMode = mode;
+  renderDims();
+}
+
+// ── 完成尺寸輸入 → 計算採購尺寸 ──
+function onFinishDimInput() {
+  const fT = parseFloat(document.getElementById('dim-FT')?.value) || 0;
+  const fL = parseFloat(document.getElementById('dim-FL')?.value) || 0;
+  const fW = parseFloat(document.getElementById('dim-FW')?.value) || 0;
+  const box = document.getElementById('allowance-display');
+  if(!fT || !fL || !fW) {
+    if(box) box.innerHTML = '<span style="color:var(--muted)">輸入完成尺寸後自動計算採購規格 →</span>';
+    ['dim-T','dim-L','dim-W'].forEach(id => { const el=document.getElementById(id); if(el) el.value='0'; });
+    return;
+  }
+  // 預留量規則（依完成T判斷）：T ≤ 100 → 單邊2.5；T > 100 → 單邊5
+  const allow = fT <= 100 ? 2.5 : 5;
+  const buyL = Math.round((fL + allow * 2) * 10) / 10;
+  const buyW = Math.round((fW + allow * 2) * 10) / 10;
+  // 板厚：直接用完成T查現貨，找「> 完成T且最接近」的板厚（不加預留）
+  const specArr = getSpecsForMat('plate');
+  let buyT = fT;
+  let specNote = '';
+  if(specArr && specArr.length > 0) {
+    const nearest = specArr.filter(t => t > fT).sort((a,b)=>a-b)[0];
+    if(nearest) {
+      buyT = nearest;
+      specNote = '完成厚 '+fT+'mm → 取現貨 <strong style="color:var(--accent2)">'+buyT+'mm</strong>';
+    } else {
+      buyT = Math.ceil(fT + 1);
+      specNote = '完成厚 '+fT+'mm，超出現貨範圍，取 '+buyT+'mm';
+    }
+  }
+  // 寫入隱藏欄位供 calc 使用
+  const hidT = document.getElementById('dim-T');
+  const hidL = document.getElementById('dim-L');
+  const hidW = document.getElementById('dim-W');
+  if(hidT) hidT.value = buyT;
+  if(hidL) hidL.value = buyL;
+  if(hidW) hidW.value = buyW;
+  // 更新顯示
+  if(box) {
+    box.innerHTML =
+      '<div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">採購尺寸（按計算後使用此規格）</div>'+
+      '<div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">'+
+        '<span style="color:var(--muted);font-size:11px">T</span>'+
+        '<strong style="color:var(--accent);font-size:18px">'+buyT+'</strong>'+
+        '<span style="color:var(--muted)">×</span>'+
+        '<span style="color:var(--muted);font-size:11px">L</span>'+
+        '<strong style="color:var(--accent);font-size:18px">'+buyL+'</strong>'+
+        '<span style="color:var(--muted)">×</span>'+
+        '<span style="color:var(--muted);font-size:11px">W</span>'+
+        '<strong style="color:var(--accent);font-size:18px">'+buyW+'</strong>'+
+        '<span style="color:var(--muted);font-size:11px">mm</span>'+
+      '</div>'+
+      '<div style="margin-top:6px;font-size:10px;color:var(--muted)">LW單邊預留 '+allow+'mm　｜　'+specNote+'</div>';
+  }
+  autoFillUnitPrice();
+}
+
+
+// ══════════════════════════════════════════════════
+// 銑床加工費（銑六面 / I接頭 / Y接頭）
+// ══════════════════════════════════════════════════
+const MILLING_CHAMFER = {
+  i: {
+    c4:  { unitPrice:2.5, minPrice:200 },
+    c10: { unitPrice:2.6, minPrice:230 },
+    c15: { unitPrice:2.7, minPrice:250 },
+  },
+  y: {
+    c4:  { unitPrice:4.3, minPrice:250 },
+    c10: { unitPrice:4.4, minPrice:280 },
+    c15: { unitPrice:4.5, minPrice:300 },
+  },
+};
+const MILLING_TYPE = {
+  six: { name:'銑六面',   unitPrice:0.9, minPrice:100 },
+  i:   { name:'I接頭/LA', unitPrice:2.5, minPrice:200 },
+  y:   { name:'Y接頭',    unitPrice:4.3, minPrice:250 },
+};
+
+// 材質 → 銑床係數
+function getMillingMatCoeff(matName) {
+  const sus = ['SUS304'];
+  const qt  = ['SCM440','SCM415','SNCM439','SUJ2','SKD11','SCM440_PL'];
+  if(sus.includes(matName)) return { mult:3.5, label:'白鐵（SUS）×3.5' };
+  if(qt.includes(matName))  return { mult:2,   label:'調質/特殊料 ×2' };
+  return { mult:1, label:'一般料 ×1' };
+}
+
+function renderMillingCard(L, W, T, matName) {
+  const fmtNT = n => Math.round(n).toLocaleString('zh-TW');
+  const ff = (n,d=2) => n.toLocaleString('zh-TW',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+  const millingType    = document.getElementById('milling-type')?.value    || 'six';
+  const millingChamfer = document.getElementById('milling-chamfer')?.value || 'c4';
+
+  let tc;
+  if(millingType === 'six') {
+    tc = MILLING_TYPE.six;
+  } else {
+    const cc = MILLING_CHAMFER[millingType][millingChamfer];
+    tc = { name: MILLING_TYPE[millingType].name, unitPrice: cc.unitPrice, minPrice: cc.minPrice };
+  }
+
+  const mc = getMillingMatCoeff(matName);
+  const areaMM2 = (L*W*2 + W*T*2 + T*L*2);
+  const areaIN2 = areaMM2 / 645;
+  const calcVal  = areaIN2 * tc.unitPrice;
+  const basePrice = Math.max(calcVal, tc.minPrice);
+  const maxDim = Math.max(L, W, T);
+
+  let sizeCoeff, sizeLabel;
+  if(millingType === 'six') {
+    if(maxDim < 450)      { sizeCoeff=1.0;  sizeLabel='<450mm → ×1.0'; }
+    else if(maxDim < 600) { sizeCoeff=1.25; sizeLabel='450~599mm → ×1.25'; }
+    else                  { sizeCoeff=1.35; sizeLabel='≥600mm → ×1.35'; }
+  } else {
+    if(maxDim <= 299)      { sizeCoeff=1.0;  sizeLabel='≤299mm → ×1.0'; }
+    else if(maxDim <= 499) { sizeCoeff=1.5;  sizeLabel='300~499mm → ×1.5'; }
+    else if(maxDim <= 699) { sizeCoeff=1.8;  sizeLabel='500~699mm → ×1.8'; }
+    else {
+      document.getElementById('milling-result').innerHTML =
+        '<div style="font-family:var(--mono);font-size:11px;color:var(--red)">⚠ 尺寸 ≥700mm，須另行報價</div>';
+      return;
+    }
+  }
+
+  const final = basePrice * sizeCoeff * mc.mult;
+
+  const chamferRow = (millingType !== 'six') ? `
+    <div class="res-row"><span class="res-label">倒角等級</span><span class="res-val">${{c4:'C4以下',c10:'C5–C10',c15:'C11–C15'}[millingChamfer]}</span></div>` : '';
+
+  document.getElementById('milling-result').innerHTML = `
+    <div style="margin-top:12px;padding:14px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.25);border-radius:2px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:8px">銑床加工費</div>
+      <div style="font-family:var(--mono);font-size:28px;font-weight:600;color:var(--accent)">NT$ ${fmtNT(final)}</div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+        <div class="res-row"><span class="res-label">六面積</span><span class="res-val">${ff(areaMM2,0)} mm²　/　${ff(areaIN2,3)} in²</span></div>
+        <div class="res-row"><span class="res-label">單價</span><span class="res-val">${tc.unitPrice} 元/in²（最低 ${tc.minPrice} 元）</span></div>
+        <div class="res-row"><span class="res-label">基本單價</span><span class="res-val">NT$ ${fmtNT(basePrice)}</span></div>
+        <div class="res-row"><span class="res-label">尺寸係數</span><span class="res-val">${sizeLabel}</span></div>
+        <div class="res-row"><span class="res-label">材質係數</span><span class="res-val">${mc.label}</span></div>${chamferRow}
+      </div>
+    </div>`;
+}
+
+function buildMillingCard(matName, finL, finW, finT) {
+  const showChamfer = document.getElementById('milling-type')?.value !== 'six';
+  const chamferHTML = showChamfer ? `
+    <div class="field" style="margin-top:8px">
+      <label style="font-size:11px;color:var(--muted);font-family:var(--mono)">倒角等級</label>
+      <select id="milling-chamfer" onchange="triggerMillingCalc()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;width:100%;border-radius:2px;-webkit-appearance:none;appearance:none">
+        <option value="c4">C4 以下</option>
+        <option value="c10">C5 – C10</option>
+        <option value="c15">C11 – C15</option>
+      </select>
+    </div>` : '';
+
+  return `<div class="res-card" id="milling-card">
+    <div class="res-card-header" onclick="toggleMillingCard()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+      <span>銑床加工費</span>
+      <span id="milling-toggle-icon" style="font-size:11px;color:var(--muted)">▲ 收合</span>
+    </div>
+    <div id="milling-card-body" class="res-card-body">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px">
+        <button onclick="setMillingType('six')" id="milling-btn-six"
+          style="padding:8px 4px;border-radius:2px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;background:var(--accent);border:1px solid var(--accent);color:#000;font-weight:600">銑六面</button>
+        <button onclick="setMillingType('i')" id="milling-btn-i"
+          style="padding:8px 4px;border-radius:2px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;background:var(--bg);border:1px solid var(--border);color:var(--muted)">I接頭/LA</button>
+        <button onclick="setMillingType('y')" id="milling-btn-y"
+          style="padding:8px 4px;border-radius:2px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;background:var(--bg);border:1px solid var(--border);color:var(--muted)">Y接頭</button>
+      </div>
+      <input type="hidden" id="milling-type" value="six">
+      <input type="hidden" id="milling-mat" value="${matName}">
+      <input type="hidden" id="milling-L" value="${finL}">
+      <input type="hidden" id="milling-W" value="${finW}">
+      <input type="hidden" id="milling-T" value="${finT}">
+      <div id="milling-chamfer-wrap">${chamferHTML}</div>
+      <div style="margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+        完成尺寸：L ${finL} × W ${finW} × T ${finT} mm
+      </div>
+      <div id="milling-result"></div>
+    </div>
+  </div>`;
+}
+
+function toggleMillingCard() {
+  const body = document.getElementById('milling-card-body');
+  const icon = document.getElementById('milling-toggle-icon');
+  if(!body || !icon) return;
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  icon.textContent = collapsed ? '▲ 收合' : '▼ 展開';
+}
+
+
+function setMillingType(type) {
+  ['six','i','y'].forEach(t => {
+    const btn = document.getElementById('milling-btn-'+t);
+    if(!btn) return;
+    const active = t===type;
+    btn.style.background = active ? 'var(--accent)' : 'var(--bg)';
+    btn.style.border      = active ? '1px solid var(--accent)' : '1px solid var(--border)';
+    btn.style.color       = active ? '#000' : 'var(--muted)';
+    btn.style.fontWeight  = active ? '600' : 'normal';
+  });
+  const typeInput = document.getElementById('milling-type');
+  if(typeInput) typeInput.value = type;
+  // 倒角選單顯示/隱藏
+  const wrap = document.getElementById('milling-chamfer-wrap');
+  const matName = document.getElementById('milling-mat')?.value || '';
+  const L = parseFloat(document.getElementById('milling-L')?.value)||0;
+  const W = parseFloat(document.getElementById('milling-W')?.value)||0;
+  const T = parseFloat(document.getElementById('milling-T')?.value)||0;
+  if(wrap) {
+    wrap.innerHTML = type !== 'six' ? `
+      <div class="field" style="margin-top:8px">
+        <label style="font-size:11px;color:var(--muted);font-family:var(--mono)">倒角等級</label>
+        <select id="milling-chamfer" onchange="triggerMillingCalc()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;width:100%;border-radius:2px;-webkit-appearance:none;appearance:none">
+          <option value="c4">C4 以下</option>
+          <option value="c10">C5 – C10</option>
+          <option value="c15">C11 – C15</option>
+        </select>
+      </div>` : '';
+  }
+  triggerMillingCalc();
+}
+
+function triggerMillingCalc() {
+  const matName = document.getElementById('milling-mat')?.value || '';
+  const L = parseFloat(document.getElementById('milling-L')?.value)||0;
+  const W = parseFloat(document.getElementById('milling-W')?.value)||0;
+  const T = parseFloat(document.getElementById('milling-T')?.value)||0;
+  if(L && W && T) renderMillingCard(L, W, T, matName);
+}
+
+
+// ══════════════════════════════════════════════════
+// 熱處理費卡片
+// ══════════════════════════════════════════════════
+const HT_DATA = [
+  {id:'norm',    label:'正常化、回火',   price:8,    mats:['S45C_L','S45C_B','S50C','SCM440','SCM415','SKD11','其他']},
+  {id:'qt',      label:'調質',           price:13.5, mats:['S45C_L','S45C_B','S50C','SCM440','SCM415']},
+  {id:'qt_suj',  label:'調質（SUJ2）',   price:18,   mats:['SUJ2']},
+  {id:'qt_blu',  label:'調質（藍十字）', price:30,   mats:['SNCM439']},
+  {id:'qt_sus',  label:'調質／固溶化',   price:36,   mats:['SUS304']},
+  {id:'carb',    label:'滲碳',           price:42,   mats:['SCM415','其他']},
+  {id:'qt_skd',  label:'調質（SKD61）',  price:48,   mats:['SKD11']},
+];
+
+// 顯示熱處理的材質清單
+const HT_PLATE_MATS = ['S50C','SCM440','S45C_L','S45C_B','SCM415','SNCM439','SUJ2','SKD11','SUS304'];
+const HT_BAR_MATS   = ['S45C_L','S45C_B','S50C','SCM440','SCM415','SNCM439','SUJ2','SKD11','SUS304'];
+
+function shouldShowHT(matName, shape) {
+  if(['pipe','prod_pipe','shaft'].includes(shape)) return false;
+  if(shape === 'plate') return HT_PLATE_MATS.includes(matName);
+  if(['bar_rnd','bar_sq','bar_hex'].includes(shape)) return HT_BAR_MATS.includes(matName);
+  return false;
+}
+
+function getHtOptions(matName) {
+  // 取該材質適用的熱處理種類
+  return HT_DATA.filter(h => h.mats.includes(matName) || h.mats.includes('其他'));
+}
+
+function buildHtCard(matName, kg) {
+  const options = getHtOptions(matName);
+  if(!options.length) return '';
+  const optHTML = options.map((h,i) =>
+    `<option value="${h.id}" ${i===0?'selected':''}>${h.label}　${h.price} 元/kg</option>`
+  ).join('');
+  return `<div class="res-card" id="ht-card">
+    <div class="res-card-header" onclick="toggleHtCard()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+      <span>熱處理費</span>
+      <span id="ht-toggle-icon" style="font-size:11px;color:var(--muted)">▲ 收合</span>
+    </div>
+    <div id="ht-card-body" class="res-card-body">
+      <div class="field">
+        <label style="font-size:11px;color:var(--muted);font-family:var(--mono)">熱處理種類</label>
+        <select id="ht-type" onchange="renderHtResult()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;width:100%;border-radius:2px;-webkit-appearance:none;appearance:none">
+          ${optHTML}
+        </select>
+      </div>
+      <input type="hidden" id="ht-kg" value="${kg}">
+      <div id="ht-result"></div>
+    </div>
+  </div>`;
+}
+
+function renderHtResult() {
+  const sel = document.getElementById('ht-type');
+  const kg  = parseFloat(document.getElementById('ht-kg')?.value) || 0;
+  const res = document.getElementById('ht-result');
+  if(!sel || !kg || !res) return;
+  const ht = HT_DATA.find(h => h.id === sel.value);
+  if(!ht) return;
+  const cost = Math.round(ht.price * kg * 10) / 10;
+  const fmtNT = n => Math.round(n).toLocaleString('zh-TW');
+  res.innerHTML = `
+    <div style="margin-top:12px;padding:14px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.25);border-radius:2px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:8px">熱處理費用</div>
+      <div style="font-family:var(--mono);font-size:28px;font-weight:600;color:var(--accent)">NT$ ${fmtNT(cost)}</div>
+      <div style="margin-top:10px">
+        <div class="res-row"><span class="res-label">重量</span><span class="res-val">${kg.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:4})} kg</span></div>
+        <div class="res-row"><span class="res-label">單價</span><span class="res-val">${ht.price} 元/kg</span></div>
+        <div class="res-row"><span class="res-label">費用</span><span class="res-val accent">NT$ ${fmtNT(cost)}</span></div>
+      </div>
+    </div>`;
+}
+
+function toggleHtCard() {
+  const body = document.getElementById('ht-card-body');
+  const icon = document.getElementById('ht-toggle-icon');
+  if(!body || !icon) return;
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  icon.textContent = collapsed ? '▲ 收合' : '▼ 展開';
+}
+
+
 function showUnitPriceInput() {
   const wrap = document.getElementById('unit-price-wrap');
   const inp = document.getElementById('unit-price');
@@ -805,8 +1131,13 @@ function autoFillUnitPrice() {
 
   // 板材種類：只有 SS400 才顯示
   const typeSection = document.getElementById('plate-type-section');
+  const copperPlateMats = ['C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL'];
+  const alumPlateMats   = ['A6061_PL','A7075_PL'];
+  const isCopperPlate = copperPlateMats.includes(matCode);
+  const isAlumPlate   = alumPlateMats.includes(matCode);
   if(typeSection && currentShape==='plate') {
-    typeSection.style.display = '';
+    // 銅/鋁板材不顯示板材種類選單
+    typeSection.style.display = (isCopperPlate || isAlumPlate) ? 'none' : '';
     // 圓板選項只有 SS400 才顯示
     const circleOpt = document.querySelector('#plate-type-sel option[value="circle"]');
     if(circleOpt) circleOpt.style.display = matCode==='SS400' ? '' : 'none';
@@ -817,13 +1148,19 @@ function autoFillUnitPrice() {
   let px = null;
 
   if(currentShape==='plate') {
-    const plateType = document.getElementById('plate-type-sel')?.value || 'square';
-    const T = parseFloat(document.getElementById('dim-T')?.value) || 0;
-    if(plateType==='profile' && ['S45C_L','S45C_B','S50C','SCM440'].includes(matCode)) {
-      px = 77; // S45C/SCM440 型體板固定 77 元/kg
-    } else if(T) {
-      const res = lookupPlatePrice(T, matCode, plateType);
-      if(res && !res.inquiry) px = res.best.px;
+    if(isCopperPlate) {
+      px = matCode==='PBC3_PL' ? 600 : matCode==='C3604_PL' ? 240 : matCode==='ALBC3_PL' ? 660 : 650;
+    } else if(isAlumPlate) {
+      px = matCode==='A7075_PL' ? 350 : 280; // A7075較貴，A6061 280；請依實際報價調整
+    } else {
+      const plateType = document.getElementById('plate-type-sel')?.value || 'square';
+      const T = parseFloat(document.getElementById('dim-T')?.value) || 0;
+      if(plateType==='profile' && ['S45C_L','S45C_B','S50C','SCM440'].includes(matCode)) {
+        px = 77; // S45C/SCM440 型體板固定 77 元/kg
+      } else if(T) {
+        const res = lookupPlatePrice(T, matCode, plateType);
+        if(res && !res.inquiry) px = res.best.px;
+      }
     }
   } else if(['bar_rnd','bar_sq','bar_hex'].includes(currentShape)) {
     const dim = parseFloat(document.getElementById(
@@ -843,7 +1180,13 @@ function autoFillUnitPrice() {
 // ══════════════════════════════════════════════════
 // 各形狀對應材質清單
 const SHAPE_MATS = {
-  plate:   [['SS400|7.85','SS400'],['S50C|7.85','S50C'],['SCM440|7.85','SCM440']],
+  plate:   [
+    ['SS400|7.85','SS400'],['S50C|7.85','S50C'],['SCM440|7.85','SCM440'],
+    ['A6061_PL|2.70','A6061　鋁合金板'],['A7075_PL|2.81','A7075　鋁合金板'],
+    ['C3604_PL|8.50','C3604　黃銅板（易切削）'],['BC6_PL|8.83','BC6　青銅板'],
+    ['PBC3_PL|8.80','PBC3　磷青銅板'],['ALBC3_PL|7.60','ALBC3　鋁青銅板'],
+    ['HBrass_PL|8.50','高張力黃銅板'],
+  ],
   // bar_rnd 使用群組格式：{group:'群組名', items:[...]}
   bar_rnd: [
     {group:'碳鋼', items:[
@@ -999,12 +1342,18 @@ function setShape(s) {
 // ══════════════════════════════════════════════════
 function mk(tag, attrs, text) {
   const el = document.createElement(tag);
-  Object.entries(attrs||{}).forEach(([k,v])=>{ if(k==='style') el.style.cssText=v; else el[k]=v; });
+  Object.entries(attrs||{}).forEach(([k,v])=>{
+    if(k==='style') el.style.cssText=v;
+    else if(k.startsWith('on')) el.setAttribute(k, v);
+    else el[k]=v;
+  });
   if(text) el.textContent=text;
   return el;
 }
-function mkInput(id, step) {
-  return mk('input',{type:'number',id,placeholder:'mm',min:0,step});
+function mkInput(id, step, oninputFn) {
+  const el = mk('input',{type:'number',id,placeholder:'mm',min:0,step});
+  if(oninputFn) el.setAttribute('oninput', oninputFn);
+  return el;
 }
 function mkField(lbl, child) {
   const d=mk('div',{className:'field'});
@@ -1031,7 +1380,8 @@ function getSpecsForMat(shape) {
   const key = shape.replace('bar_','');
   const mc = matCode;
   // 不鏽鋼、鋁合金、銅合金：無內建規格
-  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass'];
+  const noSpec = ['SUS304','A6061','A7075','BC6','PBC3','ALBC3','HBrass',
+    'A6061_PL','A7075_PL','C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL'];
   if(noSpec.includes(mc)) return [];
   if(mc==='SS400'||mc==='ST52') return grp['SS400']||grp['default_'+key]||[];
   if(mc==='S45C_L') return grp['S45C_L']||grp['S45C']||grp['default_'+key]||[];
@@ -1062,6 +1412,8 @@ function renderDims() {
     area.appendChild(typeField);
     // 尺寸輸入
     const plateMat = document.getElementById('mat')?.value.split('|')[0] || '';
+    const copperAlumPlateCodes = ['C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL','A6061_PL','A7075_PL'];
+    if(copperAlumPlateCodes.includes(plateMat)) typeField.style.display = 'none';
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
     let plateSpecs, plateSpecLabel;
     if(plateMat==='SCM440') {
@@ -1071,15 +1423,57 @@ function renderDims() {
     } else {
       plateSpecs = getSpecsForMat('plate'); plateSpecLabel = 'T（厚）';
     }
-    const tWidget = mkSpecSel('dim-T', plateSpecs, '', autoFillUnitPrice);
-    const tf=mkField(plateSpecLabel, tWidget);
-    tf.style.flex='1';
-    const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
-    const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
-    const x2=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
-    const wf=mkField('W（寬）',mkInput('dim-W','1')); wf.style.flex='1';
-    g.appendChild(tf); g.appendChild(x1); g.appendChild(lf); g.appendChild(x2); g.appendChild(wf);
-    area.appendChild(g);
+    // ── 完成尺寸 / 採購尺寸切換（正向模式且非銅鋁板才顯示）
+    const isNonSteelPlate = copperAlumPlateCodes.includes(plateMat);
+    if(!isNonSteelPlate && currentMode !== 'reverse') {
+      const modeRow = mk('div', {style:'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px'});
+      ['finish','purchase'].forEach(v => {
+        const lbl = v==='purchase' ? '採購尺寸' : '完成尺寸';
+        const btn = mk('button', {
+          id:'plate-input-btn-'+v,
+          style:'padding:8px 4px;border-radius:2px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .15s;'+
+                (currentPlateInputMode===v
+                  ? 'background:var(--accent);border:1px solid var(--accent);color:#000;font-weight:600'
+                  : 'background:var(--bg);border:1px solid var(--border);color:var(--muted)'),
+          onclick: 'setPlateInputMode("'+v+'")'
+        }, lbl);
+        modeRow.appendChild(btn);
+      });
+      area.appendChild(modeRow);
+    }
+
+    if(currentPlateInputMode==='finish' && !isNonSteelPlate && currentMode !== 'reverse') {
+      // ── 完成尺寸模式：輸入完成 L/W/T，顯示採購尺寸
+      const finG=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
+      const ftf=mkField('T 完成尺寸（厚）',mkInput('dim-FT','0.1','onFinishDimInput()')); ftf.style.flex='1';
+      const fx1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
+      const flf=mkField('L 完成尺寸（長）',mkInput('dim-FL','1','onFinishDimInput()')); flf.style.flex='1';
+      const fx2=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
+      const fwf=mkField('W 完成尺寸（寬）',mkInput('dim-FW','1','onFinishDimInput()')); fwf.style.flex='1';
+      finG.appendChild(ftf); finG.appendChild(fx1); finG.appendChild(flf); finG.appendChild(fx2); finG.appendChild(fwf);
+      area.appendChild(finG);
+      // 採購尺寸結果框
+      const allowanceBox = mk('div',{id:'allowance-display',
+        style:'margin-top:10px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.3);padding:12px 14px;border-radius:2px;font-family:var(--mono);font-size:12px'});
+      allowanceBox.innerHTML = '<span style="color:var(--muted)">輸入完成尺寸後自動計算採購規格 →</span>';
+      area.appendChild(allowanceBox);
+      // 隱藏欄位（給 calc 讀取）
+      ['dim-T','dim-L','dim-W'].forEach(id => {
+        const h=mk('input',{type:'hidden',id,value:'0'});
+        area.appendChild(h);
+      });
+    } else {
+      // ── 採購尺寸模式（原本邏輯）
+      const tWidget = mkSpecSel('dim-T', plateSpecs, '', autoFillUnitPrice);
+      const tf=mkField(plateSpecLabel, tWidget);
+      tf.style.flex='1';
+      const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
+      const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
+      const x2=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
+      const wf=mkField('W（寬）',mkInput('dim-W','1')); wf.style.flex='1';
+      g.appendChild(tf); g.appendChild(x1); g.appendChild(lf); g.appendChild(x2); g.appendChild(wf);
+      area.appendChild(g);
+    }
 
   } else if(currentShape==='bar_rnd') {
     const hollowCopperMats = ['BC6','PBC3','ALBC3','HBrass'];
@@ -1305,13 +1699,26 @@ function updateProdPipeHint() {
 function calculate() {
   const matVal = document.getElementById('mat').value.split('|');
   const matName = matVal[0];
-  let matDisplay = matName.replace('S45C_L','S45C 光中碳').replace('S45C_B','S45C 黑中碳');
+  let matDisplay = matName
+    .replace('S45C_L','S45C 光中碳').replace('S45C_B','S45C 黑中碳')
+    .replace('_PL','');  // 去除板材後綴
   // 板材種類顯示
   if(currentShape==='plate') {
     const ptSel = document.getElementById('plate-type-sel');
-    if(ptSel) {
+    const copperAlumPlateCodes2 = ['C3604','BC6','PBC3','ALBC3','HBrass','A6061','A7075'];
+    const baseCode = matName.replace('_PL','');
+    if(ptSel && !copperAlumPlateCodes2.includes(baseCode)) {
       const ptMap = {square:'四角板', profile:'型體板', circle:'圓板切孔'};
       matDisplay += '　' + (ptMap[ptSel.value] || '');
+    } else {
+      matDisplay += '　板材';
+    }
+    // 完成尺寸模式：標題補充完成尺寸
+    if(currentPlateInputMode==='finish' && currentMode!=='reverse') {
+      const fT=parseFloat(document.getElementById('dim-FT')?.value)||0;
+      const fL=parseFloat(document.getElementById('dim-FL')?.value)||0;
+      const fW=parseFloat(document.getElementById('dim-FW')?.value)||0;
+      if(fT&&fL&&fW) matDisplay += '（完成 T'+fT+'×L'+fL+'×W'+fW+'）';
     }
   }
   // 管料/成品管/硬鉻軸：材質區隱藏，依形狀給預設密度
@@ -1457,19 +1864,19 @@ function calculate() {
     }
   }
 
-  // 銅料圓棒：外徑+7、內徑-7、長度+5，密度9，×1.03
+  // 銅料圓棒：正向模式 外徑+7、內徑-7、長度+5，密度9，×1.03；反查模式實寸
   const copperBarMats = ['C3604','BC6','PBC3','ALBC3','HBrass'];
   const isCopperBar = copperBarMats.includes(matName) && currentShape==='bar_rnd';
-  if(isCopperBar) {
+  if(isCopperBar && currentMode !== 'reverse') {
     dims = {...dims,
       D: dims.D + 7,
       L: dims.L + 5,
       ...(dims.ID && dims.ID > 0 ? {ID: Math.max(dims.ID - 7, 1)} : {})
     };
   }
-  const copperDensity = isCopperBar ? 9 : density;
+  const copperDensity = (isCopperBar && currentMode !== 'reverse') ? 9 : density;
   let {kg, formula} = calcWeight(currentShape, dims, copperDensity);
-  if(isCopperBar) { kg = Math.round(kg * 1.03 * 10000) / 10000; }
+  if(isCopperBar && currentMode !== 'reverse') { kg = Math.round(kg * 1.03 * 10000) / 10000; }
   if(currentShape==='plate' && kg < 1) kg = 1;
   let totalKg = kg * qty;
   let autoSawFeeAmt = 0;
@@ -1477,11 +1884,11 @@ function calculate() {
   if(currentShape==='pipe' && dims.OD) {
     autoSawFeeAmt = Math.round(dims.OD / 10 * 10) / 10;
   }
-  // 型體板 S45C/SCM440 → 長寬各加 10mm（採購餘量）
+  // 型體板 S45C/SCM440 → 正向模式：長寬各加 10mm（採購餘量）；反查模式：實寸
   const plateType = document.getElementById('plate-type-sel')?.value || 'square';
   const isProfileSpecial = currentShape==='plate' && plateType==='profile' &&
     ['S45C_L','S45C_B','S50C','SCM440'].includes(matName);
-  if(isProfileSpecial) { dims = {...dims, L: dims.L+10, W: dims.W+10}; }
+  if(isProfileSpecial && currentMode !== 'reverse') { dims = {...dims, L: dims.L+10, W: dims.W+10}; }
   // 規格選單已限定現貨，不需要 checkSpec
   let hasCost = !isNaN(unitPrice) && unitPrice > 0;
 
@@ -1490,19 +1897,42 @@ function calculate() {
   // 保守採購單價
   let suggestHTML = '';
   let autoPrice = null;
+  const copperPlateMatsCalc = ['C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL'];
+  const alumPlateMatsCalc   = ['A6061_PL','A7075_PL'];
+  const isCopperPlateCalc = copperPlateMatsCalc.includes(matName);
+  const isAlumPlateCalc   = alumPlateMatsCalc.includes(matName);
   if(currentShape==='plate') {
-    const res = lookupPlatePrice(dims.T, matName, plateType);
-    if(isProfileSpecial) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">採購說明</div><div class="res-card-body">'+
-        '<div class="res-row"><span class="res-label">供應商</span><span class="res-val accent">益聖（唯一可處理）</span></div>'+
-        '<div class="res-row"><span class="res-label">計算尺寸</span><span class="res-val" style="color:var(--accent2)">L '+dims.L+'mm（+10）× W '+dims.W+'mm（+10）× T '+dims.T+'mm</span></div>'+
-        '<div style="margin-top:6px;font-size:11px;color:var(--muted)">型體板採購尺寸長寬各加 10mm 計重，請手動輸入益聖單價</div>'+
+    if(isCopperPlateCalc) {
+      const cpx = matName==='PBC3_PL'?600:matName==='C3604_PL'?240:matName==='ALBC3_PL'?660:650;
+      autoPrice = cpx;
+      suggestHTML = '<div class="res-card"><div class="res-card-header">採購單價（銅合金板）</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">單價</span><span class="res-val accent">'+cpx+' 元/kg</span></div>'+
+        '<div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(cpx*totalKg)+'</span></div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--muted)">銅合金板，以毛重計費</div>'+
         '</div></div>';
-    } else if(res && res.inquiry) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">採購建議</div><div class="res-card-body"><div class="warn-ok" style="background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.4);color:var(--blue)">📞 建議另洽詢價：'+res.suppliers+'</div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">特殊鋼板規格庫存不定，請先確認有料再計算費用</div></div></div>';
-    } else if(res) {
-      suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
-      autoPrice = res.best.px;
+    } else if(isAlumPlateCalc) {
+      const apx = matName==='A7075_PL' ? 350 : 280;
+      autoPrice = apx;
+      suggestHTML = '<div class="res-card"><div class="res-card-header">採購單價（鋁合金板）</div><div class="res-card-body">'+
+        '<div class="res-row"><span class="res-label">單價</span><span class="res-val accent">'+apx+' 元/kg</span></div>'+
+        '<div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(apx*totalKg)+'</span></div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--muted)">鋁合金板，以毛重計費（可修改單價）</div>'+
+        '<button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button>'+
+        '</div></div>';
+    } else {
+      const res = lookupPlatePrice(dims.T, matName, plateType);
+      if(isProfileSpecial) {
+        suggestHTML = '<div class="res-card"><div class="res-card-header">採購說明</div><div class="res-card-body">'+
+          '<div class="res-row"><span class="res-label">供應商</span><span class="res-val accent">益聖（唯一可處理）</span></div>'+
+          '<div class="res-row"><span class="res-label">計算尺寸</span><span class="res-val" style="color:var(--accent2)">L '+dims.L+'mm（+10）× W '+dims.W+'mm（+10）× T '+dims.T+'mm</span></div>'+
+          '<div style="margin-top:6px;font-size:11px;color:var(--muted)">型體板採購尺寸長寬各加 10mm 計重，請手動輸入益聖單價</div>'+
+          '</div></div>';
+      } else if(res && res.inquiry) {
+        suggestHTML = '<div class="res-card"><div class="res-card-header">採購建議</div><div class="res-card-body"><div class="warn-ok" style="background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.4);color:var(--blue)">📞 建議另洽詢價：'+res.suppliers+'</div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">特殊鋼板規格庫存不定，請先確認有料再計算費用</div></div></div>';
+      } else if(res) {
+        suggestHTML = '<div class="res-card"><div class="res-card-header">保守採購單價</div><div class="res-card-body"><div class="res-row"><span class="res-label">最高廠商</span><span class="res-val accent">'+res.best.name+'　'+res.best.px+' 元/kg</span></div><div class="res-row"><span class="res-label">建議材料費</span><span class="res-val green">NT$ '+fmtNT(res.best.px*totalKg)+'</span></div><div style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--muted)">各廠：'+res.all.map(x=>x.name+' '+x.px+'元').join('　')+'</div><button onclick="showUnitPriceInput()" style="margin-top:10px;width:100%;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:2px;cursor:pointer">✏ 修改單價</button></div></div>';
+        autoPrice = res.best.px;
+      }
     }
   }
   // S45C/SCM440 型體板以 77 元/kg 計價
@@ -1624,18 +2054,32 @@ function calculate() {
 
   // 套用按鈕（只在有金額時顯示，且在 iframe 模式下才出現）
   let applyBtnHTML = '';
-  if (hasCost || autoPrice) {
-    const finalCost = hasCost
-      ? Math.round(totalKg * unitPrice + autoSawFeeAmt)
-      : Math.round(totalKg * (autoPrice||0) + autoSawFeeAmt);
-    if (finalCost > 0 && window.self !== window.top) {
-      applyBtnHTML = '<div class="res-card" style="border:2px solid var(--accent)">'
-        + '<div class="res-card-body" style="text-align:center;">'
-        + '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">材料費計算結果</div>'
-        + '<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:12px;">NT$ ' + fmtNT(finalCost) + '</div>'
-        + '<button onclick="applyToQuote(' + finalCost + ')" style="width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:3px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✔ 套用到報價單</button>'
-        + '</div></div>';
+
+  // 銑床加工費卡片（板材才顯示）
+  let millingHTML = '';
+  if(currentShape === 'plate') {
+    const copperAlumCodes = ['C3604_PL','BC6_PL','PBC3_PL','ALBC3_PL','HBrass_PL','A6061_PL','A7075_PL'];
+    const isNonSteel = copperAlumCodes.includes(matName);
+    // 取完成尺寸（完成尺寸模式用 dim-F*，採購尺寸模式用 dim-*）
+    let finL, finW, finT;
+    if(currentPlateInputMode === 'finish' && !isNonSteel) {
+      finL = parseFloat(document.getElementById('dim-FL')?.value) || 0;
+      finW = parseFloat(document.getElementById('dim-FW')?.value) || 0;
+      finT = parseFloat(document.getElementById('dim-FT')?.value) || 0;
+    } else {
+      finL = dims.L || 0;
+      finW = dims.W || 0;
+      finT = dims.T || 0;
     }
+    if(finL && finW && finT) {
+      millingHTML = buildMillingCard(matName, finL, finW, finT);
+    }
+  }
+
+  // 熱處理費卡片
+  let htHTML = '';
+  if(shouldShowHT(matName, currentShape)) {
+    htHTML = buildHtCard(matName, kg);
   }
 
   document.getElementById('result').innerHTML =
@@ -1643,7 +2087,14 @@ function calculate() {
     '<div class="res-card"><div class="res-card-header">計算公式</div><div class="res-card-body"><div class="formula-box">'+formula+'<br>= <strong style="color:var(--accent)">'+fmt(kg)+' kg</strong></div></div></div>'+
     suggestHTML +
     costHTML +
+    millingHTML +
+    htHTML +
     applyBtnHTML;
+
+  // 初始化銑床計算
+  if(millingHTML) triggerMillingCalc();
+  // 初始化熱處理計算
+  if(htHTML) renderHtResult();
 }
 
 // ══════════════════════════════════════════════════
@@ -1941,11 +2392,10 @@ function reverseCalc() {
     const isCopperBar = copperBarMats.includes(matName) && currentShape==='bar_rnd';
     const isFCD45 = matName==='FCD45';
 
-    // 計算重量
+    // 計算重量（反查模式一律實寸，銅棒用實際密度，不乘1.03）
     if(isCopperBar) {
-      // 反查：輸入實際進料尺寸，直接計重（不加預留量）
-      const {kg:k} = calcWeight(currentShape, dims, 9);
-      weight = Math.round(k * 1.03 * 10000) / 10000;
+      const {kg:k} = calcWeight(currentShape, dims, density);
+      weight = k;
     } else {
       const {kg:k}=calcWeight(currentShape,dims,density);
       weight=currentShape==='plate'&&k<1?1:k;
@@ -1961,7 +2411,7 @@ function reverseCalc() {
       }
     } else if(isCopperBar) {
       const cpx = matName==='PBC3'?600:matName==='C3604'?240:matName==='ALBC3'?660:650;
-      dbPrices=[{name:'行情參考',px:cpx}];
+      dbPrices=[{name:'行情參考（實寸）',px:cpx}];
     } else if(currentShape==='plate') {
       const plateType=document.getElementById('plate-type-sel')?.value||'square';
       const res=lookupPlatePrice(dims.T,matName,plateType);
