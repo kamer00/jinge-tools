@@ -167,7 +167,7 @@
   </section>
 
   <section class="tools-section">
-    <div class="section-label">工具總覽 — 10 items</div>
+    <div class="section-label">工具總覽 — 12 items</div>
     <div class="sort-bar">
       <button id="sortBtn" onclick="toggleSort()">⇅ 調整順序</button>
     </div>
@@ -182,17 +182,19 @@
     <div class="footer-status"><span class="status-dot"></span>ONLINE</div>
   </footer>  <script>
     const TOOLS = [
-      { no:'01', icon:'📦', title:'材料計算機',         shortTitle:'材料計算',  href:'./材料計算機.html',        desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。' },
+      { no:'01', icon:'📦', title:'材料計算機・調質・銑床', shortTitle:'材料計算',  href:'./材料計算機.html',        desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。亦可查詢調質（S45C、42CrMo）及銑床用材規格參考。' },
       { no:'02', icon:'✨', title:'研磨・拋光・電鍍試算', shortTitle:'表面加工',  href:'./表面加工試算.html',      desc:'軸心／鋼管 表面加工費用試算，含研磨、拋光、電鍍工序。' },
       { no:'03', icon:'🔩', title:'銑床加工計算機',     shortTitle:'銑床加工',  href:'./銑床加工計算機.html',    desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
       { no:'04', icon:'🕳️', title:'深孔加工計算機',     shortTitle:'深孔加工',  href:'./深孔加工計算機.html',    desc:'深孔鑽削加工工時與費用估算，依孔徑、深度及加工材質計算。' },
       { no:'05', icon:'🔥', title:'熱處理計算機',        shortTitle:'熱處理',    href:'./熱處理計算機.html',      desc:'依工件重量與熱處理方式（調質、淬火、滲碳等）估算加工費用。' },
-      { no:'06', icon:'🏭', title:'恆展加工單價計算機', shortTitle:'恆展單價',  href:'./恆展加工單價計算機.html',desc:'恆展廠 SD型 / LA型 加工件單價計算，依規格自動套用計價邏輯。' },
-      { no:'07', icon:'⚖️', title:'軸心整修 vs 製新',   shortTitle:'軸心整修',  href:'./軸心整修vs製新.html',    desc:'快速比較軸心整修成本與重新製作費用，提供決策依據。' },
-      { no:'08', icon:'📋', title:'報價單產生器',        shortTitle:'報價單',    href:'./報價單_勁格科技.html',   desc:'整合各項加工費用，自動彙整油壓缸完整報價單，支援列印輸出。因頁面較大，建議於 PC 使用。' },
-      { no:'09', icon:'🔩', title:'鎖緊扭力表',          shortTitle:'鎖緊扭力',  href:'./鎖緊扭力表.html',        desc:'M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。' },
-      { no:'10', icon:'⚙️', title:'螺紋加工計算機',     shortTitle:'螺紋加工',  href:'./螺紋加工計算機.html',    desc:'公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。' },
-      { no:'11', icon:'💎', title:'硬度換算工具',        shortTitle:'硬度換算',  href:'./硬度換算工具.html',      desc:'HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。' },
+      { no:'06', icon:'⚡', title:'高週波計算機',        shortTitle:'高週波',    href:'./高週波計算機.html',      desc:'高週波感應淬火費用估算，依工件尺寸與淬火長度計算加工費用。' },
+      { no:'07', icon:'📐', title:'公差查詢計算機',      shortTitle:'公差查詢',  href:'./公差查詢計算機.html',    desc:'ISO 286 標準公差查詢，輸入孔徑或軸徑即可查詢 H/h 等級偏差值與配合選用。' },
+      { no:'08', icon:'🏭', title:'恆展加工單價計算機', shortTitle:'恆展單價',  href:'./恆展加工單價計算機.html',desc:'恆展廠 SD型 / LA型 加工件單價計算，依規格自動套用計價邏輯。' },
+      { no:'09', icon:'⚖️', title:'軸心整修 vs 製新',   shortTitle:'軸心整修',  href:'./軸心整修vs製新.html',    desc:'快速比較軸心整修成本與重新製作費用，提供決策依據。' },
+
+      { no:'11', icon:'🔩', title:'鎖緊扭力表',          shortTitle:'鎖緊扭力',  href:'./鎖緊扭力表.html',        desc:'M6–M56 螺栓各材質等級鎖緊扭力規格查詢，含細牙／粗牙標示。' },
+      { no:'12', icon:'⚙️', title:'螺紋加工計算機',     shortTitle:'螺紋加工',  href:'./螺紋加工計算機.html',    desc:'公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。' },
+      { no:'13', icon:'💎', title:'硬度換算工具',        shortTitle:'硬度換算',  href:'./硬度換算工具.html',      desc:'HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。' },
     ];
 
     const STORAGE_KEY = 'jinge_tool_order';
