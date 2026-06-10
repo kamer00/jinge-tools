@@ -1063,8 +1063,17 @@ function getHtOptions(matName) {
 function buildHtCard(matName, kg) {
   const options = getHtOptions(matName);
   if(!options.length) return '';
-  const optHTML = options.map((h,i) =>
-    `<option value="${h.id}" ${i===0?'selected':''}>${h.label}　${h.price} 元/kg</option>`
+  // 預設選調質類：優先找 qt，其次找 qt_* 系列，最後才選第一個
+  const defaultId = (() => {
+    if(options.find(h=>h.id==='qt'))     return 'qt';
+    if(options.find(h=>h.id==='qt_suj')) return 'qt_suj';
+    if(options.find(h=>h.id==='qt_blu')) return 'qt_blu';
+    if(options.find(h=>h.id==='qt_sus')) return 'qt_sus';
+    if(options.find(h=>h.id==='qt_skd')) return 'qt_skd';
+    return options[0].id;
+  })();
+  const optHTML = options.map(h =>
+    `<option value="${h.id}" ${h.id===defaultId?'selected':''}>${h.label}　${h.price} 元/kg</option>`
   ).join('');
   return `<div class="res-card" id="ht-card">
     <div class="res-card-header" onclick="toggleHtCard()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
