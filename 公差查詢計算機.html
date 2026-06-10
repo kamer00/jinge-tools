@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公差查詢計算機 — 勁格科技</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3349;
+    --accent: #f59e0b;
+    --accent2: #3b82f6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', 'Noto Sans TC', monospace;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .header p {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Mode tabs */
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    background: var(--surface);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .mode-tab.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+
+  /* Input area */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .input-row {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .input-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .input-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  input[type="number"], select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  select option { background: var(--surface2); }
+
+  .btn-query {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #000;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-query:hover { opacity: 0.85; }
+
+  /* Result area */
+  .result-section {
+    display: none;
+  }
+  .result-section.show { display: block; }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .result-card.hole { border-left: 3px solid var(--accent2); }
+  .result-card.shaft { border-left: 3px solid var(--orange); }
+  .result-card.fit { border-left: 3px solid var(--green); }
+
+  .card-title {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .symbol-big {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+  .size-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .tol-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .tol-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+  }
+  .tol-item .val {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .tol-item .val.pos { color: var(--green); }
+  .tol-item .val.neg { color: var(--red); }
+  .tol-item .val.zero { color: var(--muted); }
+  .tol-item .lbl {
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.08em;
+  }
+
+  .fit-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .clearance { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid var(--green); }
+  .transition { background: rgba(245,158,11,0.15); color: var(--accent); border: 1px solid var(--accent); }
+  .interference { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red); }
+
+  .usage-text {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 6px;
+  }
+
+  /* Fit result */
+  .fit-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .fit-val {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    text-align: center;
+  }
+  .fit-val .val { font-size: 1.05rem; font-weight: 700; }
+  .fit-val .lbl { font-size: 0.62rem; color: var(--muted); margin-top: 3px; }
+
+  /* diagram */
+  .tol-bar-wrap {
+    margin: 12px 0;
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 12px;
+  }
+  .tol-bar-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; }
+  .bar-track {
+    position: relative;
+    height: 28px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: visible;
+  }
+  .zero-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--muted);
+    opacity: 0.5;
+  }
+  .tol-bar {
+    position: absolute;
+    top: 4px;
+    height: 20px;
+    border-radius: 3px;
+    opacity: 0.85;
+    transition: all 0.4s;
+  }
+  .zero-tag {
+    position: absolute;
+    left: 50%;
+    top: 32px;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  .error-msg {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--red);
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .input-row.cols-3 { grid-template-columns: 1fr 1fr; }
+    .tol-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="data:image/png;base64,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" style="height:48px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;">
+  <h1>⚙ ISO 286 公差查詢</h1>
+  <p>孔軸配合公差 · ISO 286 · 1–630 mm · 勁格科技內部工具</p>
+</div>
+
+<!-- Mode Tabs -->
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="setMode('fit')">孔＋軸配合</button>
+  <button class="mode-tab" onclick="setMode('hole')">單查孔</button>
+  <button class="mode-tab" onclick="setMode('shaft')">單查軸</button>
+</div>
+
+<!-- Input -->
+<div class="input-section">
+  <div class="input-row cols-2" id="row-size-hole" style="display:none">
+    <div>
+      <label>公稱尺寸 (mm)</label>
+      <input type="number" id="dia-hole" min="1" max="630" placeholder="例：50">
+    </div>
+    <div>
+      <label>孔公差符號</label>
+      <select id="sel-hole"></select>
+    </div>
+  </div>
+
+  <div class="input-row cols-2" id="row-size-shaft" style="display:none">
+    <div>
+      <label>公稱尺寸 (mm)</label>
+      <input type="number" id="dia-shaft" min="1" max="630" placeholder="例：50">
+    </div>
+    <div>
+      <label>軸公差符號</label>
+      <select id="sel-shaft-only"></select>
+    </div>
+  </div>
+
+  <div id="row-fit" style="display:block">
+    <div class="input-row cols-3">
+      <div>
+        <label>公稱尺寸 (mm)</label>
+        <input type="number" id="dia-fit" min="1" max="630" placeholder="例：50" oninput="updateFitCombos()">
+      </div>
+      <div>
+        <label>配合類型</label>
+        <select id="sel-fit-type" onchange="updateFitCombos()">
+          <option value="clearance">間隙配合</option>
+          <option value="transition">過渡配合</option>
+          <option value="interference">過盈配合</option>
+        </select>
+      </div>
+      <div>
+        <label>精度等級</label>
+        <select id="sel-fit-grade" onchange="updateFitCombos()">
+          <option value="precise">精密</option>
+          <option value="normal" selected>一般</option>
+          <option value="loose">寬鬆</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row" style="margin-bottom:0">
+      <div>
+        <label>建議組合</label>
+        <select id="sel-fit-combo"></select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-query" onclick="query()">▶ 查詢</button>
+</div>
+
+<!-- Result -->
+<div class="result-section" id="result-area"></div>
+
+<script>
+// ── ISO 286 資料庫 ──────────────────────────────────────────
+// 尺寸段 [min, max) → 各公差符號偏差 (μm)
+// 正值=正偏差, 負值=負偏差
+// 格式: { ES, EI } 孔 / { es, ei } 軸
+
+const SIZE_RANGES = [
+  [1,3],[3,6],[6,10],[10,18],[18,30],[30,50],[50,80],[80,120],
+  [120,180],[180,250],[250,315],[315,400],[400,500],[500,630]
+];
+
+// 孔公差資料 [ES, EI] (μm) per size range (含500-630mm段)
+const HOLE_DATA = {
+  H6: [[6,0],[8,0],[9,0],[11,0],[13,0],[16,0],[19,0],[22,0],[25,0],[29,0],[32,0],[36,0],[40,0],[44,0]],
+  H7: [[10,0],[12,0],[15,0],[18,0],[21,0],[25,0],[30,0],[35,0],[40,0],[46,0],[52,0],[57,0],[63,0],[70,0]],
+  H8: [[14,0],[18,0],[22,0],[27,0],[33,0],[39,0],[46,0],[54,0],[63,0],[72,0],[81,0],[89,0],[97,0],[110,0]],
+  H9: [[25,0],[30,0],[36,0],[43,0],[52,0],[62,0],[74,0],[87,0],[100,0],[115,0],[130,0],[140,0],[155,0],[175,0]],
+  H11:[[60,0],[75,0],[90,0],[110,0],[130,0],[160,0],[190,0],[220,0],[250,0],[290,0],[320,0],[360,0],[400,0],[440,0]],
+  JS7:[[5,-5],[6,-6],[7.5,-7.5],[9,-9],[10.5,-10.5],[12.5,-12.5],[15,-15],[17.5,-17.5],[20,-20],[23,-23],[26,-26],[28.5,-28.5],[31.5,-31.5],[35,-35]],
+  K7: [[-4,-14],[-6,-18],[-7,-22],[-9,-27],[-11,-32],[-13,-38],[-15,-45],[-18,-53],[-21,-61],[-24,-70],[-27,-79],[-29,-86],[-32,-95],[-38,-108]],
+};
+
+// 軸公差資料 [es, ei] (μm) per size range (含500-630mm段)
+const SHAFT_DATA = {
+  f6: [[-6,-12],[-10,-18],[-13,-22],[-16,-27],[-20,-33],[-25,-41],[-30,-49],[-36,-58],[-43,-68],[-50,-79],[-56,-88],[-62,-98],[-68,-108],[-76,-120]],
+  f7: [[-6,-16],[-10,-22],[-13,-28],[-16,-34],[-20,-41],[-25,-50],[-30,-60],[-36,-71],[-43,-83],[-50,-96],[-56,-108],[-62,-119],[-68,-131],[-76,-146]],
+  g6: [[-2,-8],[-4,-12],[-5,-14],[-6,-17],[-7,-20],[-9,-25],[-10,-29],[-12,-34],[-14,-39],[-15,-44],[-17,-49],[-18,-54],[-20,-60],[-22,-66]],
+  g7: [[-2,-12],[-4,-16],[-5,-20],[-6,-24],[-7,-28],[-9,-34],[-10,-40],[-12,-47],[-14,-54],[-15,-61],[-17,-69],[-18,-75],[-20,-83],[-22,-92]],
+  h6: [[0,-6],[0,-8],[0,-9],[0,-11],[0,-13],[0,-16],[0,-19],[0,-22],[0,-25],[0,-29],[0,-32],[0,-36],[0,-40],[0,-44]],
+  h7: [[0,-10],[0,-12],[0,-15],[0,-18],[0,-21],[0,-25],[0,-30],[0,-35],[0,-40],[0,-46],[0,-52],[0,-57],[0,-63],[0,-70]],
+  h8: [[0,-14],[0,-18],[0,-22],[0,-27],[0,-33],[0,-39],[0,-46],[0,-54],[0,-63],[0,-72],[0,-81],[0,-89],[0,-97],[0,-110]],
+  h9: [[0,-25],[0,-30],[0,-36],[0,-43],[0,-52],[0,-62],[0,-74],[0,-87],[0,-100],[0,-115],[0,-130],[0,-140],[0,-155],[0,-175]],
+  h11:[[0,-60],[0,-75],[0,-90],[0,-110],[0,-130],[0,-160],[0,-190],[0,-220],[0,-250],[0,-290],[0,-320],[0,-360],[0,-400],[0,-440]],
+  js6:[[3,-3],[4,-4],[4.5,-4.5],[5.5,-5.5],[6.5,-6.5],[8,-8],[9.5,-9.5],[11,-11],[12.5,-12.5],[14.5,-14.5],[16,-16],[18,-18],[20,-20],[22,-22]],
+  js7:[[5,-5],[6,-6],[7.5,-7.5],[9,-9],[10.5,-10.5],[12.5,-12.5],[15,-15],[17.5,-17.5],[20,-20],[23,-23],[26,-26],[28.5,-28.5],[31.5,-31.5],[35,-35]],
+  k6: [[6,0],[9,1],[10,1],[12,1],[15,2],[18,2],[21,2],[25,3],[28,3],[33,4],[36,4],[40,4],[45,5],[50,6]],
+  k7: [[10,0],[13,1],[16,1],[18,1],[21,2],[25,2],[30,2],[35,3],[40,3],[46,4],[52,4],[57,4],[63,5],[70,6]],
+  m6: [[8,2],[12,4],[15,6],[18,7],[22,8],[26,9],[30,11],[35,13],[40,15],[46,17],[52,20],[57,21],[63,23],[70,26]],
+  m7: [[12,2],[16,4],[21,6],[24,7],[29,8],[34,9],[41,11],[48,13],[55,15],[63,17],[72,20],[78,21],[86,23],[95,26]],
+  n6: [[10,4],[16,8],[19,10],[23,12],[28,15],[33,17],[39,20],[45,23],[52,27],[60,31],[66,34],[73,37],[80,40],[88,44]],
+  n7: [[14,4],[20,8],[25,10],[29,12],[35,15],[42,17],[50,20],[58,23],[67,27],[77,31],[86,34],[94,37],[103,40],[114,44]],
+  p6: [[12,6],[20,12],[24,15],[29,18],[35,22],[42,26],[51,32],[59,37],[68,43],[79,50],[88,56],[98,62],[108,68],[122,78]],
+  p7: [[16,6],[24,12],[30,15],[35,18],[42,22],[51,26],[62,32],[72,37],[83,43],[96,50],[108,56],[119,62],[131,68],[146,76]],
+  r6: [[16,10],[23,15],[28,19],[34,23],[41,28],[50,34],[60,41],[73,51],[76,54],[88,63],[90,65],[106,77],[114,80],[132,88]],
+  s6: [[20,14],[27,19],[32,23],[39,28],[48,35],[59,43],[72,53],[88,66],[100,77],[118,93],[130,103],[150,121],[164,132],[182,138]],
+  s7: [[24,14],[31,19],[38,23],[45,28],[55,35],[68,43],[83,53],[101,66],[115,77],[135,93],[150,103],[171,121],[189,132],[212,142]],
+};
+
+// 用途說明
+const HOLE_USAGE = {
+  H6:'緊密配合基準孔，配合精密軸，用於滾動軸承座、精密導柱。',
+  H7:'最常用基準孔，廣泛用於各類配合，適配 f6/g6/h6/k6/n6/p6 等軸。',
+  H8:'中等精度配合孔，用於一般機械、農機、工具機非關鍵部位。',
+  H9:'較寬鬆配合孔，用於低速、輕載或需易裝拆的場合。',
+  H11:'大間隙配合孔，用於粗加工、鑄件、鍛件初配。',
+  JS7:'對稱公差孔，上下偏差相等，用於需居中配合的場合。',
+  K7:'小負偏差孔，用於輕過渡或輕過盈場合。',
+};
+const SHAFT_USAGE = {
+  f6:'間隙配合軸，小間隙，適用於精密軸承、精密滑動配合，需潤滑。',
+  f7:'間隙配合軸，一般間隙，廣泛用於一般滑動配合、轉動軸。',
+  g6:'小間隙配合軸，精密滑動，用於液壓閥心、精密導軌。',
+  g7:'小間隙配合軸，較 g6 寬鬆，適用高精度滑動場合。',
+  h6:'基準軸（零偏差），用於精密滑動或定位配合。',
+  h7:'最常用基準軸，廣泛用於一般配合、間隙或過渡配合。',
+  h8:'中等精度基準軸，適用一般機械非關鍵配合。',
+  h9:'較鬆基準軸，用於低要求、易裝拆場合。',
+  h11:'粗加工基準軸，用於鑄鍛件初配或大間隙配合。',
+  js6:'對稱公差軸，用於需可拆卸的精密定位配合。',
+  js7:'對稱公差軸，過渡配合，易裝拆，定位精度中等。',
+  k6:'過渡配合軸，輕度過盈，用於輕敲裝配的定位場合（齒輪、聯軸器）。',
+  k7:'過渡配合軸，略寬，適用於需較易裝拆的過渡配合。',
+  m6:'過渡配合軸，中度過盈，用於鍵槽配合、需較穩固定位的場合。',
+  m7:'過渡配合軸，用於中等力矩傳遞配合。',
+  n6:'過渡/輕過盈配合軸，用於不需傳遞大力矩但需穩固的配合。',
+  n7:'輕過盈配合軸，適用軸承內圈對軸的配合。',
+  p6:'過盈配合軸，需壓入，用於輕負荷傳動配合。',
+  p7:'過盈配合軸，標準壓入配合，廣泛用於傳動件固定。',
+  r6:'中等過盈配合軸，需油壓壓入或熱裝，用於中等力矩傳遞。',
+  s6:'重過盈配合軸，需熱裝，用於重負荷、高扭矩傳遞場合。',
+  s7:'重過盈配合軸，最大過盈量較大，適用重載傳動件固定。',
+};
+
+// 常用配合組合建議
+const FIT_COMBOS = {
+  'H7/f6':'間隙配合，迴轉滑動，需潤滑，適用軸承蓋、連桿',
+  'H7/f7':'間隙配合，一般轉動軸，適用大多數旋轉場合',
+  'H7/g6':'間隙配合，小間隙精密滑動，適用精密機床主軸',
+  'H7/h6':'間隙配合，精密定位滑動，可手推裝入',
+  'H7/h7':'間隙配合，一般定位，易裝拆',
+  'H7/js6':'過渡配合，精密定位，輕敲裝入',
+  'H7/k6':'過渡配合，定位齒輪、帶輪、聯軸器',
+  'H7/m6':'過渡配合，穩固定位，輕敲或壓入',
+  'H7/n6':'過渡/輕過盈，需壓入，滑環、蝸輪',
+  'H7/p6':'過盈配合，壓入，輕載傳動',
+  'H7/r6':'過盈配合，油壓或熱裝，中載傳動',
+  'H7/s6':'過盈配合，熱裝，重載傳動',
+  'H8/f7':'間隙配合，一般滑動機構',
+  'H8/h7':'間隙配合，中精度定位',
+  'H8/h9':'間隙配合，較鬆定位',
+  'H9/h9':'間隙配合，低精度易裝拆',
+  'H11/h11':'大間隙配合，粗加工鑄件',
+  'H6/h5':'精密間隙定位配合',
+  'H7/s7':'重過盈配合，最大傳動力矩',
+};
+
+// ── 工具函數 ──────────────────────────────────────────────
+function getSizeIndex(d) {
+  for (let i = 0; i < SIZE_RANGES.length; i++) {
+    if (d >= SIZE_RANGES[i][0] && d < SIZE_RANGES[i][1]) return i;
+  }
+  return -1;
+}
+function fmtMicron(v) {
+  if (v === 0) return '0';
+  return (v > 0 ? '+' : '') + v;
+}
+function fmtMM(v) {
+  return (v > 0 ? '+' : '') + (v/1000).toFixed(3);
+}
+function valClass(v) {
+  if (v > 0) return 'pos';
+  if (v < 0) return 'neg';
+  return 'zero';
+}
+function getSizeLabel(d) {
+  const idx = getSizeIndex(d);
+  if (idx < 0) return '';
+  const r = SIZE_RANGES[idx];
+  return `尺寸段 ${r[0]}–${r[1]} mm`;
+}
+
+// ── 渲染邏輯 ──────────────────────────────────────────────
+let currentMode = 'fit';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['fit','hole','shaft'][i] === mode);
+  });
+  document.getElementById('row-fit').style.display = mode==='fit' ? 'block' : 'none';
+  document.getElementById('row-size-hole').style.display = mode==='hole' ? 'grid' : 'none';
+  document.getElementById('row-size-shaft').style.display = mode==='shaft' ? 'grid' : 'none';
+  document.getElementById('result-area').innerHTML = '';
+  document.getElementById('result-area').classList.remove('show');
+}
+
+function query() {
+  const area = document.getElementById('result-area');
+  area.innerHTML = '';
+
+  if (currentMode === 'fit') {
+    const d = parseFloat(document.getElementById('dia-fit').value);
+    const combo = document.getElementById('sel-fit-combo').value;
+    if (!d || d < 1 || d > 630) { showError('請輸入有效公稱尺寸 (1–630 mm)', area); return; }
+    if (!combo) { showError('請選擇建議組合', area); return; }
+    const idx = getSizeIndex(d);
+    if (idx < 0) { showError('尺寸超出 ISO 286 適用範圍', area); return; }
+    const [hSym, sSym] = combo.split('/');
+    area.innerHTML = renderHole(d, idx, hSym) + renderShaft(d, idx, sSym) + renderFit(d, idx, hSym, sSym);
+  } else if (currentMode === 'hole') {
+    const d = parseFloat(document.getElementById('dia-hole').value);
+    const sym = document.getElementById('sel-hole').value;
+    if (!d || d < 1 || d > 630) { showError('請輸入有效公稱尺寸 (1–630 mm)', area); return; }
+    const idx = getSizeIndex(d);
+    if (idx < 0) { showError('尺寸超出 ISO 286 適用範圍', area); return; }
+    area.innerHTML = renderHole(d, idx, sym);
+  } else {
+    const d = parseFloat(document.getElementById('dia-shaft').value);
+    const sym = document.getElementById('sel-shaft-only').value;
+    if (!d || d < 1 || d > 630) { showError('請輸入有效公稱尺寸 (1–630 mm)', area); return; }
+    const idx = getSizeIndex(d);
+    if (idx < 0) { showError('尺寸超出 ISO 286 適用範圍', area); return; }
+    area.innerHTML = renderShaft(d, idx, sym);
+  }
+
+  area.classList.add('show');
+}
+
+function showError(msg, area) {
+  area.innerHTML = `<div class="error-msg">⚠ ${msg}</div>`;
+  area.classList.add('show');
+}
+
+function renderHole(d, idx, sym) {
+  const data = HOLE_DATA[sym];
+  if (!data) return '';
+  const [ES, EI] = data[idx];
+  const tol = ES - EI;
+  const usage = HOLE_USAGE[sym] || '';
+  return `
+  <div class="result-card hole">
+    <div class="card-title">▐ 孔 HOLE</div>
+    <div class="symbol-big">Ø${d} ${sym}</div>
+    <div class="size-note">${getSizeLabel(d)}</div>
+    <div class="tol-grid">
+      <div class="tol-item">
+        <div class="val ${valClass(ES)}">${fmtMM(ES)}</div>
+        <div class="lbl">上偏差 ES (mm)</div>
+      </div>
+      <div class="tol-item">
+        <div class="val ${valClass(EI)}">${fmtMM(EI)}</div>
+        <div class="lbl">下偏差 EI (mm)</div>
+      </div>
+      <div class="tol-item">
+        <div class="val" style="color:var(--accent)">${(tol/1000).toFixed(3)}</div>
+        <div class="lbl">公差帶 IT (mm)</div>
+      </div>
+    </div>
+    <div class="usage-text">💡 ${usage}</div>
+  </div>`;
+}
+
+function renderShaft(d, idx, sym) {
+  const data = SHAFT_DATA[sym];
+  if (!data) return '';
+  const [es, ei] = data[idx];
+  const tol = es - ei;
+  const usage = SHAFT_USAGE[sym] || '';
+  return `
+  <div class="result-card shaft">
+    <div class="card-title">▐ 軸 SHAFT</div>
+    <div class="symbol-big">Ø${d} ${sym}</div>
+    <div class="size-note">${getSizeLabel(d)}</div>
+    <div class="tol-grid">
+      <div class="tol-item">
+        <div class="val ${valClass(es)}">${fmtMM(es)}</div>
+        <div class="lbl">上偏差 es (mm)</div>
+      </div>
+      <div class="tol-item">
+        <div class="val ${valClass(ei)}">${fmtMM(ei)}</div>
+        <div class="lbl">下偏差 ei (mm)</div>
+      </div>
+      <div class="tol-item">
+        <div class="val" style="color:var(--accent)">${(tol/1000).toFixed(3)}</div>
+        <div class="lbl">公差帶 IT (mm)</div>
+      </div>
+    </div>
+    <div class="usage-text">💡 ${usage}</div>
+  </div>`;
+}
+
+function renderFit(d, idx, hSym, sSym) {
+  const hData = HOLE_DATA[hSym];
+  const sData = SHAFT_DATA[sSym];
+  if (!hData || !sData) return '';
+  const [ES, EI] = hData[idx];
+  const [es, ei] = sData[idx];
+
+  // 最大間隙 = ES - ei (正=間隙, 負=過盈)
+  // 最小間隙 = EI - es
+  const maxClearance = ES - ei;
+  const minClearance = EI - es;
+
+  let fitType, badgeClass, fitDesc;
+  if (minClearance > 0) {
+    fitType = '間隙配合'; badgeClass = 'clearance'; fitDesc = '孔軸間有間隙，可相對移動，適用滑動/旋轉場合。';
+  } else if (maxClearance < 0) {
+    fitType = '過盈配合'; badgeClass = 'interference'; fitDesc = '孔軸間有過盈，需壓入或熱裝，不可相對移動，傳遞力矩靠摩擦力。';
+  } else {
+    fitType = '過渡配合'; badgeClass = 'transition'; fitDesc = '配合可能有間隙或過盈，依實際尺寸而定，需輕敲裝入，用於精密定位。';
+  }
+
+  const comboKey = `${hSym}/${sSym.toLowerCase()}`;
+  const comboHint = FIT_COMBOS[`${hSym}/${sSym}`] || FIT_COMBOS[comboKey] || '';
+
+  return `
+  <div class="result-card fit">
+    <div class="card-title">▐ 配合結果 FIT RESULT</div>
+    <div class="symbol-big">${hSym} / ${sSym}</div>
+    <div class="size-note">Ø${d} mm · ${getSizeLabel(d)}</div>
+    <div style="margin-bottom:12px">
+      <span class="fit-type-badge ${badgeClass}">${fitType}</span>
+    </div>
+    <div class="fit-row">
+      <div class="fit-val">
+        <div class="val ${maxClearance>0?'pos':'neg'}">${fmtMM(maxClearance)}</div>
+        <div class="lbl">${maxClearance>=0?'最大間隙':'最大過盈'} (mm)</div>
+      </div>
+      <div class="fit-val">
+        <div class="val ${minClearance>0?'pos':'neg'}">${fmtMM(minClearance)}</div>
+        <div class="lbl">${minClearance>=0?'最小間隙':'最小過盈'} (mm)</div>
+      </div>
+    </div>
+    <div class="usage-text">
+      ⚙ ${fitDesc}${comboHint ? '<br>📌 ' + comboHint : ''}
+    </div>
+  </div>`;
+}
+
+function renderBar(upper, lower, color) {
+  // 視覺化公差帶，以零線為中心
+  const range = 300; // ±150μm 顯示範圍
+  const centerPct = 50;
+  const scale = 50 / 150;
+  const uPct = centerPct + upper * scale;
+  const lPct = centerPct + lower * scale;
+  const leftPct = Math.min(uPct, lPct);
+  const widthPct = Math.abs(uPct - lPct);
+
+  return `
+  <div class="tol-bar-wrap">
+    <div class="tol-bar-label">公差帶位置示意（以零線為基準）</div>
+    <div class="bar-track">
+      <div class="zero-line"></div>
+      <div class="tol-bar" style="left:${leftPct}%;width:${Math.max(widthPct,1)}%;background:${color}"></div>
+    </div>
+    <div style="position:relative;height:18px">
+      <span class="zero-tag">零線 (0)</span>
+    </div>
+  </div>`;
+}
+
+// ── 配合建議資料庫 ──────────────────────────────────────────
+// 格式: [孔, 軸, 精度(precise/normal/loose), 說明]
+const FIT_SUGGESTIONS = [
+  // 間隙配合
+  ['H6','g5','precise','極小間隙，精密主軸、精密導柱'],
+  ['H6','h5','precise','精密定位滑動，可手推裝入'],
+  ['H7','f6','precise','小間隙旋轉，精密軸承蓋、連桿'],
+  ['H7','g6','precise','精密小間隙滑動，液壓閥心、精密導軌'],
+  ['H7','h6','normal','精密定位滑動，可手推裝入'],
+  ['H7','f7','normal','一般旋轉滑動，需潤滑'],
+  ['H7','h7','normal','一般間隙定位，易裝拆'],
+  ['H8','f7','normal','一般滑動機構，稍大間隙'],
+  ['H8','h7','normal','中精度間隙定位'],
+  ['H8','h8','normal','較寬鬆定位，易裝拆'],
+  ['H9','h9','loose','低精度易裝拆，農機、一般機械'],
+  ['H11','h11','loose','大間隙配合，粗加工鑄鍛件'],
+  // 過渡配合
+  ['H7','js6','precise','精密定位，輕敲裝入，易拆卸'],
+  ['H7','k6','normal','定位齒輪、帶輪、聯軸器，輕敲'],
+  ['H7','m6','normal','穩固定位，輕敲或壓入'],
+  ['H6','k5','precise','高精度過渡定位'],
+  ['H6','m5','precise','精密穩固定位'],
+  ['H8','k7','loose','較寬鬆過渡定位'],
+  // 過盈配合
+  ['H7','n6','normal','輕過盈，壓入，滑環、蝸輪'],
+  ['H7','p6','normal','標準壓入，輕載傳動'],
+  ['H7','r6','normal','中等過盈，油壓或熱裝，中載傳動'],
+  ['H7','s6','normal','重過盈，熱裝，重載傳動'],
+  ['H7','s7','normal','最大重過盈，最大傳動力矩'],
+  ['H6','p5','precise','精密重載壓入配合'],
+  ['H8','s7','loose','較寬鬆重過盈，一般重載固定'],
+];
+
+function updateFitCombos() {
+  const type = document.getElementById('sel-fit-type').value;
+  const grade = document.getElementById('sel-fit-grade').value;
+  const sel = document.getElementById('sel-fit-combo');
+
+  const typeMap = { clearance:'間隙', transition:'過渡', interference:'過盈' };
+  const typeLabel = typeMap[type];
+
+  // 依類型篩選
+  let matches = FIT_SUGGESTIONS.filter(([h, s, g, desc]) => {
+    const isMatch =
+      (type === 'clearance' && desc.includes('間隙')) ||
+      (type === 'transition' && (desc.includes('過渡') || desc.includes('定位') && !desc.includes('過盈') && !desc.includes('壓入'))) ||
+      (type === 'interference' && (desc.includes('過盈') || desc.includes('壓入') || desc.includes('熱裝')));
+    const gradeOk = grade === 'precise' ? g === 'precise' :
+                    grade === 'loose'   ? g === 'loose' :
+                    g === 'normal';
+    return isMatch && gradeOk;
+  });
+
+  // 若篩無結果，放寬精度限制
+  if (matches.length === 0) {
+    matches = FIT_SUGGESTIONS.filter(([h, s, g, desc]) => {
+      return (type === 'clearance' && desc.includes('間隙')) ||
+             (type === 'transition' && !desc.includes('過盈') && !desc.includes('壓入') && !desc.includes('熱裝') && !desc.includes('間隙')) ||
+             (type === 'interference' && (desc.includes('過盈') || desc.includes('壓入') || desc.includes('熱裝')));
+    });
+  }
+
+  sel.innerHTML = '';
+  matches.forEach(([h, s, g, desc]) => {
+    sel.innerHTML += `<option value="${h}/${s}">${h}/${s} — ${desc}</option>`;
+  });
+}
+
+// ── 初始化選單 ──────────────────────────────────────────────
+function initSelects() {
+  const holeSyms = Object.keys(HOLE_DATA);
+  const shaftSyms = Object.keys(SHAFT_DATA);
+
+  const selHole = document.getElementById('sel-hole');
+  const selShaftOnly = document.getElementById('sel-shaft-only');
+
+  holeSyms.forEach(s => {
+    selHole.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+  shaftSyms.forEach(s => {
+    selShaftOnly.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+
+  updateFitCombos();
+}
+
+initSelects();
+</script>
+</body>
+</html>

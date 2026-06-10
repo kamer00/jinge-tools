@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高週波計算機｜勁格科技</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Bebas+Neue&family=Share+Tech+Mono&display=swap');
+  :root {
+    --bg:#111416; --surface:#1a1e22; --card:#20262c; --border:#2e3740;
+    --accent:#e8a020; --accent2:#c07010; --text:#d8dde3; --muted:#6b7885;
+    --danger:#e05050; --green:#4caf7d;
+    --mono:'Share Tech Mono',monospace; --sans:'Noto Sans TC',sans-serif; --display:'Bebas Neue',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:60px}
+  header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+  header img{width:44px;height:44px;border-radius:6px;object-fit:cover}
+  header .title-block{flex:1}
+  header h1{font-family:var(--display);font-size:1.6rem;letter-spacing:2px;color:var(--accent);line-height:1}
+  header p{font-size:0.7rem;color:var(--muted);letter-spacing:1px;margin-top:2px}
+  .vendor-badge{font-size:0.68rem;background:var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;letter-spacing:0.5px;line-height:1.4;text-align:right}
+  main{max-width:680px;margin:0 auto;padding:20px 16px 0;display:flex;flex-direction:column;gap:20px}
+  .section-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px}
+  .section-icon{width:32px;height:32px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+  .section-title{font-size:0.95rem;font-weight:700;letter-spacing:1px;color:var(--text)}
+  .section-sub{font-size:0.68rem;color:var(--muted);margin-top:2px}
+  .section-body{padding:16px 18px}
+  .row-label{font-size:0.72rem;color:var(--muted);letter-spacing:0.5px;margin-bottom:6px;margin-top:14px}
+  .row-label:first-child{margin-top:0}
+  .input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .input-group{flex:1;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .2s}
+  .input-group:focus-within{border-color:var(--accent)}
+  .input-group label{font-family:var(--mono);font-size:0.72rem;color:var(--muted);padding:0 8px;white-space:nowrap;border-right:1px solid var(--border);height:38px;display:flex;align-items:center;min-width:36px}
+  .input-group input{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:0.9rem;padding:0 10px;height:38px;outline:none;width:0}
+  .input-group .unit{font-size:0.65rem;color:var(--muted);padding-right:8px;white-space:nowrap}
+  .segment-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .seg-num{font-family:var(--mono);font-size:0.72rem;color:var(--accent);min-width:18px;text-align:center}
+  .seg-inputs{display:flex;gap:8px;flex:1}
+  .seg-inputs .input-group{flex:1}
+  .btn-del{background:transparent;border:1px solid var(--border);color:var(--danger);border-radius:6px;width:34px;height:38px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+  .btn-del:hover{background:rgba(224,80,80,0.12)}
+  .btn-add{display:flex;align-items:center;gap:8px;background:transparent;border:1px dashed var(--border);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;font-family:var(--sans);font-size:0.8rem;width:100%;margin-top:4px;transition:border-color .2s,color .2s}
+  .btn-add:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-calc{background:var(--accent);color:#111;border:none;border-radius:8px;padding:12px 0;width:100%;font-family:var(--display);font-size:1.2rem;letter-spacing:2px;cursor:pointer;margin-top:16px;transition:background .2s}
+  .btn-calc:hover{background:var(--accent2)}
+  .result-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:none}
+  .result-panel.show{display:block;animation:fadeIn .3s ease}
+  .result-header{padding:10px 18px;background:var(--card);border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--muted);letter-spacing:1px}
+  .result-body{padding:16px 18px}
+  .result-rows{display:flex;flex-direction:column;gap:6px}
+  .result-row{display:flex;justify-content:space-between;align-items:baseline;font-size:0.82rem}
+  .result-row .key{color:var(--muted)}
+  .result-row .val{font-family:var(--mono);color:var(--text)}
+  .result-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+  .result-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
+  .result-total .label{font-size:0.9rem;font-weight:700;color:var(--text)}
+  .result-total .amount{font-family:var(--mono);font-size:1.8rem;color:var(--accent);line-height:1}
+  .min-badge{font-size:0.68rem;background:rgba(232,160,32,0.15);color:var(--accent);border:1px solid rgba(232,160,32,0.3);border-radius:4px;padding:2px 7px;margin-left:8px}
+  .shape-toggle{display:flex;gap:8px;margin-bottom:4px}
+  .shape-btn{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:8px 0;font-family:var(--sans);font-size:0.82rem;cursor:pointer;transition:all .2s}
+  .shape-btn.active{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700}
+  .btn-reset{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:8px 16px;font-family:var(--sans);font-size:0.78rem;cursor:pointer;margin-top:10px;transition:border-color .2s,color .2s}
+  .btn-reset:hover{border-color:var(--muted);color:var(--text)}
+  .note{font-size:0.7rem;color:var(--muted);line-height:1.6;padding:10px 18px;border-top:1px solid var(--border);background:var(--bg)}
+  .note span{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <img src="data:image/jpeg;base64,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" alt="勁格科技 LOGO">
+  <div class="title-block">
+    <h1>高週波計算機</h1>
+    <p>INDUCTION HARDENING COST ESTIMATOR</p>
+  </div>
+  
+</header>
+<main>
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-icon">⚙</div>
+      <div>
+        <div class="section-title">圓周面熱處理</div>
+        <div class="section-sub">π × Ø × L　｜　≤1000mm $2／in2　超過 $3／in2</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row-label">各段尺寸輸入（mm）</div>
+      <div id="seg-container"></div>
+      <button class="btn-add" onclick="addSeg()">＋ 新增段</button>
+      <button class="btn-calc" onclick="calcCyl()">計算圓周面費用</button>
+    </div>
+    <div class="note">最低消費：全長 ≤1000mm 以 <span>$100</span> 計；全長 &gt;1000mm 以 <span>$300</span> 計</div>
+  </div>
+  <div class="result-panel" id="result-cyl">
+    <div class="result-header">── 計算結果：圓周面 ──</div>
+    <div class="result-body">
+      <div class="result-rows" id="cyl-detail"></div>
+      <hr class="result-divider">
+      <div class="result-total">
+        <span class="label">應付金額</span>
+        <span class="amount" id="cyl-total"></span>
+      </div>
+      <button class="btn-reset" onclick="resetCyl()">↺ 重新計算</button>
+    </div>
+  </div>
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-icon">▣</div>
+      <div>
+        <div class="section-title">平面熱處理</div>
+        <div class="section-sub">長 × 寬　｜　$4／in2</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="row-label">形狀</div>
+      <div class="shape-toggle">
+        <button class="shape-btn active" id="btn-circ" onclick="setShape('circ')">● 圓形</button>
+        <button class="shape-btn" id="btn-rect" onclick="setShape('rect')">■ 方形</button>
+      </div>
+      <div class="row-label">端面尺寸（mm）</div>
+      <div class="input-row">
+        <div class="input-group">
+          <label id="face-l-label">長</label>
+          <input type="number" id="face-l" placeholder="130" min="0" inputmode="decimal">
+          <span class="unit">mm</span>
+        </div>
+        <div class="input-group">
+          <label id="face-w-label">寬</label>
+          <input type="number" id="face-w" placeholder="130" min="0" inputmode="decimal">
+          <span class="unit">mm</span>
+        </div>
+      </div>
+      <button class="btn-calc" onclick="calcFace()">計算平面費用</button>
+    </div>
+    <div class="note">最低消費：<span>$150</span></div>
+  </div>
+  <div class="result-panel" id="result-face">
+    <div class="result-header">── 計算結果：平面 ──</div>
+    <div class="result-body">
+      <div class="result-rows" id="face-detail"></div>
+      <hr class="result-divider">
+      <div class="result-total">
+        <span class="label">應付金額</span>
+        <span class="amount" id="face-total"></span>
+      </div>
+      <button class="btn-reset" onclick="resetFace()">↺ 重新計算</button>
+    </div>
+  </div>
+</main>
+<script>
+const MM2_PER_SQIN = 645.16;
+let segId = 0;
+function addSeg() {
+  segId++;
+  const id = segId;
+  const container = document.getElementById('seg-container');
+  const div = document.createElement('div');
+  div.className = 'segment-row';
+  div.id = 'seg-' + id;
+  div.innerHTML = `
+    <span class="seg-num">${container.children.length + 1}</span>
+    <div class="seg-inputs">
+      <div class="input-group"><label>Ø</label><input type="number" placeholder="76" min="0" inputmode="decimal" class="seg-d"><span class="unit">mm</span></div>
+      <div class="input-group"><label>L</label><input type="number" placeholder="1680" min="0" inputmode="decimal" class="seg-l"><span class="unit">mm</span></div>
+    </div>
+    <button class="btn-del" onclick="delSeg(${id})">✕</button>
+  `;
+  container.appendChild(div);
+  renumberSegs();
+}
+function delSeg(id) {
+  const el = document.getElementById('seg-' + id);
+  if (el) el.remove();
+  renumberSegs();
+}
+function renumberSegs() {
+  document.querySelectorAll('.segment-row .seg-num').forEach((el, i) => el.textContent = i + 1);
+}
+function calcCyl() {
+  const rows = document.querySelectorAll('.segment-row');
+  if (!rows.length) { alert('請先新增至少一段'); return; }
+  let details = [], valid = true;
+  rows.forEach((row, i) => {
+    const d = parseFloat(row.querySelector('.seg-d').value);
+    const l = parseFloat(row.querySelector('.seg-l').value);
+    if (isNaN(d) || isNaN(l) || d <= 0 || l <= 0) { valid = false; return; }
+    const areaSqIn = Math.PI * d * l / MM2_PER_SQIN;
+    const rate = l <= 1000 ? 2 : 3;
+    const segCost = areaSqIn * rate;
+    details.push({ seg: i + 1, d, l, areaSqIn, rate, segCost });
+  });
+  if (!valid || !details.length) { alert('請確認所有欄位均已填入有效數值'); return; }
+  const minFee = 100;
+  details.forEach(s => {
+    s.finalSegCost = Math.max(s.segCost, minFee);
+    s.minTriggered = s.segCost < minFee;
+  });
+  const finalCost = details.reduce((sum, s) => sum + s.finalSegCost, 0);
+  let html = '';
+  details.forEach(s => {
+    const badge = s.minTriggered ? ' <span class="min-badge">最低</span>' : '';
+    html += `<div class="result-row"><span class="key">第 ${s.seg} 段　Ø${s.d} × L${s.l}　$${s.rate}/in2</span><span class="val">$${s.finalSegCost.toFixed(0)}${badge}</span></div>`;
+  });
+  html += `<div class="result-row" style="margin-top:6px"><span class="key">合計</span><span class="val">$${finalCost.toFixed(0)}</span></div>`;
+  document.getElementById('cyl-detail').innerHTML = html;
+  document.getElementById('cyl-total').innerHTML = `$${finalCost.toFixed(0)}`;
+  document.getElementById('result-cyl').classList.add('show');
+  document.getElementById('result-cyl').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function resetCyl() { document.getElementById('result-cyl').classList.remove('show'); }
+let faceShape = 'circ';
+function setShape(s) {
+  faceShape = s;
+  document.getElementById('btn-rect').classList.toggle('active', s === 'rect');
+  document.getElementById('btn-circ').classList.toggle('active', s === 'circ');
+
+}
+function calcFace() {
+  const l = parseFloat(document.getElementById('face-l').value);
+  const w = parseFloat(document.getElementById('face-w').value);
+  if (isNaN(l) || isNaN(w) || l <= 0 || w <= 0) { alert('請填入有效的長寬數值'); return; }
+  const isCirc = faceShape === 'circ';
+  const areaSqIn = isCirc ? (l * w * Math.PI / MM2_PER_SQIN) : (l * w / MM2_PER_SQIN);
+  const rawCost = areaSqIn * 4;
+  const finalCost = Math.max(rawCost, 150);
+  const triggered = rawCost < 150;
+  const shapeLabel = isCirc ? `${l} × ${w}（圓形）` : `${l} × ${w}（方形）`;
+  let html = `
+    <div class="result-row"><span class="key">尺寸</span><span class="val">${shapeLabel} mm</span></div>
+    <div class="result-row"><span class="key">單價</span><span class="val">$4 / in2</span></div>
+    <div class="result-row"><span class="key">面積計算金額</span><span class="val">$${rawCost.toFixed(0)}</span></div>
+  `;
+  if (triggered) html += `<div class="result-row"><span class="key">最低消費觸發</span><span class="val" style="color:var(--accent)">最低 $150</span></div>`;
+  document.getElementById('face-detail').innerHTML = html;
+  document.getElementById('face-total').innerHTML = `$${finalCost.toFixed(0)}${triggered ? '<span class="min-badge">最低</span>' : ''}`;
+  document.getElementById('result-face').classList.add('show');
+  document.getElementById('result-face').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function resetFace() { document.getElementById('result-face').classList.remove('show'); }
+addSeg();
+</script>
+</body>
+</html>
