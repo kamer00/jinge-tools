@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>柱型油缸報價系統 | 勁格科技</title>
+<style>
+  :root {
+    --bg: #1a1a1a; --surface: #242424; --surface2: #2e2e2e;
+    --border: #3a3a3a; --accent: #e8a020; --text: #e8e8e8;
+    --text2: #999; --radius: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI','Microsoft JhengHei',sans-serif; font-size: 14px; }
+  header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 16px; font-weight: 600; color: var(--accent); }
+  header span { font-size: 12px; color: var(--text2); }
+  .main { max-width: 680px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .bore-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .bore-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .input-row { display: flex; gap: 12px; }
+  .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .bore-btn { padding: 7px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .bore-btn:hover { border-color: var(--accent); color: var(--text); }
+  .bore-btn.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 700; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .panel-header { background: var(--surface2); padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .panel-header h2 { font-size: 13px; font-weight: 600; }
+  .panel-total { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .panel-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  .opt-group { display: flex; flex-direction: column; gap: 6px; }
+  .opt-label { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: 0.5px; }
+  .opt-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opt-btn { padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+  .opt-btn:hover { border-color: var(--accent); color: var(--text); }
+  .opt-btn.active { background: #2d2200; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  .divider { border: none; border-top: 1px solid var(--border); }
+  .detail-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .toggle-btn { background: none; border: none; color: var(--text2); font-size: 12px; cursor: pointer; text-align: left; padding: 2px 0; font-family: inherit; }
+  .toggle-btn:hover, .toggle-btn.open { color: var(--accent); }
+  .detail-rows { display: flex; flex-direction: column; gap: 5px; }
+  .detail-rows.hidden { display: none; }
+  .detail-row { display: flex; justify-content: space-between; }
+  .detail-row .dn { font-size: 12px; color: var(--text2); }
+  .detail-row .dv { font-size: 12px; font-weight: 600; color: var(--text); }
+  .detail-row.sub .dn { color: var(--text); font-weight: 600; font-size: 13px; }
+  .detail-row.sub .dv { color: var(--accent); font-size: 14px; font-weight: 700; }
+  .na { color: var(--text2); font-size: 12px; font-style: italic; }
+</style>
+</head>
+<body>
+<header>
+  <img src="data:image/png;base64,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" style="height:36px;width:36px;border-radius:6px;">
+  <h1>柱型油缸報價系統</h1>
+  <span>勁格科技股份有限公司</span>
+</header>
+<div class="main">
+
+  <div class="bore-section">
+    <div class="input-row">
+      <div class="input-group">
+        <div class="section-title">缸徑</div>
+        <select id="boreSelect" onchange="onBoreSelect(this.value)"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 12px;font-size:14px;font-weight:600;outline:none;width:100%;cursor:pointer;">
+          <option value="">選擇缸徑</option>
+        </select>
+        <input type="text" inputmode="decimal" id="boreManual" placeholder="輸入缸徑"
+          style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 12px;font-size:14px;font-weight:600;width:100%;outline:none;margin-top:6px;"
+          oninput="setBore(this.value)">
+        <div id="boreHint" style="font-size:11px;color:var(--accent);margin-top:4px;min-height:16px;"></div>
+      </div>
+      <div class="input-group">
+        <div class="section-title">軸徑（mm）</div>
+        <input type="text" inputmode="decimal" id="shaftDia" placeholder="輸入軸徑"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 12px;font-size:14px;width:100%;outline:none;"
+          oninput="renderAll()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 前蓋 -->
+  <div class="panel">
+    <div class="panel-header"><h2>前蓋</h2><span class="panel-total" id="frontTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="frontMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('front')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="frontMatBtn">展開計算</button>
+        </div>
+        <div id="frontMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'front')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="frontMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">基本型（二選一）</div><div class="opt-row" id="frontBase"></div></div>
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="frontExtras"></div></div>
+      <div class="opt-group"><div class="opt-label">鑽孔</div><div class="opt-row" id="frontDrill"></div></div>
+      <div class="detail-wrap" id="frontWrap">
+        <button class="toggle-btn" onclick="toggleDetail('frontWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="frontDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 後蓋 -->
+  <div class="panel">
+    <div class="panel-header"><h2>後蓋</h2><span class="panel-total" id="rearTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="rearMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('rear')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="rearMatBtn">展開計算</button>
+        </div>
+        <div id="rearMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'rear')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="rearMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="rearExtras"></div></div>
+      <div class="opt-group"><div class="opt-label">鑽孔</div><div class="opt-row" id="rearDrill"></div></div>
+      <div class="detail-wrap" id="rearWrap">
+        <button class="toggle-btn" onclick="toggleDetail('rearWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="rearDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 套板 -->
+  <div class="panel">
+    <div class="panel-header"><h2>套板</h2><span class="panel-total" id="plateTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="plateMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('plate')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="plateMatBtn">展開計算</button>
+        </div>
+        <div id="plateMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'plate')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="plateMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="detail-wrap" id="plateWrap">
+        <button class="toggle-btn" onclick="toggleDetail('plateWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="plateDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 襯套 -->
+  <div class="panel">
+    <div class="panel-header"><h2>襯套</h2><span class="panel-total" id="bushTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="bushMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('bush')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="bushMatBtn">展開計算</button>
+        </div>
+        <div id="bushMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'bush')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="bushMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="bushExtras"></div></div>
+      <div class="detail-wrap" id="bushWrap">
+        <button class="toggle-btn" onclick="toggleDetail('bushWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="bushDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 活塞 -->
+  <div class="panel">
+    <div class="panel-header"><h2>活塞</h2><span class="panel-total" id="pistTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="pistMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('pist')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="pistMatBtn">展開計算</button>
+        </div>
+        <div id="pistMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'pist')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="pistMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="pistExtras"></div></div>
+      <div class="opt-group"><div class="opt-label">油封</div><div class="opt-row" id="pistOil"></div></div>
+      <div class="detail-wrap" id="pistWrap">
+        <button class="toggle-btn" onclick="toggleDetail('pistWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="pistDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 固定柱 -->
+  <div class="panel">
+    <div class="panel-header"><h2>固定柱</h2><span class="panel-total" id="fixTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="fixMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('fix')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="fixMatBtn">展開計算</button>
+        </div>
+        <div id="fixMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'fix')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="fixMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="fixExtras"></div></div>
+      <div class="detail-wrap" id="fixWrap">
+        <button class="toggle-btn" onclick="toggleDetail('fixWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="fixDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五金 -->
+  <div class="panel">
+    <div class="panel-header"><h2>五金</h2><span class="panel-total" id="hwTotal">—</span></div>
+    <div class="panel-body">
+      <div class="detail-wrap" id="hwWrap">
+        <button class="toggle-btn" onclick="toggleDetail('hwWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="hwDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CU+AIR -->
+  <div class="panel">
+    <div class="panel-header"><h2>CU+AIR</h2><span class="panel-total" id="cuairTotal">—</span></div>
+    <div class="panel-body">
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="cuairExtras"></div></div>
+      <div class="detail-wrap" id="cuairWrap">
+        <button class="toggle-btn" onclick="toggleDetail('cuairWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="cuairDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 軸心 -->
+  <div class="panel">
+    <div class="panel-header"><h2>軸心</h2><span class="panel-total" id="shaftTotal">—</span></div>
+    <div class="panel-body">
+      <div class="mat-section" id="shaftMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('shaft')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="shaftMatBtn">展開計算</button>
+        </div>
+        <div id="shaftMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'shaft')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="shaftMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group"><div class="opt-label">材質</div><div class="opt-row" id="shaftMat"></div></div>
+
+      <div class="mat-section" id="pipeMatSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="opt-label">材料費</div>
+          <button onclick="toggleMatFrame('pipe')"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
+            id="pipeMatBtn">展開計算</button>
+        </div>
+        <div id="pipeMatFrame" style="display:none;margin-top:8px;">
+          <iframe src="材料計算機.html"
+            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
+            onload="bindMatFrame(this, 'pipe')">
+          </iframe>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <input type="text" inputmode="decimal" id="pipeMat" placeholder="材料費"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
+            oninput="renderAll()">
+          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="opt-group">
+        <div class="opt-label">長度（mm）</div>
+        <input type="text" inputmode="decimal" id="shaftLen" placeholder="輸入長度"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-size:13px;width:160px;outline:none;"
+          oninput="renderAll()">
+      </div>
+      <div class="detail-wrap" id="shaftWrap">
+        <button class="toggle-btn" onclick="toggleDetail('shaftWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="shaftDetail"><span class="na">請輸入軸徑和長度</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 鋼管 -->
+  <div class="panel">
+    <div class="panel-header"><h2>鋼管</h2><span class="panel-total" id="pipeTotal">—</span></div>
+    <div class="panel-body">
+      <div class="opt-group">
+        <div class="opt-label">長度（mm）</div>
+        <input type="text" inputmode="decimal" id="pipeLen" placeholder="輸入長度"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-size:13px;width:160px;outline:none;"
+          oninput="renderAll()">
+      </div>
+      <div class="detail-wrap" id="pipeWrap">
+        <button class="toggle-btn" onclick="toggleDetail('pipeWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="pipeDetail"><span class="na">請先選擇缸徑並輸入長度</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 配件 -->
+  <div class="panel">
+    <div class="panel-header"><h2>配件</h2><span class="panel-total" id="partTotal">—</span></div>
+    <div class="panel-body">
+      <div class="opt-group"><div class="opt-label">法蘭（二選一）</div><div class="opt-row" id="partFAFB"></div></div>
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="partExtras"></div></div>
+      <div class="detail-wrap" id="partWrap">
+        <button class="toggle-btn" onclick="toggleDetail('partWrap')">▶ 明細</button>
+        <div class="detail-rows hidden" id="partDetail"><span class="na">請先選擇缸徑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 材料費 -->
+  <div class="panel" id="matPanel">
+    <div class="panel-header">
+      <h2>材料計算機</h2>
+      <button onclick="toggleMat()" id="matToggleBtn"
+        style="background:#2d2200;border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:12px;padding:4px 12px;cursor:pointer;font-family:inherit;">
+        展開
+      </button>
+    </div>
+    <div id="matFrame" style="display:none;">
+      <iframe src="材料計算機.html" id="matIframe"
+        style="width:100%;height:700px;border:none;border-top:1px solid var(--border);">
+      </iframe>
+    </div>
+    <div class="panel-body" id="matResult" style="display:none;">
+      <div class="detail-row">
+        <span class="dn">材料費（已套用）</span>
+        <span class="dv" id="matCostVal" style="color:var(--accent);font-size:14px;font-weight:700;">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 加工費合計 -->
+  <div class="panel" style="border-color:var(--accent);">
+    <div class="panel-body" style="padding:16px 20px;">
+      <div class="detail-row">
+        <span style="font-size:13px;color:var(--text2);">加工費合計</span>
+        <span id="totalProcess" style="font-size:15px;font-weight:700;color:var(--text);">—</span>
+      </div>
+      <div class="detail-row" id="matSumRow" style="display:none;">
+        <span style="font-size:13px;color:var(--text2);">材料費合計</span>
+        <span id="totalMat" style="font-size:15px;font-weight:700;color:var(--text);">—</span>
+      </div>
+      <div style="border-top:2px solid var(--accent);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:15px;font-weight:600;">總計</span>
+        <span id="grandTotal" style="font-size:22px;font-weight:700;color:var(--accent);">—</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const BORES = [32,40,50,63,80,100,125,150,180,200,250];
+
+const PRICE = {
+  front: {
+    '襯套式':    [220,220,250,280,320,350,450,600,800,1000,1200],
+    '內槽式':    [350,350,350,400,450,550,650,850,1050,1300,1500],
+    '端面槽':    [100,100,100,130,150,150,200,200,250,250,250],
+    '前凸緣':    [150,150,150,200,200,250,300,350,400,500,650],
+    '一般鑽孔':  [100,100,100,120,120,150,180,200,250,300,400],
+    '緩衝鑽孔':  [170,170,170,170,170,180,220,240,280,340,450],
+    '入油口鑽孔':[60,60,60,60,80,80,100,100,120,150,200],
+  },
+  rear: {
+    '基本車床':  [150,150,180,220,280,300,350,450,600,750,1000],
+    '端面槽':    [100,100,100,130,150,150,200,200,250,250,250],
+    '一般鑽孔':  [100,100,100,120,120,150,180,200,250,300,400],
+    '緩衝鑽孔':  [170,170,170,170,170,170,220,240,280,340,450],
+    '入油口鑽孔':[60,60,60,60,80,80,100,100,120,150,200],
+  },
+  plate: {
+    '基本加工': [100,100,100,100,120,150,150,180,200,250,300],
+    '鑽孔':     [60,60,60,60,80,100,120,140,160,200,280],
+  },
+  bush: {
+    '車床': [250,250,250,250,300,350,450,550,650,750,850],
+    '車牙': [50,50,50,50,50,80,110,140,170,200,230],
+    '銑床': [60,60,60,60,60,80,100,130,160,190,230],
+  },
+  pist: {
+    'USH車床': [180,180,180,200,220,250,300,400,550,650,750],
+    '車牙':    [30,30,30,30,60,60,100,100,140,140,200],
+    'PT油封':  [50,50,50,50,50,50,70,70,100,100,150],
+    'PBC油封': [60,60,60,60,60,80,100,130,160,200,250],
+  },
+  fix: {
+    '車床×4':   [60,60,60,60,80,80,100,120,120,120,120],
+    '調質×4':   [140,140,140,140,160,160,220,240,280,320,360],
+  },
+  cuair: {
+    'CU緩衝組': [700,700,700,700,800,900,1200,1400,1600,1800,2200],
+    'AIR-VENT': [400,400,400,400,400,500,500,600,600,700,800],
+  },
+  part: {
+    'FA': [240,240,240,240,290,330,400,480,610,760,950],
+    'FB': [120,120,120,120,140,180,220,280,360,460,600],
+    'CA': [500,550,550,600,800,940,1300,2000,2800,5800,12000],
+    'CB': [650,700,750,800,1000,1200,1700,2600,3800,8000,16000],
+    'TC': [470,470,470,540,630,750,890,1100,1400,1800,2300],
+    'Y':  [100,100,160,300,400,550,900,1200,1600,2000,2400],
+  },
+};
+
+// 五金依缸徑動態計算
+function calcHwVal(bore) {
+  function dia(b) {
+    let d=10;
+    if(b>50)d+=2; if(b>63)d+=4; if(b>80)d+=2; if(b>100)d+=4;
+    if(b>125)d+=4; if(b>150)d+=4; if(b>180)d+=3; if(b>200)d+=6;
+    return d;
+  }
+  function pillarPrice(d) {
+    let v=1.5;
+    [[10,.7],[12,1.8],[14,-.5],[16,2],[18,1.5],[20,3],[22,4],
+     [24,12.5],[26,13.5],[27,8],[30,7],[33,5],[36,60],[39,-40]
+    ].forEach(([t,a])=>{ if(d>t) v+=a; });
+    return Math.round(v*100)/100;
+  }
+  function shaftSize(b) {
+    let v=16;
+    if(b>32)v+=4; if(b>40)v+=4; if(b>50)v+=6; if(b>63)v+=6;
+    if(b>80)v+=12; if(b>100)v+=16; if(b>125)v+=12; if(b>150)v+=19;
+    if(b>180)v+=5; if(b>200)v+=20; if(b>220)v+=10;
+    return v;
+  }
+  function shaftPrice(s) {
+    let v=2;
+    [[16,5.2],[20,6.3],[24,8.5],[30,18],[36,5],[39,55],
+     [48,50],[64,200],[76,50],[95,50],[100,50],[120,100]
+    ].forEach(([t,a])=>{ if(s>t) v+=a; });
+    return Math.round(v*100)/100;
+  }
+  const d = dia(bore);
+  const pp = pillarPrice(d);
+  const ss = shaftSize(bore);
+  const sp = shaftPrice(ss);
+  return { pillar: Math.round(pp*8*100)/100, shaft: sp, total: Math.round((pp*8+sp)*100)/100 };
+}
+
+const S = {
+  bore: null,
+  frontBase: '襯套式', frontExtra: {'端面槽':false,'前凸緣':false}, frontDrill: '一般+入油口',
+  rearExtra: {'端面槽':false}, rearDrill: '一般+入油口',
+  bushExtra: {'車牙':false,'銑床':false},
+  pistExtra: {'車牙':false}, pistOil: 'USH',
+  fixMat: 'S45C', fixExtra: {'調質':false},
+  cuairExtra: {'CU緩衝組':false,'AIR-VENT':false},
+  shaftMat: '硬鉻軸',
+  partFAFB: '無', partExtra: {'CA':false,'CB':false,'TC':false,'Y':false},
+};
+
+function idx() { return BORES.indexOf(S.bore); }
+function p(panel, key) { const i=idx(); return i<0?0:PRICE[panel][key][i]; }
+function fmt(n) { return '$'+Math.round(n).toLocaleString(); }
+
+function mkRadio(id, opts, getV, setV) {
+  const el=document.getElementById(id); el.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn'+(getV()===opt?' active':'');
+    btn.textContent=opt;
+    btn.addEventListener('click',()=>{ setV(opt); renderAll(); });
+    el.appendChild(btn);
+  });
+}
+function mkCheck(id, opts, getMap, setFn) {
+  const el=document.getElementById(id); el.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn'+(getMap()[opt]?' active':'');
+    btn.textContent=opt;
+    btn.addEventListener('click',()=>{ setFn(opt); renderAll(); });
+    el.appendChild(btn);
+  });
+}
+
+function initButtons() {
+  mkRadio('frontBase',['襯套式','內槽式'],()=>S.frontBase,v=>S.frontBase=v);
+  mkCheck('frontExtras',['端面槽','前凸緣'],()=>S.frontExtra,k=>S.frontExtra[k]=!S.frontExtra[k]);
+  mkRadio('frontDrill',['一般+入油口','一般+緩衝+入油口'],()=>S.frontDrill,v=>S.frontDrill=v);
+  mkCheck('rearExtras',['端面槽'],()=>S.rearExtra,k=>S.rearExtra[k]=!S.rearExtra[k]);
+  mkRadio('rearDrill',['一般+入油口','一般+緩衝+入油口'],()=>S.rearDrill,v=>S.rearDrill=v);
+  mkCheck('bushExtras',['車牙','銑床'],()=>S.bushExtra,k=>S.bushExtra[k]=!S.bushExtra[k]);
+  mkCheck('pistExtras',['車牙'],()=>S.pistExtra,k=>S.pistExtra[k]=!S.pistExtra[k]);
+  mkRadio('pistOil',['USH','PT油封','PBC油封'],()=>S.pistOil,v=>S.pistOil=v);
+  mkRadio('fixMat',['S45C','SCM440'],()=>S.fixMat,v=>S.fixMat=v);
+  mkCheck('fixExtras',['調質'],()=>S.fixExtra,k=>S.fixExtra[k]=!S.fixExtra[k]);
+  mkCheck('cuairExtras',['CU緩衝組','AIR-VENT'],()=>S.cuairExtra,k=>S.cuairExtra[k]=!S.cuairExtra[k]);
+  mkRadio('shaftMat',['硬鉻軸','S45C','SCM440'],()=>S.shaftMat,v=>S.shaftMat=v);
+  mkRadio('partFAFB',['無','FA','FB'],()=>S.partFAFB,v=>S.partFAFB=v);
+  mkCheck('partExtras',['CA','CB','TC','Y'],()=>S.partExtra,k=>S.partExtra[k]=!S.partExtra[k]);
+}
+
+function calcFront() {
+  if(S.bore===null) return null;
+  const items=[{name:S.frontBase,val:p('front',S.frontBase)}];
+  if(S.frontExtra['端面槽']) items.push({name:'端面槽',val:p('front','端面槽')});
+  if(S.frontExtra['前凸緣']) items.push({name:'前凸緣',val:p('front','前凸緣')});
+  items.push({name:'一般鑽孔',val:p('front','一般鑽孔')});
+  if(S.frontDrill==='一般+緩衝+入油口') items.push({name:'緩衝鑽孔',val:p('front','緩衝鑽孔')});
+  items.push({name:'入油口鑽孔',val:p('front','入油口鑽孔')});
+  return items;
+}
+function calcRear() {
+  if(S.bore===null) return null;
+  const items=[{name:'基本車床',val:p('rear','基本車床')}];
+  if(S.rearExtra['端面槽']) items.push({name:'端面槽',val:p('rear','端面槽')});
+  items.push({name:'一般鑽孔',val:p('rear','一般鑽孔')});
+  if(S.rearDrill==='一般+緩衝+入油口') items.push({name:'緩衝鑽孔',val:p('rear','緩衝鑽孔')});
+  items.push({name:'入油口鑽孔',val:p('rear','入油口鑽孔')});
+  return items;
+}
+function calcPlate() {
+  if(S.bore===null) return null;
+  return [{name:'基本加工',val:p('plate','基本加工')},{name:'鑽孔',val:p('plate','鑽孔')}];
+}
+function calcBush() {
+  if(S.bore===null) return null;
+  const items=[{name:'車床',val:p('bush','車床')}];
+  if(S.bushExtra['車牙']) items.push({name:'車牙',val:p('bush','車牙')});
+  if(S.bushExtra['銑床']) items.push({name:'銑床',val:p('bush','銑床')});
+  return items;
+}
+function calcPist() {
+  if(S.bore===null) return null;
+  const items=[{name:'USH車床',val:p('pist','USH車床')}];
+  if(S.pistExtra['車牙']) items.push({name:'車牙',val:p('pist','車牙')});
+  if(S.pistOil==='PT油封') items.push({name:'PT油封',val:p('pist','PT油封')});
+  if(S.pistOil==='PBC油封') items.push({name:'PBC油封',val:p('pist','PBC油封')});
+  return items;
+}
+function calcFix() {
+  if(S.bore===null) return null;
+  const key = S.fixExtra['調質'] ? '調質×4' : '車床×4';
+  const items=[{name:S.fixMat+(S.fixExtra['調質']?'+調質':''),val:p('fix',key)}];
+  return items;
+}
+function calcHw() {
+  if(S.bore===null) return null;
+  const hw=calcHwVal(S.bore);
+  return [
+    {name:'柱帽×8',val:hw.pillar},
+    {name:'軸帽×1',val:hw.shaft},
+  ];
+}
+function calcCuair() {
+  if(S.bore===null) return null;
+  const items=[];
+  if(S.cuairExtra['CU緩衝組']) items.push({name:'CU緩衝組',val:p('cuair','CU緩衝組')});
+  if(S.cuairExtra['AIR-VENT']) items.push({name:'AIR-VENT',val:p('cuair','AIR-VENT')});
+  return items;
+}
+function calcShaft() {
+  const d = parseFloat((document.getElementById('shaftDia')||{}).value)||0;
+  const l = parseFloat((document.getElementById('shaftLen')||{}).value)||0;
+  if(d<=0||l<=0) return null;
+  if(S.bore!==null && d>=S.bore) return [{name:'⚠ 軸徑不可大於等於缸徑',val:0}];
+
+  if(S.shaftMat==='硬鉻軸') {
+    // 車床E4: 基底E8=120，依軸徑累加
+    let lathe=120;
+    [[22.4,30],[25,30],[30,20],[35,50],[40,30],[45,20],[50,50],
+     [56,50],[65,50],[80,50],[90,50],[95,50],[101.6,100]
+    ].forEach(([t,a])=>{ if(d>t) lathe+=a; });
+    // 長度加價F4: >1000+50, >1500+50, >2000+100
+    if(l>1000) lathe+=50; if(l>1500) lathe+=50; if(l>2000) lathe+=100;
+    // 銑床G4: 基底G12=30，依軸徑累加
+    let mill=30;
+    [[36,10],[45,10],[56,10],[75,20],[85,10],[95,10],[100,20]
+    ].forEach(([t,a])=>{ if(d>t) mill+=a; });
+    // 長度加價H4: >1000+50, >1500+30, >2000+50
+    if(l>1000) mill+=50; if(l>1500) mill+=30; if(l>2000) mill+=50;
+    return [{name:'車床',val:lathe},{name:'銑床',val:mill}];
+
+  } else {
+    // S45C / SCM440
+    // 面積L12 = 3.14 * 軸徑 * 長度 / 645
+    const area = 3.14 * d * l / 645;
+    // 車床L13 = 面積 * 2.5，最低500
+    let lathe = Math.max(500, Math.round(area * 2.5 * 100) / 100);
+    // 銑床K12
+    let mill=50;
+    if(d>51)  mill+=50; if(d>101) mill+=50; if(d>125) mill+=50;
+    if(d>150) mill+=100; if(d>199) mill+=200;
+    if(l>999)  mill+=50; if(l>1999) mill+=50;
+    const items=[
+      {name:'車床',val:lathe},
+      {name:'銑床',val:mill},
+      {name:'研磨',val:Math.round(area*2*100)/100},
+      {name:'電鍍',val:Math.round(Math.max(0, area*3.5 + Math.max(0, 650-area*5.5))*100)/100},
+    ];
+    return items;
+  }
+}
+
+function calcPipe() {
+  if(S.bore===null) return null;
+  const len = parseInt((document.getElementById('pipeLen')||{}).value)||0;
+  if(len<=0) return null;
+  let fee = 50;
+  if(S.bore>80)  fee += 50;
+  if(S.bore>100) fee += 50;
+  if(S.bore>150) fee += 50;
+  if(S.bore>200) fee += 100;
+  if(len>500)    fee += 50;
+  if(len>1001)   fee += 100;
+  return [{name:'車床費',val:fee}];
+}
+
+function calcPart() {
+  if(S.bore===null) return null;
+  const items=[];
+  if(S.partFAFB==='FA') items.push({name:'FA',val:p('part','FA')});
+  if(S.partFAFB==='FB') items.push({name:'FB',val:p('part','FB')});
+  if(S.partExtra['CA']) items.push({name:'CA',val:p('part','CA')});
+  if(S.partExtra['CB']) items.push({name:'CB',val:p('part','CB')});
+  if(S.partExtra['TC']) items.push({name:'TC',val:p('part','TC')});
+  if(S.partExtra['Y'])  items.push({name:'Y接頭',val:p('part','Y')});
+  return items;
+}
+
+function total(items) { return items?items.reduce((a,b)=>a+b.val,0):0; }
+
+function renderDetail(id, items) {
+  const el=document.getElementById(id);
+  const wasHidden=el.classList.contains('hidden');
+  if(!items||items.length===0) {
+    el.innerHTML='<span class="na">請先選擇缸徑</span>';
+  } else {
+    el.innerHTML=items.map(it=>
+      `<div class="detail-row"><span class="dn">${it.name}</span><span class="dv">${fmt(it.val)}</span></div>`
+    ).join('')+
+    `<div class="detail-row sub"><span class="dn">小計</span><span class="dv">${fmt(total(items))}</span></div>`;
+  }
+  if(wasHidden) el.classList.add('hidden');
+}
+
+function toggleDetail(wrapId) {
+  const wrap=document.getElementById(wrapId);
+  const btn=wrap.querySelector('.toggle-btn');
+  const rows=wrap.querySelector('.detail-rows');
+  const isOpen=!rows.classList.contains('hidden');
+  rows.classList.toggle('hidden',isOpen);
+  btn.classList.toggle('open',!isOpen);
+  btn.textContent=(isOpen?'▶':'▼')+' 明細';
+}
+
+function renderAll() {
+  // SCM440自動勾選調質
+  if(S.fixMat==='SCM440') S.fixExtra['調質']=true;
+  S.cuairExtra['CU緩衝組']=(S.frontDrill==='一般+緩衝+入油口'||S.rearDrill==='一般+緩衝+入油口');
+  initButtons();
+  const fi=calcFront(),ri=calcRear(),pi=calcPlate(),bi=calcBush(),psi=calcPist();
+  const fxi=calcFix(),hwi=calcHw(),ci=calcCuair(),shi=calcShaft(),ppei=calcPipe(),pri=calcPart();
+  renderDetail('frontDetail',fi);
+  renderDetail('rearDetail',ri);
+  renderDetail('plateDetail',pi);
+  renderDetail('bushDetail',bi);
+  renderDetail('pistDetail',psi);
+  renderDetail('fixDetail',fxi);
+  renderDetail('hwDetail',hwi);
+  renderDetail('cuairDetail',ci);
+  renderDetail('shaftDetail',shi);
+  renderDetail('pipeDetail',ppei);
+  renderDetail('partDetail',pri);
+  const matIds = {
+    'frontTotal':'frontMat','rearTotal':'rearMat','plateTotal':'plateMat',
+    'bushTotal':'bushMat','pistTotal':'pistMat','fixTotal':'fixMat',
+    'shaftTotal':'shaftMat','pipeTotal':'pipeMat'
+  };
+  const setTotal=(id,items,cond)=>{
+    const hasData = S.bore!==null&&(cond===undefined||cond)&&items&&items.length;
+    const processAmt = hasData ? total(items) : 0;
+    const matEl = matIds[id] ? document.getElementById(matIds[id]) : null;
+    const matAmt = matEl ? (parseInt(matEl.value)||0) : 0;
+    const grandAmt = processAmt + matAmt;
+    document.getElementById(id).textContent = hasData||matAmt>0 ? fmt(grandAmt) : '—';
+  };
+  setTotal('frontTotal',fi);
+  setTotal('rearTotal',ri);
+  setTotal('plateTotal',pi);
+  setTotal('bushTotal',bi);
+  setTotal('pistTotal',psi);
+  setTotal('fixTotal',fxi);
+  setTotal('hwTotal',hwi);
+  setTotal('cuairTotal',ci);
+  setTotal('shaftTotal',shi);
+  setTotal('pipeTotal',ppei);
+  setTotal('partTotal',pri);
+  updateGrandTotal();
+}
+
+// 各零件材料計算機開關
+function toggleMatFrame(panel) {
+  const frame = document.getElementById(panel+'MatFrame');
+  const btn = document.getElementById(panel+'MatBtn');
+  const isHidden = frame.style.display === 'none';
+  frame.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '收起' : '展開計算';
+}
+
+// 綁定iframe的postMessage
+function bindMatFrame(iframe, panel) {
+  // iframe載入後監聽訊息已由window listener處理
+  iframe.dataset.panel = panel;
+}
+
+// 接收材料費（辨識來源panel）
+let currentMatPanel = null;
+document.querySelectorAll('iframe').forEach(f => {
+  f.addEventListener('focus', () => { currentMatPanel = f.dataset.panel; });
+});
+
+// 材料計算機開關
+function toggleMat() {
+  const frame = document.getElementById('matFrame');
+  const btn = document.getElementById('matToggleBtn');
+  const isHidden = frame.style.display === 'none';
+  frame.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '收起' : '展開';
+}
+
+// 接收材料費
+let matCost = 0;
+const panels = ['front','rear','plate','bush','pist','fix','shaft','pipe'];
+window.addEventListener('message', (e) => {
+  if(e.data && e.data.type === 'MATERIAL_COST') {
+    const amount = e.data.amount || 0;
+    // 找出是哪個iframe傳來的
+    let targetPanel = null;
+    document.querySelectorAll('iframe').forEach(f => {
+      try {
+        if(f.contentWindow === e.source) targetPanel = f.closest('[id$="MatFrame"]')?.id?.replace('MatFrame','');
+      } catch(err){}
+    });
+    if(targetPanel) {
+      const input = document.getElementById(targetPanel+'Mat');
+      if(input) {
+        input.value = amount;
+        // 收起iframe
+        document.getElementById(targetPanel+'MatFrame').style.display = 'none';
+        document.getElementById(targetPanel+'MatBtn').textContent = '展開計算';
+        renderAll();
+      }
+    }
+  }
+});
+
+function updateGrandTotal() {
+  // 計算加工費合計
+  const panels = ['frontTotal','rearTotal','plateTotal','bushTotal','pistTotal',
+                  'fixTotal','hwTotal','cuairTotal','shaftTotal','pipeTotal','partTotal'];
+  let process = 0;
+  panels.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.textContent !== '—') {
+      process += parseInt(el.textContent.replace(/[^0-9]/g,''))||0;
+    }
+  });
+  document.getElementById('totalProcess').textContent = process > 0 ? '$'+process.toLocaleString() : '—';
+  document.getElementById('totalMat').textContent = matCost > 0 ? '$'+matCost.toLocaleString() : '—';
+  const grand = process + matCost;
+  document.getElementById('grandTotal').textContent = grand > 0 ? '$'+grand.toLocaleString() : '—';
+}
+
+function initBores() {
+  const sel = document.getElementById('boreSelect');
+  BORES.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b; opt.textContent = b + ' mm';
+    sel.appendChild(opt);
+  });
+  const manual = document.createElement('option');
+  manual.value = 'manual'; manual.textContent = '手動輸入';
+  sel.appendChild(manual);
+}
+
+function onBoreSelect(val) {
+  const manualInput = document.getElementById('boreManual');
+  const hint = document.getElementById('boreHint');
+  if(val === 'manual') {
+    manualInput.style.display = 'block';
+    manualInput.focus();
+    S.bore = null;
+    if(hint) hint.textContent = '';
+    renderAll();
+  } else {
+    manualInput.style.display = 'none';
+    setBore(val);
+  }
+}
+
+function setBore(val) {
+  const input = parseInt(val)||parseInt((document.getElementById('boreManual')||{}).value)||0;
+  const hint = document.getElementById('boreHint');
+  if(!input) {
+    S.bore = null;
+    S.boreInput = null;
+    if(hint) hint.textContent = '';
+  } else {
+    S.boreInput = input;
+    // 往上取最接近的標準缸徑
+    const matched = BORES.find(b => b >= input);
+    if(matched) {
+      S.bore = matched;
+      if(hint) hint.textContent = matched === input ? '' : `使用缸徑 ${matched} 報價`;
+    } else {
+      S.bore = null;
+      if(hint) hint.textContent = '超出範圍（最大250）';
+    }
+  }
+  renderAll();
+}
+
+initBores();
+initButtons();
+</script>
+</body>
+</html>
