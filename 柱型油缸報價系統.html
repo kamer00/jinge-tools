@@ -87,26 +87,16 @@
   <div class="panel">
     <div class="panel-header"><h2>前蓋</h2><span class="panel-total" id="frontTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="frontMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('front')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="frontMatBtn">展開計算</button>
-        </div>
-        <div id="frontMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'front')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="frontMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('front')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="frontMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">基本型（二選一）</div><div class="opt-row" id="frontBase"></div></div>
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="frontExtras"></div></div>
@@ -122,26 +112,16 @@
   <div class="panel">
     <div class="panel-header"><h2>後蓋</h2><span class="panel-total" id="rearTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="rearMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('rear')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="rearMatBtn">展開計算</button>
-        </div>
-        <div id="rearMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'rear')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="rearMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('rear')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="rearMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="rearExtras"></div></div>
       <div class="opt-group"><div class="opt-label">鑽孔</div><div class="opt-row" id="rearDrill"></div></div>
@@ -156,26 +136,16 @@
   <div class="panel">
     <div class="panel-header"><h2>套板</h2><span class="panel-total" id="plateTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="plateMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('plate')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="plateMatBtn">展開計算</button>
-        </div>
-        <div id="plateMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'plate')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="plateMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('plate')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="plateMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="detail-wrap" id="plateWrap">
         <button class="toggle-btn" onclick="toggleDetail('plateWrap')">▶ 明細</button>
@@ -188,26 +158,16 @@
   <div class="panel">
     <div class="panel-header"><h2>襯套</h2><span class="panel-total" id="bushTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="bushMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('bush')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="bushMatBtn">展開計算</button>
-        </div>
-        <div id="bushMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'bush')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="bushMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('bush')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="bushMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="bushExtras"></div></div>
       <div class="detail-wrap" id="bushWrap">
@@ -221,26 +181,16 @@
   <div class="panel">
     <div class="panel-header"><h2>活塞</h2><span class="panel-total" id="pistTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="pistMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('pist')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="pistMatBtn">展開計算</button>
-        </div>
-        <div id="pistMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'pist')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="pistMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('pist')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="pistMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="pistExtras"></div></div>
       <div class="opt-group"><div class="opt-label">油封</div><div class="opt-row" id="pistOil"></div></div>
@@ -255,26 +205,16 @@
   <div class="panel">
     <div class="panel-header"><h2>固定柱</h2><span class="panel-total" id="fixTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="fixMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('fix')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="fixMatBtn">展開計算</button>
-        </div>
-        <div id="fixMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'fix')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="fixMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('fix')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="fixMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="fixExtras"></div></div>
@@ -312,49 +252,29 @@
   <div class="panel">
     <div class="panel-header"><h2>軸心</h2><span class="panel-total" id="shaftTotal">—</span></div>
     <div class="panel-body">
-      <div class="mat-section" id="shaftMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('shaft')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="shaftMatBtn">展開計算</button>
-        </div>
-        <div id="shaftMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'shaft')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="shaftMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('shaft')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="shaftMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">材質</div><div class="opt-row" id="shaftMat"></div></div>
 
-      <div class="mat-section" id="pipeMatSection">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="opt-label">材料費</div>
-          <button onclick="toggleMatFrame('pipe')"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;"
-            id="pipeMatBtn">展開計算</button>
-        </div>
-        <div id="pipeMatFrame" style="display:none;margin-top:8px;">
-          <iframe src="材料計算機.html"
-            style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius);"
-            onload="bindMatFrame(this, 'pipe')">
-          </iframe>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <input type="text" inputmode="decimal" id="pipeMat" placeholder="材料費"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:5px 10px;font-size:13px;font-weight:600;width:120px;outline:none;"
-            oninput="renderAll()">
-          <span style="font-size:11px;color:var(--text2);">手動輸入或從計算機套用</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="opt-label">材料費</div>
+        <button onclick="openMatCalc('pipe')"
+          style="background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:11px;padding:3px 10px;cursor:pointer;font-family:inherit;">
+          計算材料費
+        </button>
       </div>
+      <input type="text" inputmode="decimal" id="pipeMat" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
       <hr class="divider">
       <div class="opt-group">
         <div class="opt-label">長度（mm）</div>
@@ -399,26 +319,16 @@
     </div>
   </div>
 
-  <!-- 材料費 -->
-  <div class="panel" id="matPanel">
-    <div class="panel-header">
-      <h2>材料計算機</h2>
-      <button onclick="toggleMat()" id="matToggleBtn"
-        style="background:#2d2200;border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);font-size:12px;padding:4px 12px;cursor:pointer;font-family:inherit;">
-        展開
-      </button>
+  <!-- 共用材料計算機 -->
+  <div id="sharedMatPanel" style="display:none;position:sticky;bottom:0;background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);overflow:hidden;z-index:100;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);">
+      <h2 style="font-size:13px;font-weight:600;color:var(--accent);">材料計算機 — <span id="matTargetLabel">—</span></h2>
+      <button onclick="closeMatCalc()"
+        style="background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:0 4px;">✕</button>
     </div>
-    <div id="matFrame" style="display:none;">
-      <iframe src="材料計算機.html" id="matIframe"
-        style="width:100%;height:700px;border:none;border-top:1px solid var(--border);">
-      </iframe>
-    </div>
-    <div class="panel-body" id="matResult" style="display:none;">
-      <div class="detail-row">
-        <span class="dn">材料費（已套用）</span>
-        <span class="dv" id="matCostVal" style="color:var(--accent);font-size:14px;font-weight:700;">—</span>
-      </div>
-    </div>
+    <iframe id="sharedMatIframe" src="材料計算機.html"
+      style="width:100%;height:650px;border:none;">
+    </iframe>
   </div>
 
   <!-- 加工費合計 -->
@@ -782,56 +692,34 @@ function renderAll() {
   updateGrandTotal();
 }
 
-// 各零件材料計算機開關
-function toggleMatFrame(panel) {
-  const frame = document.getElementById(panel+'MatFrame');
-  const btn = document.getElementById(panel+'MatBtn');
-  const isHidden = frame.style.display === 'none';
-  frame.style.display = isHidden ? 'block' : 'none';
-  btn.textContent = isHidden ? '收起' : '展開計算';
+// 共用材料計算機
+const panelLabels = {"front": "前蓋", "rear": "後蓋", "plate": "套板", "bush": "襯套", "pist": "活塞", "fix": "固定柱", "shaft": "軸心", "pipe": "鋼管"};
+let activeMatPanel = null;
+
+function openMatCalc(panel) {
+  activeMatPanel = panel;
+  document.getElementById('matTargetLabel').textContent = panelLabels[panel] || panel;
+  document.getElementById('sharedMatPanel').style.display = 'block';
+  document.getElementById('sharedMatPanel').scrollIntoView({behavior:'smooth', block:'end'});
 }
 
-// 綁定iframe的postMessage
-function bindMatFrame(iframe, panel) {
-  // iframe載入後監聽訊息已由window listener處理
-  iframe.dataset.panel = panel;
+function closeMatCalc() {
+  document.getElementById('sharedMatPanel').style.display = 'none';
+  activeMatPanel = null;
 }
 
-// 接收材料費（辨識來源panel）
-let currentMatPanel = null;
-document.querySelectorAll('iframe').forEach(f => {
-  f.addEventListener('focus', () => { currentMatPanel = f.dataset.panel; });
-});
 
-// 材料計算機開關
-function toggleMat() {
-  const frame = document.getElementById('matFrame');
-  const btn = document.getElementById('matToggleBtn');
-  const isHidden = frame.style.display === 'none';
-  frame.style.display = isHidden ? 'block' : 'none';
-  btn.textContent = isHidden ? '收起' : '展開';
-}
 
 // 接收材料費
 let matCost = 0;
-const panels = ['front','rear','plate','bush','pist','fix','shaft','pipe'];
 window.addEventListener('message', (e) => {
   if(e.data && e.data.type === 'MATERIAL_COST') {
     const amount = e.data.amount || 0;
-    // 找出是哪個iframe傳來的
-    let targetPanel = null;
-    document.querySelectorAll('iframe').forEach(f => {
-      try {
-        if(f.contentWindow === e.source) targetPanel = f.closest('[id$="MatFrame"]')?.id?.replace('MatFrame','');
-      } catch(err){}
-    });
-    if(targetPanel) {
-      const input = document.getElementById(targetPanel+'Mat');
+    if(activeMatPanel) {
+      const input = document.getElementById(activeMatPanel+'Mat');
       if(input) {
         input.value = amount;
-        // 收起iframe
-        document.getElementById(targetPanel+'MatFrame').style.display = 'none';
-        document.getElementById(targetPanel+'MatBtn').textContent = '展開計算';
+        closeMatCalc();
         renderAll();
       }
     }
