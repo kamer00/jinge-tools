@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>材料計算機｜勁格科技</title>
 <style>
-/* 使用系統字型，避免iframe跨域問題 */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -2551,41 +2551,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // 套用到報價單（postMessage 傳回父頁面）
 function applyToQuote(amount) {
   window.parent.postMessage({ type: 'MATERIAL_COST', amount: amount }, '*');
-  // 顯示已套用提示
-  const btn = document.getElementById('applyBtn');
-  if(btn) { btn.textContent = '✓ 已套用'; btn.style.background = '#2d4a2d'; setTimeout(()=>{ btn.textContent = '套用到報價系統'; btn.style.background = ''; }, 2000); }
-}
-
-// 在結果區加入套用按鈕
-function addApplyBtn(amount) {
-  // 移除舊按鈕
-  const old = document.getElementById('applyBtn');
-  if(old) old.remove();
-  if(!amount || amount <= 0) return;
-  const btn = document.createElement('button');
-  btn.id = 'applyBtn';
-  btn.textContent = '套用到報價系統';
-  btn.style.cssText = 'margin-top:12px;width:100%;background:#1a3a1a;border:1px solid #4caf50;border-radius:6px;color:#4caf50;font-size:13px;font-weight:600;padding:10px;cursor:pointer;font-family:inherit;';
-  btn.onclick = () => applyToQuote(amount);
-  const result = document.getElementById('result');
-  if(result) result.appendChild(btn);
 }
 </script>
 
-<script>
-// 監聽結果區變化，自動加套用按鈕
-const resultEl = document.getElementById('result');
-if(resultEl) {
-  const obs = new MutationObserver(() => {
-    const priceEl = resultEl.querySelector('.price-num');
-    if(priceEl) {
-      const text = priceEl.textContent.replace(/[^0-9]/g,'');
-      const amount = parseInt(text)||0;
-      if(amount > 0) addApplyBtn(amount);
-    }
-  });
-  obs.observe(resultEl, { childList: true, subtree: true });
-}
-</script>
 </body>
 </html>
