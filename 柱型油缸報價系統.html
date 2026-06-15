@@ -122,11 +122,25 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('frontMatCost','前蓋')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('front','前蓋')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="frontMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
+          <input type="text" inputmode="decimal" id="frontMillCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">調質費</div>
+          <input type="text" inputmode="decimal" id="frontHtCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+      </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">基本型（二選一）</div><div class="opt-row" id="frontBase"></div></div>
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="frontExtras"></div></div>
@@ -144,11 +158,25 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('rearMatCost','後蓋')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('rear','後蓋')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="rearMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
+          <input type="text" inputmode="decimal" id="rearMillCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">調質費</div>
+          <input type="text" inputmode="decimal" id="rearHtCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+      </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="rearExtras"></div></div>
       <div class="opt-group"><div class="opt-label">鑽孔</div><div class="opt-row" id="rearDrill"></div></div>
@@ -165,11 +193,25 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('plateMatCost','套板')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('plate','套板')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="plateMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
+          <input type="text" inputmode="decimal" id="plateMillCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">調質費</div>
+          <input type="text" inputmode="decimal" id="plateHtCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+      </div>
       <hr class="divider">
       <div class="detail-wrap" id="plateWrap">
         <button class="toggle-btn" onclick="toggleDetail('plateWrap')">▶ 明細</button>
@@ -184,7 +226,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('bushMatCost','襯套')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('bush','襯套')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="bushMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -204,11 +246,25 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('pistMatCost','活塞')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('pist','活塞')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="pistMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
+          <input type="text" inputmode="decimal" id="pistMillCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">調質費</div>
+          <input type="text" inputmode="decimal" id="pistHtCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+      </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="pistExtras"></div></div>
       <div class="opt-group"><div class="opt-label">油封</div><div class="opt-row" id="pistOil"></div></div>
@@ -223,6 +279,28 @@
   <div class="panel">
     <div class="panel-header"><h2>固定柱</h2><span class="panel-total" id="fixTotal">—</span></div>
     <div class="panel-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('fix','固定柱')">⚙ 計算</button>
+      </div>
+      <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
+          <input type="text" inputmode="decimal" id="fixMillCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+        <div>
+          <div class="opt-label" style="margin-bottom:3px">調質費</div>
+          <input type="text" inputmode="decimal" id="fixHtCost" placeholder="NT$"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+            oninput="renderAll()">
+        </div>
+      </div>
+      <hr class="divider">
       <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="fixExtras"></div></div>
       <div class="detail-wrap" id="fixWrap">
@@ -263,9 +341,9 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('pipeMatCost','軸心')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('shaft','軸心')">⚙ 計算</button>
       </div>
-      <input type="text" inputmode="decimal" id="pipeMatCost" placeholder="材料費（NT$）"
+      <input type="text" inputmode="decimal" id="shaftMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
       <hr class="divider">
@@ -286,6 +364,14 @@
   <div class="panel">
     <div class="panel-header"><h2>鋼管</h2><span class="panel-total" id="pipeTotal">—</span></div>
     <div class="panel-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('pipe','鋼管')">⚙ 計算</button>
+      </div>
+      <input type="text" inputmode="decimal" id="pipeMatCost" placeholder="材料費（NT$）"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
+        oninput="renderAll()">
+      <hr class="divider">
       <div class="opt-group">
         <div class="opt-label">長度（mm）</div>
         <input type="text" inputmode="decimal" id="pipeLen" placeholder="輸入長度"
@@ -642,13 +728,26 @@ function renderAll() {
     'bushTotal':'bushMatCost','pistTotal':'pistMatCost','fixTotal':'fixMatCost',
     'shaftTotal':'shaftMatCost','pipeTotal':'pipeMatCost'
   };
+  const millIds = {
+    'frontTotal':'frontMillCost','rearTotal':'rearMillCost','plateTotal':'plateMillCost',
+    'pistTotal':'pistMillCost','fixTotal':'fixMillCost'
+  };
+  const htIds = {
+    'frontTotal':'frontHtCost','rearTotal':'rearHtCost','plateTotal':'plateHtCost',
+    'pistTotal':'pistHtCost','fixTotal':'fixHtCost'
+  };
   const setTotal=(id,items,cond)=>{
     const hasData = S.bore!==null&&(cond===undefined||cond)&&items&&items.length;
     const processAmt = hasData ? total(items) : 0;
-    const matEl = matIds[id] ? document.getElementById(matIds[id]) : null;
-    const matAmt = matEl ? (parseInt(matEl.value)||0) : 0;
-    const grandAmt = processAmt + matAmt;
-    document.getElementById(id).textContent = hasData||matAmt>0 ? fmt(grandAmt) : '—';
+    const matEl  = matIds[id]  ? document.getElementById(matIds[id])  : null;
+    const millEl = millIds[id] ? document.getElementById(millIds[id]) : null;
+    const htEl   = htIds[id]   ? document.getElementById(htIds[id])   : null;
+    const matAmt  = matEl  ? (parseInt(matEl.value)||0)  : 0;
+    const millAmt = millEl ? (parseInt(millEl.value)||0) : 0;
+    const htAmt   = htEl   ? (parseInt(htEl.value)||0)   : 0;
+    const grandAmt = processAmt + matAmt + millAmt + htAmt;
+    const hasAny = hasData||matAmt>0||millAmt>0||htAmt>0;
+    document.getElementById(id).textContent = hasAny ? fmt(grandAmt) : '—';
   };
   setTotal('frontTotal',fi);
   setTotal('rearTotal',ri);
@@ -745,10 +844,10 @@ initButtons();
 </div>
 
 <script>
-let _mcTarget = null;
+let _mcPrefix = null;
 
-function mcOpen(targetId, label) {
-  _mcTarget = targetId;
+function mcOpen(prefix, label) {
+  _mcPrefix = prefix;
   document.getElementById('mc-label').textContent = label;
   document.getElementById('mc-overlay').classList.add('open');
   document.getElementById('mc-panel').classList.add('open');
@@ -759,18 +858,22 @@ function mcClose() {
   document.getElementById('mc-panel').classList.remove('open');
 }
 
-// 接收材料計算機傳來的金額
+// 接收材料計算機傳來的金額（支援材料費/銑床費/調質費）
 window.addEventListener('message', function(e) {
-  if (!e.data || e.data.type !== 'MATERIAL_COST') return;
-  const amount = e.data.amount;
-  if (_mcTarget && amount > 0) {
-    const el = document.getElementById(_mcTarget);
-    if (el) {
-      el.value = amount;
-      el.dispatchEvent(new Event('input'));
-    }
+  if (!e.data || !_mcPrefix) return;
+  const {type, amount} = e.data;
+  if (!amount || amount <= 0) return;
+  let fieldId;
+  if (type === 'MATERIAL_COST')  fieldId = _mcPrefix + 'MatCost';
+  else if (type === 'MILLING_COST') fieldId = _mcPrefix + 'MillCost';
+  else if (type === 'HT_COST')   fieldId = _mcPrefix + 'HtCost';
+  else return;
+  const el = document.getElementById(fieldId);
+  if (el) {
+    el.value = amount;
+    el.dispatchEvent(new Event('input'));
   }
-  mcClose();
+  if (type === 'MATERIAL_COST') mcClose();
 });
 </script>
 
