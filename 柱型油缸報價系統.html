@@ -127,11 +127,13 @@
       <input type="text" inputmode="decimal" id="frontMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="frontMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">銑床費</div>
         <input type="text" inputmode="decimal" id="frontMillCost" placeholder="NT$"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
           oninput="renderAll()">
+      <div id="frontMillSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">基本型（二選一）</div><div class="opt-row" id="frontBase"></div></div>
@@ -155,11 +157,13 @@
       <input type="text" inputmode="decimal" id="rearMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="rearMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">銑床費</div>
         <input type="text" inputmode="decimal" id="rearMillCost" placeholder="NT$"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
           oninput="renderAll()">
+      <div id="rearMillSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="rearExtras"></div></div>
@@ -182,11 +186,13 @@
       <input type="text" inputmode="decimal" id="plateMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="plateMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">銑床費</div>
         <input type="text" inputmode="decimal" id="plateMillCost" placeholder="NT$"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
           oninput="renderAll()">
+      <div id="plateMillSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
       <div class="detail-wrap" id="plateWrap">
@@ -207,6 +213,7 @@
       <input type="text" inputmode="decimal" id="bushMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="bushMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="bushExtras"></div></div>
       <div class="detail-wrap" id="bushWrap">
@@ -227,6 +234,7 @@
       <input type="text" inputmode="decimal" id="pistMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="pistMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
 
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="pistExtras"></div></div>
@@ -249,11 +257,13 @@
       <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="fixMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">調質費</div>
         <input type="text" inputmode="decimal" id="fixHtCost" placeholder="NT$"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
           oninput="renderAll()">
+      <div id="fixHtSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
@@ -301,11 +311,13 @@
       <input type="text" inputmode="decimal" id="shaftMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="shaftMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:-2px;margin-bottom:8px;">
         <div class="opt-label" style="margin-bottom:3px">調質費</div>
         <input type="text" inputmode="decimal" id="shaftHtCost" placeholder="NT$"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
           oninput="renderAll()">
+      <div id="shaftHtSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
       <div class="opt-group">
@@ -332,6 +344,7 @@
       <input type="text" inputmode="decimal" id="pipeMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div id="pipeMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <hr class="divider">
       <div class="opt-group">
         <div class="opt-label">長度（mm）</div>
@@ -841,6 +854,8 @@ window.addEventListener('message', function(e) {
     el.value = amount;
     el.dispatchEvent(new Event('input'));
   }
+  const specEl = document.getElementById(fieldId.replace('Cost','Spec'));
+  if (specEl && e.data.spec) specEl.textContent = e.data.spec;
   if (type === 'MATERIAL_COST') mcClose();
 });
 </script>
