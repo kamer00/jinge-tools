@@ -2059,7 +2059,18 @@ function calculate() {
   }
 
   // 套用按鈕（只在有金額時顯示，且在 iframe 模式下才出現）
+  const _inFrame = window.self !== window.top;
   let applyBtnHTML = '';
+  if(_inFrame && hasCost) {
+    const _applyAmt = Math.round(totalKg * unitPrice + autoSawFeeAmt);
+    applyBtnHTML = '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">'
+      + '<button onclick="applyToQuote(' + _applyAmt + ')" style="'
+      + 'width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;'
+      + 'color:#3fb950;cursor:pointer;font-family:var(--mono);font-size:14px;'
+      + 'font-weight:700;padding:14px;letter-spacing:1px">'
+      + '✓ 套用到報價系統&nbsp;&nbsp;NT$ ' + _applyAmt.toLocaleString('zh-TW')
+      + '</button></div>';
+  }
 
   // 銑床加工費卡片（板材才顯示）
   let millingHTML = '';

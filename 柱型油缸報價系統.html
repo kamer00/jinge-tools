@@ -51,6 +51,39 @@
   .detail-row.sub .dn { color: var(--text); font-weight: 600; font-size: 13px; }
   .detail-row.sub .dv { color: var(--accent); font-size: 14px; font-weight: 700; }
   .na { color: var(--text2); font-size: 12px; font-style: italic; }
+
+  /* ── 材料計算機側邊面板 ── */
+  #mc-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.6); z-index:1000;
+  }
+  #mc-panel {
+    display:none; position:fixed;
+    top:0; right:0; width:min(420px,100vw); height:100vh;
+    background:#0d1117; border-left:2px solid #e8a020;
+    z-index:1001; flex-direction:column;
+  }
+  #mc-panel.open, #mc-overlay.open { display:flex; }
+  #mc-overlay.open { display:block; }
+  #mc-panel-hdr {
+    background:#161b22; border-bottom:1px solid #444c56;
+    padding:12px 16px; display:flex;
+    justify-content:space-between; align-items:center; flex-shrink:0;
+  }
+  #mc-panel-hdr .title  { font-size:11px; color:#e8a020; letter-spacing:1px; font-weight:700; }
+  #mc-panel-hdr .label  { font-size:14px; font-weight:600; color:#e6edf3; margin-top:2px; }
+  #mc-panel-hdr .close  {
+    background:none; border:none; color:#cdd9e5;
+    font-size:22px; cursor:pointer; padding:0 4px; line-height:1;
+  }
+  #mc-frame { flex:1; border:none; width:100%; }
+  .mc-open-btn {
+    background:rgba(232,160,32,.1); border:1px solid rgba(232,160,32,.4);
+    border-radius:4px; color:#e8a020; cursor:pointer;
+    font-size:11px; font-weight:700; padding:3px 10px;
+    white-space:nowrap; transition:background .15s;
+  }
+  .mc-open-btn:hover { background:rgba(232,160,32,.2); }
 </style>
 </head>
 <body>
@@ -89,6 +122,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('frontMatCost','前蓋')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="frontMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -110,6 +144,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('rearMatCost','後蓋')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="rearMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -130,6 +165,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('plateMatCost','套板')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="plateMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -148,6 +184,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('bushMatCost','襯套')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="bushMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -167,6 +204,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('pistMatCost','活塞')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="pistMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -225,6 +263,7 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
+        <button class="mc-open-btn" onclick="mcOpen('pipeMatCost','軸心')">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="pipeMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -691,5 +730,49 @@ function updateGrandTotal() {
 initBores();
 initButtons();
 </script>
+
+<!-- ── 材料計算機側邊面板 ── -->
+<div id="mc-overlay" onclick="mcClose()"></div>
+<div id="mc-panel">
+  <div id="mc-panel-hdr">
+    <div>
+      <div class="title">⚙ 材料費計算</div>
+      <div id="mc-label" class="label">—</div>
+    </div>
+    <button class="close" onclick="mcClose()">×</button>
+  </div>
+  <iframe id="mc-frame" src="%E6%9D%90%E6%96%99%E8%A8%88%E7%AE%97%E6%A9%9F.html"></iframe>
+</div>
+
+<script>
+let _mcTarget = null;
+
+function mcOpen(targetId, label) {
+  _mcTarget = targetId;
+  document.getElementById('mc-label').textContent = label;
+  document.getElementById('mc-overlay').classList.add('open');
+  document.getElementById('mc-panel').classList.add('open');
+}
+
+function mcClose() {
+  document.getElementById('mc-overlay').classList.remove('open');
+  document.getElementById('mc-panel').classList.remove('open');
+}
+
+// 接收材料計算機傳來的金額
+window.addEventListener('message', function(e) {
+  if (!e.data || e.data.type !== 'MATERIAL_COST') return;
+  const amount = e.data.amount;
+  if (_mcTarget && amount > 0) {
+    const el = document.getElementById(_mcTarget);
+    if (el) {
+      el.value = amount;
+      el.dispatchEvent(new Event('input'));
+    }
+  }
+  mcClose();
+});
+</script>
+
 </body>
 </html>
