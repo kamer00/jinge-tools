@@ -938,7 +938,12 @@ function renderMillingCard(L, W, T, matName) {
     const _ma=Math.round(final);
     const _md=document.createElement('div');
     _md.style.cssText='margin-top:10px';
-    _md.innerHTML='<button onclick="applyToQuote('+_ma+',\'MILLING_COST\')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:13px;font-weight:700;padding:10px;">✓ 套用銑床費　NT$ '+_ma.toLocaleString('zh-TW')+'</button>';
+    const _mspec='銑六面 L'+L+'×W'+W+'×T'+T+'mm ('+mc.label+')';
+    const _mb2=document.createElement('button');
+    _mb2.textContent='✓ 套用銑床費　NT$ '+_ma.toLocaleString('zh-TW');
+    _mb2.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:13px;font-weight:700;padding:10px;';
+    _mb2.onclick=function(){ applyToQuote(_ma,'MILLING_COST',_mspec); };
+    _md.appendChild(_mb2);
     document.getElementById('milling-result').appendChild(_md);
   }
 }
@@ -1123,7 +1128,12 @@ function renderHtResult() {
     const _ha=Math.round(cost);
     const _hd=document.createElement('div');
     _hd.style.cssText='margin-top:10px';
-    _hd.innerHTML='<button onclick="applyToQuote('+_ha+',\'HT_COST\')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:13px;font-weight:700;padding:10px;">✓ 套用調質費　NT$ '+_ha.toLocaleString('zh-TW')+'</button>';
+    const _hspec=ht.label+' / '+kg.toFixed(2)+'kg';
+    const _hb=document.createElement('button');
+    _hb.textContent='✓ 套用調質費　NT$ '+_ha.toLocaleString('zh-TW');
+    _hb.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:13px;font-weight:700;padding:10px;';
+    _hb.onclick=function(){ applyToQuote(_ha,'HT_COST',_hspec); };
+    _hd.appendChild(_hb);
     res.appendChild(_hd);
   }
 }
@@ -1796,9 +1806,14 @@ function calculate() {
     document.getElementById('result').innerHTML = '<div class="res-card"><div class="res-card-header">STKM13C '+typeLabel[tp]+' Ø'+p.id+'×Ø'+p.od+' ／ '+L+'mm</div><div class="res-card-body">'+html+'</div></div>';
     if(window.self!==window.top){
       const _pa=Math.round(best.px*L*qty);
+      const _pspec='STKM13C '+typeLabel[tp]+' Ø'+p.id+'×Ø'+p.od+' / L'+L+'mm';
       const _pd=document.createElement('div');
       _pd.style.cssText='margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
-      _pd.innerHTML='<button onclick="applyToQuote('+_pa+')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;">✓ 套用到報價系統　NT$ '+_pa.toLocaleString('zh-TW')+'</button>';
+      const _pb=document.createElement('button');
+      _pb.textContent='✓ 套用到報價系統　NT$ '+_pa.toLocaleString('zh-TW');
+      _pb.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;';
+      _pb.onclick=function(){ applyToQuote(_pa,'MATERIAL_COST',_pspec); };
+      _pd.appendChild(_pb);
       document.getElementById('result').appendChild(_pd);
     }
     return;
@@ -1822,9 +1837,14 @@ function calculate() {
     document.getElementById('result').innerHTML = '<div class="res-card"><div class="res-card-header">硬鉻軸心 Ø'+s.dia+'mm '+matMap[mat]+' ／ '+L+'mm</div><div class="res-card-body"><div class="price-big"><div class="price-label-sm">HIGHEST PRICE</div><div class="price-num">NT$ '+fmtNT(shaftTotal)+'</div><div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+'mm'+(shaftSawFee>0?' + 材切 NT$'+shaftSawFee:'')+'</div></div><div style="margin-top:12px"><div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+':'+x.px+'元/mm').join('　')+'</span></div>'+sawNote+'</div></div></div>';
     if (window.self !== window.top) {
       const _sa = Math.round(shaftTotal);
+      const _sspec = '硬鉻軸心 Ø'+s.dia+'mm '+matMap[mat]+' / L'+L+'mm';
       const _sd = document.createElement('div');
       _sd.style.cssText = 'margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
-      _sd.innerHTML = '<button onclick="applyToQuote('+_sa+')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;letter-spacing:1px">✓ 套用到報價系統　NT$ '+_sa.toLocaleString('zh-TW')+'</button>';
+      const _sb = document.createElement('button');
+      _sb.textContent = '✓ 套用到報價系統　NT$ '+_sa.toLocaleString('zh-TW');
+      _sb.style.cssText = 'width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;letter-spacing:1px';
+      _sb.onclick = function(){ applyToQuote(_sa, 'MATERIAL_COST', _sspec); };
+      _sd.appendChild(_sb);
       document.getElementById('result').appendChild(_sd);
     }
     return;
@@ -1896,9 +1916,14 @@ function calculate() {
         '</div></div></div>';
       if(window.self!==window.top){
         const _pia=Math.round(total);
+        const _pispec=matLabel+' Ø'+p.id+'×Ø'+p.od+' / L'+L+'mm';
         const _pid=document.createElement('div');
         _pid.style.cssText='margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
-        _pid.innerHTML='<button onclick="applyToQuote('+_pia+')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;">✓ 套用到報價系統　NT$ '+_pia.toLocaleString('zh-TW')+'</button>';
+        const _pib=document.createElement('button');
+        _pib.textContent='✓ 套用到報價系統　NT$ '+_pia.toLocaleString('zh-TW');
+        _pib.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;';
+        _pib.onclick=function(){ applyToQuote(_pia,'MATERIAL_COST',_pispec); };
+        _pid.appendChild(_pib);
         document.getElementById('result').appendChild(_pid);
       }
       return;
@@ -2135,9 +2160,18 @@ function calculate() {
   // 材料費套用按鈕（iframe 模式，DOM 追加）
   if(window.self !== window.top && hasCost) {
     const _ma = Math.round(totalKg * unitPrice + autoSawFeeAmt);
+    let _spec = matDisplay;
+    if(currentShape==='bar_rnd') _spec += ' Ø'+(dims.D||'')+(dims.ID?' 中空':'')+'×'+dims.L+'mm';
+    else if(currentShape==='bar_sq') _spec += ' □'+dims.A+'×'+dims.L+'mm';
+    else if(currentShape==='bar_hex') _spec += ' ⬡'+dims.S+'×'+dims.L+'mm';
+    else if(currentShape==='plate') _spec += ' '+dims.L+'×'+dims.W+'×T'+dims.T+'mm';
     const _md = document.createElement('div');
     _md.style.cssText = 'margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
-    _md.innerHTML = '<button onclick="applyToQuote('+_ma+')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;letter-spacing:1px">✓ 套用到報價系統\u3000NT$ '+_ma.toLocaleString('zh-TW')+'</button>';
+    const _mb = document.createElement('button');
+    _mb.textContent = '✓ 套用到報價系統　NT$ '+_ma.toLocaleString('zh-TW');
+    _mb.style.cssText = 'width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;letter-spacing:1px';
+    _mb.onclick = function(){ applyToQuote(_ma, 'MATERIAL_COST', _spec); };
+    _md.appendChild(_mb);
     document.getElementById('result').appendChild(_md);
   }
 
@@ -2635,8 +2669,8 @@ window.addEventListener('message', function(e) {
 });
 
 // 套用到報價單（postMessage 傳回父頁面）
-function applyToQuote(amount, type) {
-  window.parent.postMessage({ type: type||'MATERIAL_COST', amount: amount }, '*');
+function applyToQuote(amount, type, spec) {
+  window.parent.postMessage({ type: type||'MATERIAL_COST', amount: amount, spec: spec||'' }, '*');
 }
 </script>
 
