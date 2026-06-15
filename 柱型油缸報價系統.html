@@ -456,23 +456,37 @@ function p(panel, key) { const i=idx(); return i<0?0:PRICE[panel][key][i]; }
 function fmt(n) { return '$'+Math.round(n).toLocaleString(); }
 
 function mkRadio(id, opts, getV, setV) {
-  const el=document.getElementById(id); el.innerHTML='';
-  opts.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.className='opt-btn'+(getV()===opt?' active':'');
-    btn.textContent=opt;
-    btn.addEventListener('click',()=>{ setV(opt); renderAll(); });
-    el.appendChild(btn);
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(el.children.length === 0) {
+    opts.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='opt-btn';
+      btn.textContent=opt;
+      btn.addEventListener('click',()=>{ setV(opt); renderAll(); });
+      el.appendChild(btn);
+    });
+  }
+  // 只更新active狀態
+  Array.from(el.children).forEach((btn,i)=>{
+    btn.classList.toggle('active', opts[i]===getV());
   });
 }
 function mkCheck(id, opts, getMap, setFn) {
-  const el=document.getElementById(id); el.innerHTML='';
-  opts.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.className='opt-btn'+(getMap()[opt]?' active':'');
-    btn.textContent=opt;
-    btn.addEventListener('click',()=>{ setFn(opt); renderAll(); });
-    el.appendChild(btn);
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(el.children.length === 0) {
+    opts.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='opt-btn';
+      btn.textContent=opt;
+      btn.addEventListener('click',()=>{ setFn(opt); renderAll(); });
+      el.appendChild(btn);
+    });
+  }
+  // 只更新active狀態
+  Array.from(el.children).forEach((btn,i)=>{
+    btn.classList.toggle('active', !!getMap()[opts[i]]);
   });
 }
 
