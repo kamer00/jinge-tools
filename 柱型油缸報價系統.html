@@ -341,7 +341,7 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('shaft','軸心')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('shaft','軸心',{shape:'shaft',dia:parseFloat(document.getElementById('shaftDia').value)||0})">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="shaftMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -366,7 +366,7 @@
     <div class="panel-body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('pipe','鋼管')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpen('pipe','鋼管',{shape:'prod_pipe',bore:S.bore||0})">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="pipeMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -846,11 +846,20 @@ initButtons();
 <script>
 let _mcPrefix = null;
 
-function mcOpen(prefix, label) {
+function mcOpen(prefix, label, prefill) {
   _mcPrefix = prefix;
   document.getElementById('mc-label').textContent = label;
   document.getElementById('mc-overlay').classList.add('open');
   document.getElementById('mc-panel').classList.add('open');
+  if (prefill) {
+    // 稍等 iframe ready 再送 PREFILL
+    setTimeout(function() {
+      const fr = document.getElementById('mc-frame');
+      if (fr && fr.contentWindow) {
+        fr.contentWindow.postMessage(Object.assign({type:'PREFILL'}, prefill), '*');
+      }
+    }, 120);
+  }
 }
 
 function mcClose() {

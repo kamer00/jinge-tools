@@ -2132,6 +2132,15 @@ function calculate() {
     htHTML +
     applyBtnHTML;
 
+  // 材料費套用按鈕（iframe 模式，DOM 追加）
+  if(window.self !== window.top && hasCost) {
+    const _ma = Math.round(totalKg * unitPrice + autoSawFeeAmt);
+    const _md = document.createElement('div');
+    _md.style.cssText = 'margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
+    _md.innerHTML = '<button onclick="applyToQuote('+_ma+')" style="width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;letter-spacing:1px">✓ 套用到報價系統\u3000NT$ '+_ma.toLocaleString('zh-TW')+'</button>';
+    document.getElementById('result').appendChild(_md);
+  }
+
   // 初始化銑床計算
   if(millingHTML) triggerMillingCalc();
   // 初始化熱處理計算
@@ -2581,6 +2590,48 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+});
+
+
+// ── 報價系統 PREFILL 整合 ──────────────────────────────────────
+window.addEventListener('message', function(e) {
+  if (!e.data || e.data.type !== 'PREFILL') return;
+  const d = e.data;
+
+  if (d.shape === 'shaft') {
+    // 切換到硬鉻軸形狀
+    setShape('shaft');
+    if (d.dia > 0) {
+      // 找最接近的外徑 index（s45c 有報價的）
+      let bestIdx = -1, bestDiff = Infinity;
+      SHAFT_PRICES.forEach((s, i) => {
+        if ((s.jy_s45c || s.yi_s45c) && Math.abs(s.dia - d.dia) < bestDiff) {
+          bestDiff = Math.abs(s.dia - d.dia);
+          bestIdx = i;
+        }
+      });
+      if (bestIdx >= 0) {
+        const sel = document.getElementById('dim-SH_DIA');
+        if (sel) sel.value = bestIdx;
+      }
+    }
+  } else if (d.shape === 'prod_pipe') {
+    // 切換到成品管形狀
+    setShape('prod_pipe');
+    if (d.bore > 0) {
+      // 找 id（內徑）等於缸徑的規格，優先完全符合，否則最接近
+      let bestIdx = 0, bestDiff = Infinity;
+      STKM_PRICES.forEach((p, i) => {
+        const diff = Math.abs(p.id - d.bore);
+        if (diff < bestDiff) { bestDiff = diff; bestIdx = i; }
+      });
+      const sel = document.getElementById('dim-PP_SPEC');
+      if (sel) {
+        sel.value = bestIdx;
+        updateProdPipeHint();
+      }
+    }
+  }
 });
 
 // 套用到報價單（postMessage 傳回父頁面）
