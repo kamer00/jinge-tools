@@ -251,19 +251,11 @@
       <input type="text" inputmode="decimal" id="pistMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
-        <div>
-          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
-          <input type="text" inputmode="decimal" id="pistMillCost" placeholder="NT$"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
-            oninput="renderAll()">
-        </div>
-        <div>
-          <div class="opt-label" style="margin-bottom:3px">調質費</div>
-          <input type="text" inputmode="decimal" id="pistHtCost" placeholder="NT$"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
-            oninput="renderAll()">
-        </div>
+      <div style="margin-top:6px;">
+        <div class="opt-label" style="margin-bottom:3px">調質費</div>
+        <input type="text" inputmode="decimal" id="pistHtCost" placeholder="NT$"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+          oninput="renderAll()">
       </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="pistExtras"></div></div>
@@ -286,19 +278,11 @@
       <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
-        <div>
-          <div class="opt-label" style="margin-bottom:3px">銑床費</div>
-          <input type="text" inputmode="decimal" id="fixMillCost" placeholder="NT$"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#58a6ff;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
-            oninput="renderAll()">
-        </div>
-        <div>
-          <div class="opt-label" style="margin-bottom:3px">調質費</div>
-          <input type="text" inputmode="decimal" id="fixHtCost" placeholder="NT$"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
-            oninput="renderAll()">
-        </div>
+      <div style="margin-top:6px;">
+        <div class="opt-label" style="margin-bottom:3px">調質費</div>
+        <input type="text" inputmode="decimal" id="fixHtCost" placeholder="NT$"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+          oninput="renderAll()">
       </div>
       <hr class="divider">
       <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
@@ -346,6 +330,12 @@
       <input type="text" inputmode="decimal" id="shaftMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
+      <div style="margin-top:-2px;margin-bottom:8px;">
+        <div class="opt-label" style="margin-bottom:3px">調質費</div>
+        <input type="text" inputmode="decimal" id="shaftHtCost" placeholder="NT$"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:#3fb950;padding:6px 10px;font-size:12px;font-weight:600;width:100%;outline:none;"
+          oninput="renderAll()">
+      </div>
       <hr class="divider">
       <div class="opt-group">
         <div class="opt-label">長度（mm）</div>
@@ -729,12 +719,11 @@ function renderAll() {
     'shaftTotal':'shaftMatCost','pipeTotal':'pipeMatCost'
   };
   const millIds = {
-    'frontTotal':'frontMillCost','rearTotal':'rearMillCost','plateTotal':'plateMillCost',
-    'pistTotal':'pistMillCost','fixTotal':'fixMillCost'
+    'frontTotal':'frontMillCost','rearTotal':'rearMillCost','plateTotal':'plateMillCost'
   };
   const htIds = {
     'frontTotal':'frontHtCost','rearTotal':'rearHtCost','plateTotal':'plateHtCost',
-    'pistTotal':'pistHtCost','fixTotal':'fixHtCost'
+    'pistTotal':'pistHtCost','fixTotal':'fixHtCost','shaftTotal':'shaftHtCost'
   };
   const setTotal=(id,items,cond)=>{
     const hasData = S.bore!==null&&(cond===undefined||cond)&&items&&items.length;
