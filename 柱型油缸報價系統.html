@@ -84,7 +84,42 @@
     white-space:nowrap; transition:background .15s;
   }
   .mc-open-btn:hover { background:rgba(232,160,32,.2); }
+
+  /* ── 報價工具列 ── */
+  .quote-toolbar {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .quote-info-row {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+  }
+  .quote-info-group { display:flex; flex-direction:column; gap:4px; }
+  .quote-info-label { font-size:10px; color:var(--text2); font-weight:700; letter-spacing:.5px; }
+  .quote-info-input {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); color:var(--text);
+    font-size:13px; font-weight:600; padding:6px 10px;
+    outline:none; width:100%;
+  }
+  .quote-info-input:focus { border-color:var(--accent); }
+  .action-row { display:flex; gap:6px; flex-wrap:wrap; }
+  .act-btn {
+    padding:6px 12px; border-radius:var(--radius); cursor:pointer;
+    font-size:12px; font-weight:600; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text2); transition:all .15s;
+    display:flex; align-items:center; gap:4px;
+  }
+  .act-btn:hover { border-color:var(--accent); color:var(--text); }
+  .act-btn.primary { background:var(--accent); border-color:var(--accent); color:#111; }
+  .act-btn.primary:hover { opacity:.9; }
+  .act-btn.pdf { background:#c00; border-color:#c00; color:#fff; }
+  .act-btn.pdf:hover { background:#a00; }
+  #save-status { font-size:11px; color:var(--text2); align-self:center; margin-left:auto; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <header>
@@ -93,6 +128,32 @@
   <span>勁格科技股份有限公司</span>
 </header>
 <div class="main">
+
+  <!-- 報價工具列 -->
+  <div class="quote-toolbar">
+    <div class="quote-info-row">
+      <div class="quote-info-group">
+        <div class="quote-info-label">客戶</div>
+        <input id="quoteCustomer" class="quote-info-input" placeholder="客戶名稱" oninput="markDirty()">
+      </div>
+      <div class="quote-info-group">
+        <div class="quote-info-label">案號</div>
+        <input id="quoteCase" class="quote-info-input" placeholder="案號" oninput="markDirty()">
+      </div>
+      <div class="quote-info-group">
+        <div class="quote-info-label">日期</div>
+        <input id="quoteDate" type="date" class="quote-info-input" oninput="markDirty()">
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="act-btn primary" onclick="saveToLS()">💾 儲存</button>
+      <button class="act-btn" onclick="loadFromLS()">📂 載入</button>
+      <button class="act-btn" onclick="exportJSON()">📥 匯出 JSON</button>
+      <button class="act-btn" onclick="importJSON()">📤 匯入 JSON</button>
+      <button class="act-btn pdf" onclick="downloadPDF()">📄 下載 PDF</button>
+      <span id="save-status"></span>
+    </div>
+  </div>
 
   <div class="bore-section">
     <div class="input-row">
@@ -733,6 +794,7 @@ function renderAll() {
   setTotal('pipeTotal',ppei);
   setTotal('partTotal',pri);
   updateGrandTotal();
+  autoSave();
 }
 
 function initBores() {
@@ -800,6 +862,253 @@ function updateGrandTotal() {
 
 initBores();
 initButtons();
+
+// ═══════════════════════════════════════════════════
+// 儲存 / 載入 / PDF
+// ═══════════════════════════════════════════════════
+const LS_KEY = 'jinge_quote_v1';
+
+const COST_INPUTS = [
+  'frontMatCost','rearMatCost','plateMatCost','bushMatCost','pistMatCost',
+  'fixMatCost','shaftMatCost','pipeMatCost',
+  'frontMillCost','rearMillCost','plateMillCost',
+  'fixHtCost','shaftHtCost',
+];
+const SPEC_DIVS = [
+  'frontMatSpec','rearMatSpec','plateMatSpec','bushMatSpec','pistMatSpec',
+  'fixMatSpec','shaftMatSpec','pipeMatSpec',
+  'frontMillSpec','rearMillSpec','plateMillSpec',
+  'fixHtSpec','shaftHtSpec',
+];
+const EXTRA_INPUTS = ['shaftDia','shaftLen','pipeLen','boreManual','quoteCustomer','quoteCase','quoteDate'];
+
+function getQuoteState() {
+  const inputs = {}, specs = {};
+  [...COST_INPUTS, ...EXTRA_INPUTS].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) inputs[id] = el.value;
+  });
+  SPEC_DIVS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) specs[id] = el.textContent;
+  });
+  const boreEl = document.getElementById('boreSelect');
+  return { S: {...S}, inputs, specs,
+    boreSelectVal: boreEl?.value || '',
+    savedAt: new Date().toISOString() };
+}
+
+function loadQuoteState(data) {
+  if (!data) return;
+  // 還原 S
+  Object.assign(S, data.S);
+  // 還原 bore UI
+  const boreEl = document.getElementById('boreSelect');
+  if (boreEl && data.boreSelectVal) {
+    boreEl.value = data.boreSelectVal;
+    if (data.boreSelectVal === 'manual') {
+      document.getElementById('boreManual').style.display = '';
+    }
+  }
+  // 還原輸入欄
+  Object.entries(data.inputs || {}).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  });
+  // 還原規格描述
+  Object.entries(data.specs || {}).forEach(([id, txt]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  });
+  initButtons();
+  renderAll();
+}
+
+// ── localStorage ──────────────────────────────────
+function saveToLS() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(getQuoteState()));
+    showStatus('已儲存 ✓');
+  } catch(e) { alert('儲存失敗：' + e.message); }
+}
+function loadFromLS() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (!raw) { alert('沒有找到已儲存的報價單'); return; }
+  try {
+    loadQuoteState(JSON.parse(raw));
+    showStatus('已載入 ✓');
+  } catch(e) { alert('載入失敗：' + e.message); }
+}
+function showStatus(msg) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.textContent = msg;
+  setTimeout(() => el.textContent = '', 2500);
+}
+function markDirty() {} // 預留
+
+// 自動儲存（每次 renderAll 後執行）
+function autoSave() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(getQuoteState())); } catch(e) {}
+}
+
+// ── JSON 匯出 / 匯入 ──────────────────────────────
+function exportJSON() {
+  const data = getQuoteState();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const cust = document.getElementById('quoteCustomer')?.value || '報價';
+  const cas  = document.getElementById('quoteCase')?.value || '';
+  a.download = '報價單_' + cust + (cas ? '_'+cas : '') + '.json';
+  a.click();
+}
+function importJSON() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        const data = JSON.parse(evt.target.result);
+        loadQuoteState(data);
+        showStatus('匯入成功 ✓');
+      } catch(err) { alert('檔案格式錯誤'); }
+    };
+    reader.readAsText(file, 'utf-8');
+  };
+  input.click();
+}
+
+// ── PDF 下載 ─────────────────────────────────────
+const PDF_PARTS = [
+  {name:'前蓋',  total:'frontTotal',  mat:'frontMatCost',  mill:'frontMillCost',  ht:null},
+  {name:'後蓋',  total:'rearTotal',   mat:'rearMatCost',   mill:'rearMillCost',   ht:null},
+  {name:'套板',  total:'plateTotal',  mat:'plateMatCost',  mill:'plateMillCost',  ht:null},
+  {name:'襯套',  total:'bushTotal',   mat:'bushMatCost',   mill:null,             ht:null},
+  {name:'活塞',  total:'pistTotal',   mat:'pistMatCost',   mill:null,             ht:null},
+  {name:'固定柱',total:'fixTotal',    mat:'fixMatCost',    mill:null,             ht:'fixHtCost'},
+  {name:'五金',  total:'hwTotal',     mat:null,            mill:null,             ht:null},
+  {name:'CU+AIR',total:'cuairTotal',  mat:null,            mill:null,             ht:null},
+  {name:'軸心',  total:'shaftTotal',  mat:'shaftMatCost',  mill:null,             ht:'shaftHtCost'},
+  {name:'鋼管',  total:'pipeTotal',   mat:'pipeMatCost',   mill:null,             ht:null},
+  {name:'配件',  total:'partTotal',   mat:null,            mill:null,             ht:null},
+];
+
+function fmtN(n) { return n > 0 ? n.toLocaleString('zh-TW') : '—'; }
+
+function buildPDFRows() {
+  return PDF_PARTS.map(p => {
+    const totalEl = document.getElementById(p.total);
+    const totalTxt = totalEl?.textContent || '—';
+    if (totalTxt === '—') return '';
+    const totalNum = parseInt(totalTxt.replace(/[^0-9]/g,'')) || 0;
+    if (totalNum === 0) return '';
+    const mat  = p.mat  ? (parseInt(document.getElementById(p.mat)?.value)||0)  : 0;
+    const mill = p.mill ? (parseInt(document.getElementById(p.mill)?.value)||0) : 0;
+    const ht   = p.ht   ? (parseInt(document.getElementById(p.ht)?.value)||0)   : 0;
+    const proc = Math.max(totalNum - mat - mill - ht, 0);
+    const td = (v,bold) => `<td style="border:1px solid #ccc;padding:5px 8px;text-align:right;${bold?'font-weight:700;':''}">${v}</td>`;
+    return `<tr>
+      <td style="border:1px solid #ccc;padding:5px 8px;">${p.name}</td>
+      ${td(fmtN(proc))}${td(fmtN(mat))}${td(fmtN(mill))}${td(fmtN(ht))}${td(fmtN(totalNum),true)}
+    </tr>`;
+  }).filter(Boolean).join('');
+}
+
+async function downloadPDF() {
+  const customer = document.getElementById('quoteCustomer')?.value || '';
+  const caseNum  = document.getElementById('quoteCase')?.value    || '';
+  const date     = document.getElementById('quoteDate')?.value    || new Date().toLocaleDateString('zh-TW');
+  const bore     = S.bore ? S.bore + ' mm' : '—';
+  const grandTxt = document.getElementById('grandTotalVal')?.textContent || '—';
+  const shaftDia = document.getElementById('shaftDia')?.value || '—';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;background:#fff;color:#111;font-family:Microsoft JhengHei,Noto Sans TC,sans-serif;padding:40px 48px;font-size:13px;';
+  wrap.innerHTML = `
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:20px;font-weight:700;letter-spacing:1px;">勁格科技股份有限公司</div>
+      <div style="font-size:15px;margin-top:4px;color:#444;">柱型油缸報價單</div>
+    </div>
+    <div style="display:flex;gap:24px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #111;font-size:13px;">
+      <span><b>客戶：</b>${customer || '—'}</span>
+      <span><b>案號：</b>${caseNum || '—'}</span>
+      <span><b>缸徑：</b>${bore}</span>
+      <span><b>軸徑：</b>${shaftDia} mm</span>
+      <span style="margin-left:auto"><b>日期：</b>${date}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr style="background:#1a1a1a;color:#fff;">
+          <th style="border:1px solid #555;padding:7px 8px;text-align:left;width:80px;">零件</th>
+          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">加工費</th>
+          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">材料費</th>
+          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">銑床費</th>
+          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">調質費</th>
+          <th style="border:1px solid #555;padding:7px 8px;text-align:right;width:90px;">小計</th>
+        </tr>
+      </thead>
+      <tbody>${buildPDFRows()}</tbody>
+      <tfoot>
+        <tr style="background:#f5f5f5;">
+          <td colspan="5" style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:14px;">合　計</td>
+          <td style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:15px;color:#c00;">${grandTxt}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="margin-top:24px;font-size:11px;color:#888;border-top:1px solid #ccc;padding-top:10px;">
+      ※ 本報價單僅供參考，實際金額以正式合約為準。
+    </div>`;
+
+  document.body.appendChild(wrap);
+  try {
+    const canvas = await html2canvas(wrap, {scale:2, useCORS:true, backgroundColor:'#fff'});
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    const pgW = pdf.internal.pageSize.getWidth();
+    const pgH = pdf.internal.pageSize.getHeight();
+    const imgH = (canvas.height * pgW) / canvas.width;
+    const imgData = canvas.toDataURL('image/png');
+    if (imgH <= pgH) {
+      pdf.addImage(imgData, 'PNG', 0, 0, pgW, imgH);
+    } else {
+      // 分頁
+      let y = 0;
+      while (y < canvas.height) {
+        const sliceH = Math.min(canvas.height - y, canvas.width * pgH / pgW);
+        const c2 = document.createElement('canvas');
+        c2.width = canvas.width; c2.height = sliceH;
+        c2.getContext('2d').drawImage(canvas, 0, -y);
+        const sliceData = c2.toDataURL('image/png');
+        if (y > 0) pdf.addPage();
+        pdf.addImage(sliceData, 'PNG', 0, 0, pgW, (sliceH * pgW) / canvas.width);
+        y += sliceH;
+      }
+    }
+    const fn = '報價單_'+(customer||'未填')+(caseNum?'_'+caseNum:'')+'_'+date.replace(/\//g,'')+'.pdf';
+    pdf.save(fn);
+  } finally {
+    document.body.removeChild(wrap);
+  }
+}
+
+// ── 頁面載入時自動還原 localStorage ───────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // 設定今日日期
+  const dateEl = document.getElementById('quoteDate');
+  if (dateEl && !dateEl.value) {
+    dateEl.value = new Date().toISOString().slice(0,10);
+  }
+  // 嘗試還原上次儲存
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw) {
+    try { loadQuoteState(JSON.parse(raw)); } catch(e) {}
+  }
+});
+
 </script>
 
 <!-- ── 材料計算機側邊面板 ── -->
