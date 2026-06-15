@@ -326,7 +326,7 @@
       <button onclick="closeMatCalc()"
         style="background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:0 4px;">✕</button>
     </div>
-    <iframe id="sharedMatIframe" src="材料計算機.html"
+    <iframe id="sharedMatIframe" data-src="材料計算機.html" src="about:blank"
       style="width:100%;height:650px;border:none;">
     </iframe>
   </div>
@@ -713,6 +713,11 @@ let activeMatPanel = null;
 function openMatCalc(panel) {
   activeMatPanel = panel;
   document.getElementById('matTargetLabel').textContent = panelLabels[panel] || panel;
+  // 懶載入：第一次點開才載入iframe
+  const iframe = document.getElementById('sharedMatIframe');
+  if(iframe.src === 'about:blank' || !iframe.src.includes('材料計算機')) {
+    iframe.src = iframe.dataset.src;
+  }
   document.getElementById('sharedMatPanel').style.display = 'block';
   document.getElementById('sharedMatPanel').scrollIntoView({behavior:'smooth', block:'end'});
 }
