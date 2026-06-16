@@ -1042,6 +1042,14 @@ const PDF_PARTS = [
 function fmtN(n) { return n > 0 ? n.toLocaleString('zh-TW') : '—'; }
 
 function buildPDFTable() {
+  function fmtSpec(spec) {
+    if (!spec) return '';
+    const parts = spec.trim().split(/\s+/);
+    if (parts.length < 2) return spec;
+    const mat  = parts[0];
+    const size = parts[parts.length - 1];
+    return mat + '- ' + size;
+  }
   // 項目名稱 → 欄位 mapping
   const COL_MAP = {
     '車床':'車床費','基本車床':'車床費','USH車床':'車床費','車牙':'車床費',
@@ -1074,7 +1082,7 @@ function buildPDFTable() {
   const partRows = [];
   partCalcs.forEach(pc => {
     const matAmt  = pc.mat  ? (parseInt(document.getElementById(pc.mat)?.value)||0)  : 0;
-    const matSpec = pc.matSpec ? (document.getElementById(pc.matSpec)?.textContent||'') : '';
+    const matSpec = pc.matSpec ? fmtSpec(document.getElementById(pc.matSpec)?.textContent||'') : '';
     const millAmt = pc.mill ? (parseInt(document.getElementById(pc.mill)?.value)||0) : 0;
     const htAmt   = pc.ht   ? (parseInt(document.getElementById(pc.ht)?.value)||0)   : 0;
     const procTotal = pc.items ? pc.items.reduce((a,b)=>a+b.val,0) : 0;
