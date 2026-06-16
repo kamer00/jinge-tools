@@ -333,13 +333,21 @@
   <div class="panel">
     <div class="panel-header"><h2>固定柱</h2><span class="panel-total" id="fixTotal">—</span></div>
     <div class="panel-body">
+      <div class="opt-group" style="margin-bottom:10px;">
+        <div class="opt-label">數量（支）</div>
+        <input type="text" inputmode="decimal" id="fixQty" value="4"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-size:14px;font-weight:600;width:100px;outline:none;"
+          oninput="renderAll()">
+        <span id="fixQtyHint" style="font-size:12px;color:var(--accent);margin-left:8px;"></span>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div class="opt-label">材料費</div>
+        <div class="opt-label">材料費（單支）</div>
         <button class="mc-open-btn" onclick="mcOpen('fix','固定柱')">⚙ 計算</button>
       </div>
+      <input type="hidden" id="fixMatCostUnit">
       <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
-        oninput="renderAll()">
+        oninput="onFixMatCostInput()">
       <div id="fixMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">調質費</div>
@@ -766,6 +774,7 @@ function toggleDetail(wrapId) {
 }
 
 function renderAll() {
+  updateFixQty();
   // SCM440自動勾選調質
   if(S.fixMat==='SCM440') S.fixExtra['調質']=true;
   S.cuairExtra['CU緩衝組']=(S.frontDrill==='一般+緩衝+入油口'||S.rearDrill==='一般+緩衝+入油口');
@@ -812,6 +821,15 @@ function renderAll() {
   setTotal('plateTotal',pi);
   setTotal('bushTotal',bi);
   setTotal('pistTotal',psi);
+  // 固定柱：若有單支金額，重算總材料費
+  const fixUnitEl = document.getElementById('fixMatCostUnit');
+  const fixQtyEl  = document.getElementById('fixQty');
+  const fixMatEl  = document.getElementById('fixMatCost');
+  if (fixUnitEl && fixQtyEl && fixMatEl && fixUnitEl.value) {
+    const unit = parseFloat(fixUnitEl.value) || 0;
+    const qty  = parseInt(fixQtyEl.value) || 4;
+    fixMatEl.value = Math.round(unit * qty);
+  }
   setTotal('fixTotal',fxi);
   setTotal('hwTotal',hwi);
   setTotal('cuairTotal',ci);
@@ -905,7 +923,7 @@ const SPEC_DIVS = [
   'frontMillSpec','rearMillSpec','plateMillSpec',
   'fixHtSpec','shaftHtSpec',
 ];
-const EXTRA_INPUTS = ['shaftDia','shaftLen','pipeLen','boreManual','quoteCustomer','quoteCase','quoteDate'];
+const EXTRA_INPUTS = ['shaftDia','shaftLen','pipeLen','boreManual','quoteCustomer','quoteCase','quoteDate','fixQty','fixMatCostUnit'];
 
 function getQuoteState() {
   const inputs = {}, specs = {};
@@ -989,6 +1007,25 @@ function showStatus(msg) {
 }
 function markDirty() {} // 預留
 
+// ── 固定柱數量邏輯 ──────────────────────────────
+function updateFixQty() {
+  const hasTc = S.partExtra && S.partExtra['TC'];
+  const qtyEl = document.getElementById('fixQty');
+  const hint  = document.getElementById('fixQtyHint');
+  if (!qtyEl) return;
+  // 只在沒有手動改過時才自動更新
+  const autoQty = hasTc ? 8 : 4;
+  if (!qtyEl.dataset.manual) {
+    qtyEl.value = autoQty;
+  }
+  if (hint) hint.textContent = hasTc ? '（含TC ×8支）' : '';
+}
+function onFixMatCostInput() {
+  // 手動改材料費時，清除單支記錄
+  document.getElementById('fixMatCostUnit').value = '';
+  renderAll();
+}
+
 // 自動儲存（每次 renderAll 後執行）
 function autoSave() {
   try { localStorage.setItem(LS_KEY, JSON.stringify(getQuoteState())); } catch(e) {}
@@ -1070,19 +1107,32 @@ function buildPDFTable() {
     {name:'套板',  items:calcPlate(), mat:'plateMatCost', matSpec:'plateMatSpec', mill:'plateMillCost', ht:null},
     {name:'襯套',  items:calcBush(),  mat:'bushMatCost',  matSpec:'bushMatSpec',  mill:null,            ht:null},
     {name:'活塞',  items:calcPist(),  mat:'pistMatCost',  matSpec:'pistMatSpec',  mill:null,            ht:null},
-    {name:'固定柱',items:calcFix(),   mat:'fixMatCost',   matSpec:'fixMatSpec',   mill:null,            ht:'fixHtCost'},
+    {name:'固定柱',items:calcFix(),   mat:'fixMatCost',   matSpec:'_fix_',        mill:null,            ht:'fixHtCost'},
     {name:'五金',  items:calcHw(),    mat:null,           matSpec:null,           mill:null,            ht:null},
     {name:'CU+AIR',items:calcCuair(),mat:null,           matSpec:null,           mill:null,            ht:null},
     {name:'軸心',  items:calcShaft(), mat:'shaftMatCost', matSpec:'shaftMatSpec', mill:null,            ht:'shaftHtCost'},
     {name:'鋼管',  items:calcPipe(),  mat:'pipeMatCost',  matSpec:'pipeMatSpec',  mill:null,            ht:null},
-    {name:'配件',  items:calcPart(),  mat:null,           matSpec:null,           mill:null,            ht:null},
+    {name:'配件',  items:calcPart(),  mat:null,           matSpec:'_part_',       mill:null,            ht:null},
   ];
 
   // 建立每個零件的欄位值
   const partRows = [];
   partCalcs.forEach(pc => {
     const matAmt  = pc.mat  ? (parseInt(document.getElementById(pc.mat)?.value)||0)  : 0;
-    const matSpec = pc.matSpec ? fmtSpec(document.getElementById(pc.matSpec)?.textContent||'') : '';
+    let matSpec = '';
+    if (pc.matSpec === '_part_') {
+      const partList = [];
+      if (S.partFAFB && S.partFAFB !== '無') partList.push(S.partFAFB);
+      ['CA','CB','TC'].forEach(k => { if (S.partExtra[k]) partList.push(k); });
+      if (S.partExtra['Y']) partList.push('Y接頭');
+      matSpec = partList.join('、');
+    } else if (pc.matSpec === '_fix_') {
+      const raw = document.getElementById('fixMatSpec')?.textContent || '';
+      const qty = parseInt(document.getElementById('fixQty')?.value) || 4;
+      matSpec = (raw ? fmtSpec(raw) : '') + ' ×' + qty + '支';
+    } else if (pc.matSpec) {
+      matSpec = fmtSpec(document.getElementById(pc.matSpec)?.textContent||'');
+    }
     const millAmt = pc.mill ? (parseInt(document.getElementById(pc.mill)?.value)||0) : 0;
     const htAmt   = pc.ht   ? (parseInt(document.getElementById(pc.ht)?.value)||0)   : 0;
     const procTotal = pc.items ? pc.items.reduce((a,b)=>a+b.val,0) : 0;
@@ -1357,6 +1407,18 @@ window.addEventListener('message', function(e) {
   const {type, amount} = e.data;
   if (!amount || amount <= 0) return;
   let fieldId;
+  // 固定柱：儲存單支材料費，乘以數量後填入 fixMatCost
+  if (_mcPrefix === 'fix' && type === 'MATERIAL_COST') {
+    const unitEl = document.getElementById('fixMatCostUnit');
+    if (unitEl) unitEl.value = amount;
+    const qty = parseInt(document.getElementById('fixQty')?.value) || 4;
+    const totalEl = document.getElementById('fixMatCost');
+    if (totalEl) { totalEl.value = Math.round(amount * qty); totalEl.dispatchEvent(new Event('input')); }
+    const specEl = document.getElementById('fixMatSpec');
+    if (specEl && e.data.spec) specEl.textContent = e.data.spec;
+    mcClose();
+    return;
+  }
   // 其他費用區塊處理
   if (_mcPrefix && _mcPrefix.startsWith('extra_')) {
     const rowId = _mcPrefix.replace('extra_', '');
