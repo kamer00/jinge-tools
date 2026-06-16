@@ -1165,7 +1165,16 @@ window.addEventListener('message', function(e) {
   }
   const specEl = document.getElementById(fieldId.replace('Cost','Spec'));
   if (specEl && e.data.spec) specEl.textContent = e.data.spec;
-  if (type === 'MATERIAL_COST') mcClose();
+  if (type === 'MATERIAL_COST') {
+    if (e.data.len > 0) {
+      const lenId = _mcPrefix === 'shaft' ? 'shaftLen' : _mcPrefix === 'pipe' ? 'pipeLen' : null;
+      if (lenId) {
+        const lenEl = document.getElementById(lenId);
+        if (lenEl) { lenEl.value = e.data.len; lenEl.dispatchEvent(new Event('input')); }
+      }
+    }
+    mcClose();
+  }
 });
 </script>
 

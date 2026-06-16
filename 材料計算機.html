@@ -2726,7 +2726,11 @@ window.addEventListener('message', function(e) {
 
 // 套用到報價單（postMessage 傳回父頁面）
 function applyToQuote(amount, type, spec) {
-  window.parent.postMessage({ type: type||'MATERIAL_COST', amount: amount, spec: spec||'' }, '*');
+  const len = parseFloat(
+    document.getElementById('dim-L')?.value ||
+    document.getElementById('dim-L-steel')?.value || 0
+  ) || 0;
+  window.parent.postMessage({ type: type||'MATERIAL_COST', amount, spec: spec||'', len }, '*');
 }
 </script>
 
