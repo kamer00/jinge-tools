@@ -2692,7 +2692,6 @@ window.addEventListener('message', function(e) {
     // 切換到硬鉻軸形狀
     setShape('shaft');
     if (d.dia > 0) {
-      // 找最接近的外徑 index（s45c 有報價的）
       let bestIdx = -1, bestDiff = Infinity;
       SHAFT_PRICES.forEach((s, i) => {
         if ((s.jy_s45c || s.yi_s45c) && Math.abs(s.dia - d.dia) < bestDiff) {
@@ -2705,6 +2704,42 @@ window.addEventListener('message', function(e) {
         if (sel) sel.value = bestIdx;
       }
     }
+  } else if (d.shape === 'bar_rnd') {
+    // 切換到圓棒，選指定材質，自動選比軸徑大 5mm 以上最近的規格
+    setShape('bar_rnd');
+    setTimeout(function() {
+      const matSel = document.getElementById('mat');
+      if (matSel && d.mat) {
+        // 找材質 option
+        const opts = Array.from(matSel.options);
+        const target = opts.find(o => o.value.startsWith(d.mat + '|'));
+        if (target) {
+          matSel.value = target.value;
+          if (typeof onMatChange === 'function') onMatChange();
+        }
+      }
+      if (d.dia > 0) {
+        // 自動填入比軸徑大 5mm 以上最近的規格到 dim-D
+        setTimeout(function() {
+          const dimD = document.getElementById('dim-D');
+          if (!dimD) return;
+          // 從 select options 中找
+          if (dimD.tagName === 'SELECT') {
+            const opts = Array.from(dimD.options).map(o => parseFloat(o.value)).filter(v => !isNaN(v));
+            const valid = opts.filter(v => v >= d.dia + 5);
+            if (valid.length > 0) {
+              const best = valid.reduce((a, b) => Math.abs(a - d.dia) < Math.abs(b - d.dia) ? a : b);
+              dimD.value = best;
+              if (typeof autoFillUnitPrice === 'function') autoFillUnitPrice();
+            }
+          } else {
+            // input 欄位直接填入 ceil(dia+5) 取整到最近 5mm
+            const target = Math.ceil((d.dia + 5) / 5) * 5;
+            dimD.value = target;
+          }
+        }, 80);
+      }
+    }, 80);
   } else if (d.shape === 'prod_pipe') {
     // 切換到成品管形狀
     setShape('prod_pipe');
@@ -2726,11 +2761,7 @@ window.addEventListener('message', function(e) {
 
 // 套用到報價單（postMessage 傳回父頁面）
 function applyToQuote(amount, type, spec) {
-  const len = parseFloat(
-    document.getElementById('dim-L')?.value ||
-    document.getElementById('dim-L-steel')?.value || 0
-  ) || 0;
-  window.parent.postMessage({ type: type||'MATERIAL_COST', amount, spec: spec||'', len }, '*');
+  window.parent.postMessage({ type: type||'MATERIAL_COST', amount: amount, spec: spec||'' }, '*');
 }
 </script>
 

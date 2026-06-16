@@ -400,7 +400,7 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費</div>
-        <button class="mc-open-btn" onclick="mcOpen('shaft','軸心',{shape:'shaft',dia:parseFloat(document.getElementById('shaftDia').value)||0})">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpenShaft()">⚙ 計算</button>
       </div>
       <input type="text" inputmode="decimal" id="shaftMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
@@ -1000,6 +1000,22 @@ function showStatus(msg) {
   setTimeout(() => el.textContent = '', 2500);
 }
 function markDirty() {} // 預留
+
+// ── 軸心材料計算機開啟 ──────────────────────────
+function mcOpenShaft() {
+  const dia = parseFloat(document.getElementById('shaftDia')?.value) || 0;
+  const mat = window.S?.shaftMat || '硬鉻軸';
+  let prefill;
+  if (mat === '硬鉻軸') {
+    prefill = { shape: 'shaft', dia: dia };
+  } else if (mat === 'SCM440') {
+    prefill = { shape: 'bar_rnd', mat: 'SCM440', dia: dia };
+  } else {
+    // S45C 用黑中碳
+    prefill = { shape: 'bar_rnd', mat: 'S45C_B', dia: dia };
+  }
+  mcOpen('shaft', '軸心', prefill);
+}
 
 // ── 固定柱材料費計算 ─────────────────────────────
 function updateFixMatTotal() {
