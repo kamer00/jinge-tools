@@ -347,7 +347,7 @@
       <input type="hidden" id="fixMatCostUnit">
       <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
-        oninput="onFixMatCostInput()">
+        oninput="renderAll()">
       <div id="fixMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">調質費</div>
@@ -1413,9 +1413,10 @@ window.addEventListener('message', function(e) {
     if (unitEl) unitEl.value = amount;
     const qty = parseInt(document.getElementById('fixQty')?.value) || 4;
     const totalEl = document.getElementById('fixMatCost');
-    if (totalEl) { totalEl.value = Math.round(amount * qty); totalEl.dispatchEvent(new Event('input')); }
+    if (totalEl) { totalEl.value = Math.round(amount * qty); }
     const specEl = document.getElementById('fixMatSpec');
     if (specEl && e.data.spec) specEl.textContent = e.data.spec;
+    renderAll();
     mcClose();
     return;
   }
