@@ -344,10 +344,13 @@
         <div class="opt-label">材料費（單支）</div>
         <button class="mc-open-btn" onclick="mcOpen('fix','固定柱')">⚙ 計算</button>
       </div>
-      <input type="hidden" id="fixMatCostUnit">
-      <input type="text" inputmode="decimal" id="fixMatCost" placeholder="材料費（NT$）"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
-        oninput="renderAll()">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <input type="text" inputmode="decimal" id="fixMatCostUnit" placeholder="單支金額"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:130px;outline:none;"
+          oninput="updateFixMatTotal()">
+        <span id="fixMatCalcLabel" style="font-size:13px;color:var(--text2);white-space:nowrap;">× 4支 = —</span>
+      </div>
+      <input type="hidden" id="fixMatCost">
       <div id="fixMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <div style="margin-top:6px;">
         <div class="opt-label" style="margin-bottom:3px">調質費</div>
@@ -821,15 +824,6 @@ function renderAll() {
   setTotal('plateTotal',pi);
   setTotal('bushTotal',bi);
   setTotal('pistTotal',psi);
-  // 固定柱：若有單支金額，重算總材料費
-  const fixUnitEl = document.getElementById('fixMatCostUnit');
-  const fixQtyEl  = document.getElementById('fixQty');
-  const fixMatEl  = document.getElementById('fixMatCost');
-  if (fixUnitEl && fixQtyEl && fixMatEl && fixUnitEl.value) {
-    const unit = parseFloat(fixUnitEl.value) || 0;
-    const qty  = parseInt(fixQtyEl.value) || 4;
-    fixMatEl.value = Math.round(unit * qty);
-  }
   setTotal('fixTotal',fxi);
   setTotal('hwTotal',hwi);
   setTotal('cuairTotal',ci);
@@ -1007,6 +1001,18 @@ function showStatus(msg) {
 }
 function markDirty() {} // 預留
 
+// ── 固定柱材料費計算 ─────────────────────────────
+function updateFixMatTotal() {
+  const unit = parseFloat(document.getElementById('fixMatCostUnit')?.value) || 0;
+  const qty  = parseInt(document.getElementById('fixQty')?.value) || 4;
+  const total = Math.round(unit * qty);
+  const totalEl = document.getElementById('fixMatCost');
+  if (totalEl) totalEl.value = total > 0 ? total : '';
+  const label = document.getElementById('fixMatCalcLabel');
+  if (label) label.textContent = '× ' + qty + '支 = ' + (total > 0 ? '$' + total.toLocaleString() : '—');
+  renderAll();
+}
+
 // ── 固定柱數量邏輯 ──────────────────────────────
 function updateFixQty() {
   const hasTc = S.partExtra && S.partExtra['TC'];
@@ -1019,6 +1025,14 @@ function updateFixQty() {
     qtyEl.value = autoQty;
   }
   if (hint) hint.textContent = hasTc ? '（含TC ×8支）' : '';
+  // 同步更新 × N支 = 總計 顯示
+  const unit = parseFloat(document.getElementById('fixMatCostUnit')?.value) || 0;
+  const qty2 = parseInt(qtyEl?.value) || 4;
+  const tot2 = Math.round(unit * qty2);
+  const totalEl2 = document.getElementById('fixMatCost');
+  if (totalEl2) totalEl2.value = tot2 > 0 ? tot2 : '';
+  const label2 = document.getElementById('fixMatCalcLabel');
+  if (label2) label2.textContent = '× ' + qty2 + '支 = ' + (tot2 > 0 ? '$' + tot2.toLocaleString() : '—');
 }
 function onFixMatCostInput() {
   // 手動改材料費時，清除單支記錄
@@ -1411,12 +1425,9 @@ window.addEventListener('message', function(e) {
   if (_mcPrefix === 'fix' && type === 'MATERIAL_COST') {
     const unitEl = document.getElementById('fixMatCostUnit');
     if (unitEl) unitEl.value = amount;
-    const qty = parseInt(document.getElementById('fixQty')?.value) || 4;
-    const totalEl = document.getElementById('fixMatCost');
-    if (totalEl) { totalEl.value = Math.round(amount * qty); }
     const specEl = document.getElementById('fixMatSpec');
     if (specEl && e.data.spec) specEl.textContent = e.data.spec;
-    renderAll();
+    updateFixMatTotal();
     mcClose();
     return;
   }
