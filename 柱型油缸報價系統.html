@@ -342,7 +342,7 @@
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="opt-label">材料費（單支）</div>
-        <button class="mc-open-btn" onclick="mcOpen('fix','固定柱')">⚙ 計算</button>
+        <button class="mc-open-btn" onclick="mcOpenFix()">⚙ 計算</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
         <input type="text" inputmode="decimal" id="fixMatCostUnit" placeholder="單支金額"
@@ -1015,6 +1015,18 @@ function mcOpenShaft() {
     prefill = { shape: 'bar_rnd', mat: 'S45C_B', dia: dia };
   }
   mcOpen('shaft', '軸心', prefill);
+}
+
+// ── 固定柱材料計算機開啟 ────────────────────────
+function mcOpenFix() {
+  const mat = window.S?.fixMat || 'S45C';
+  let prefill;
+  if (mat === 'SCM440') {
+    prefill = { shape: 'bar_rnd', mat: 'SCM440' };
+  } else {
+    prefill = { shape: 'bar_rnd', mat: 'S45C_B' };
+  }
+  mcOpen('fix', '固定柱', prefill);
 }
 
 // ── 固定柱材料費計算 ─────────────────────────────
