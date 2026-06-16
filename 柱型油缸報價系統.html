@@ -333,6 +333,9 @@
   <div class="panel">
     <div class="panel-header"><h2>固定柱</h2><span class="panel-total" id="fixTotal">—</span></div>
     <div class="panel-body">
+      <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
+      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="fixExtras"></div></div>
+      <hr class="divider">
       <div class="opt-group" style="margin-bottom:10px;">
         <div class="opt-label">數量（支）</div>
         <input type="text" inputmode="decimal" id="fixQty" value="4"
@@ -360,8 +363,6 @@
       <div id="fixHtSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <hr class="divider">
-      <div class="opt-group"><div class="opt-label">材質（二選一）</div><div class="opt-row" id="fixMat"></div></div>
-      <div class="opt-group"><div class="opt-label">選配</div><div class="opt-row" id="fixExtras"></div></div>
       <div class="detail-wrap" id="fixWrap">
         <button class="toggle-btn" onclick="toggleDetail('fixWrap')">▶ 明細</button>
         <div class="detail-rows hidden" id="fixDetail"><span class="na">請先選擇缸徑</span></div>
