@@ -6,51 +6,74 @@
 <title>柱型油缸報價系統 | 勁格科技</title>
 <style>
   :root {
-    --bg: #1a1a1a; --surface: #242424; --surface2: #2e2e2e;
-    --border: #3a3a3a; --accent: #e8a020; --text: #e8e8e8;
-    --text2: #999; --radius: 6px;
+    --bg: #141414; --surface: #1e1e1e; --surface2: #282828;
+    --border: #444; --accent: #f0a800; --text: #f0f0f0;
+    --text2: #b0b0b0; --radius: 6px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI','Microsoft JhengHei',sans-serif; font-size: 14px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI','Microsoft JhengHei',sans-serif; font-size: 16px; }
   header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
-  header h1 { font-size: 16px; font-weight: 600; color: var(--accent); }
-  header span { font-size: 12px; color: var(--text2); }
+  header h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
+  header span { font-size: 13px; color: var(--text2); }
   .main { max-width: 680px; margin: 0 auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 16px; }
 
   .bore-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; }
-  .section-title { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .section-title { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
   .bore-grid { display: flex; flex-wrap: wrap; gap: 8px; }
   .input-row { display: flex; gap: 12px; }
   .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  .bore-btn { padding: 7px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .bore-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 15px; font-weight: 500; transition: all 0.15s; }
   .bore-btn:hover { border-color: var(--accent); color: var(--text); }
   .bore-btn.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 700; }
 
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .panel-header { background: var(--surface2); padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .panel-header h2 { font-size: 13px; font-weight: 600; }
-  .panel-total { font-size: 15px; font-weight: 700; color: var(--accent); }
+  .panel-header { background: var(--surface2); padding: 11px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .panel-header h2 { font-size: 15px; font-weight: 700; }
+  .panel-total { font-size: 17px; font-weight: 700; color: var(--accent); }
   .panel-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 
   .opt-group { display: flex; flex-direction: column; gap: 6px; }
-  .opt-label { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: 0.5px; }
+  .opt-label { font-size: 13px; color: var(--text2); font-weight: 600; letter-spacing: 0.5px; }
   .opt-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .opt-btn { padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+  .opt-btn { padding: 6px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 14px; transition: all 0.15s; }
   .opt-btn:hover { border-color: var(--accent); color: var(--text); }
   .opt-btn.active { background: #2d2200; border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
   .divider { border: none; border-top: 1px solid var(--border); }
   .detail-wrap { display: flex; flex-direction: column; gap: 6px; }
-  .toggle-btn { background: none; border: none; color: var(--text2); font-size: 12px; cursor: pointer; text-align: left; padding: 2px 0; font-family: inherit; }
+  .toggle-btn { background: none; border: none; color: var(--text2); font-size: 14px; cursor: pointer; text-align: left; padding: 2px 0; font-family: inherit; }
   .toggle-btn:hover, .toggle-btn.open { color: var(--accent); }
   .detail-rows { display: flex; flex-direction: column; gap: 5px; }
   .detail-rows.hidden { display: none; }
   .detail-row { display: flex; justify-content: space-between; }
-  .detail-row .dn { font-size: 12px; color: var(--text2); }
-  .detail-row .dv { font-size: 12px; font-weight: 600; color: var(--text); }
-  .detail-row.sub .dn { color: var(--text); font-weight: 600; font-size: 13px; }
-  .detail-row.sub .dv { color: var(--accent); font-size: 14px; font-weight: 700; }
-  .na { color: var(--text2); font-size: 12px; font-style: italic; }
+  .detail-row .dn { font-size: 14px; color: var(--text2); }
+  .detail-row .dv { font-size: 14px; font-weight: 600; color: var(--text); }
+  .detail-row.sub .dn { color: var(--text); font-weight: 600; font-size: 15px; }
+  .detail-row.sub .dv { color: var(--accent); font-size: 16px; font-weight: 700; }
+  .na { color: var(--text2); font-size: 14px; font-style: italic; }
+
+  /* ── 開啟詢問 Modal ── */
+  #start-modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.75); z-index:2000;
+    align-items:center; justify-content:center;
+  }
+  #start-modal-overlay.open { display:flex; }
+  #start-modal {
+    background:var(--surface); border:2px solid var(--accent);
+    border-radius:10px; padding:28px 32px;
+    max-width:340px; width:90%; text-align:center;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  #start-modal h3 { font-size:18px; font-weight:700; color:var(--accent); }
+  #start-modal p { font-size:15px; color:var(--text2); line-height:1.6; }
+  #start-modal .modal-btns { display:flex; gap:12px; justify-content:center; }
+  #start-modal .modal-btn {
+    padding:10px 22px; border-radius:var(--radius); cursor:pointer;
+    font-size:15px; font-weight:700; border:none; flex:1;
+  }
+  #start-modal .modal-btn.continue { background:var(--accent); color:#111; }
+  #start-modal .modal-btn.new { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
 
   /* ── 材料計算機側邊面板 ── */
   #mc-overlay {
@@ -147,7 +170,6 @@
     </div>
     <div class="action-row">
       <button class="act-btn primary" onclick="saveToLS()">💾 儲存</button>
-      <button class="act-btn" onclick="loadFromLS()">📂 載入</button>
       <button class="act-btn" onclick="exportJSON()">📥 匯出 JSON</button>
       <button class="act-btn" onclick="importJSON()">📤 匯入 JSON</button>
       <button class="act-btn pdf" onclick="downloadPDF()">📄 下載 PDF</button>
@@ -380,13 +402,8 @@
           oninput="renderAll()">
       <div id="shaftHtSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
+      <input type="hidden" id="shaftLen">
       <hr class="divider">
-      <div class="opt-group">
-        <div class="opt-label">長度（mm）</div>
-        <input type="text" inputmode="decimal" id="shaftLen" placeholder="輸入長度"
-          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-size:13px;width:160px;outline:none;"
-          oninput="renderAll()">
-      </div>
       <div class="detail-wrap" id="shaftWrap">
         <button class="toggle-btn" onclick="toggleDetail('shaftWrap')">▶ 明細</button>
         <div class="detail-rows hidden" id="shaftDetail"><span class="na">請輸入軸徑和長度</span></div>
@@ -406,13 +423,8 @@
         style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);padding:6px 12px;font-size:13px;font-weight:600;width:100%;outline:none;margin-bottom:8px;"
         oninput="renderAll()">
       <div id="pipeMatSpec" style="font-size:11px;color:#666;font-family:monospace;min-height:13px;margin-top:2px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      <input type="hidden" id="pipeLen">
       <hr class="divider">
-      <div class="opt-group">
-        <div class="opt-label">長度（mm）</div>
-        <input type="text" inputmode="decimal" id="pipeLen" placeholder="輸入長度"
-          style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 12px;font-size:13px;width:160px;outline:none;"
-          oninput="renderAll()">
-      </div>
       <div class="detail-wrap" id="pipeWrap">
         <button class="toggle-btn" onclick="toggleDetail('pipeWrap')">▶ 明細</button>
         <div class="detail-rows hidden" id="pipeDetail"><span class="na">請先選擇缸徑並輸入長度</span></div>
@@ -430,6 +442,19 @@
         <button class="toggle-btn" onclick="toggleDetail('partWrap')">▶ 明細</button>
         <div class="detail-rows hidden" id="partDetail"><span class="na">請先選擇缸徑</span></div>
       </div>
+    </div>
+  </div>
+
+  <!-- 其他費用 -->
+  <div class="panel">
+    <div class="panel-header"><h2>其他費用</h2><span class="panel-total" id="extraTotal">—</span></div>
+    <div class="panel-body">
+      <div id="extra-rows" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button onclick="addExtraRow()"
+        style="margin-top:4px;padding:7px 16px;border:1px dashed var(--border);border-radius:var(--radius);
+               background:none;color:var(--text2);cursor:pointer;font-size:14px;width:100%;text-align:center;">
+        ＋ 新增項目
+      </button>
     </div>
   </div>
 
@@ -849,7 +874,7 @@ function setBore(val) {
 
 function updateGrandTotal() {
   const allIds = ['frontTotal','rearTotal','plateTotal','bushTotal','pistTotal',
-                  'fixTotal','hwTotal','cuairTotal','shaftTotal','pipeTotal','partTotal'];
+                  'fixTotal','hwTotal','cuairTotal','shaftTotal','pipeTotal','partTotal','extraTotal'];
   let grand = 0;
   allIds.forEach(id => {
     const el = document.getElementById(id);
@@ -893,8 +918,17 @@ function getQuoteState() {
     if (el) specs[id] = el.textContent;
   });
   const boreEl = document.getElementById('boreSelect');
+  // 序列化其他費用
+  const extraRows = [];
+  document.querySelectorAll('.extra-row').forEach(row => {
+    extraRows.push({
+      name: row.querySelector('.extra-name')?.value || '',
+      amount: row.querySelector('.extra-amount')?.value || ''
+    });
+  });
   return { S: {...S}, inputs, specs,
     boreSelectVal: boreEl?.value || '',
+    extraRows,
     savedAt: new Date().toISOString() };
 }
 
@@ -921,6 +955,14 @@ function loadQuoteState(data) {
     if (el) el.textContent = txt;
   });
   initButtons();
+  // 還原其他費用
+  if (data.extraRows && data.extraRows.length) {
+    const container = document.getElementById('extra-rows');
+    if (container) {
+      container.innerHTML = '';
+      data.extraRows.forEach(r => addExtraRow(r.name, r.amount));
+    }
+  }
   renderAll();
 }
 
@@ -999,23 +1041,113 @@ const PDF_PARTS = [
 
 function fmtN(n) { return n > 0 ? n.toLocaleString('zh-TW') : '—'; }
 
-function buildPDFRows() {
-  return PDF_PARTS.map(p => {
-    const totalEl = document.getElementById(p.total);
-    const totalTxt = totalEl?.textContent || '—';
-    if (totalTxt === '—') return '';
-    const totalNum = parseInt(totalTxt.replace(/[^0-9]/g,'')) || 0;
-    if (totalNum === 0) return '';
-    const mat  = p.mat  ? (parseInt(document.getElementById(p.mat)?.value)||0)  : 0;
-    const mill = p.mill ? (parseInt(document.getElementById(p.mill)?.value)||0) : 0;
-    const ht   = p.ht   ? (parseInt(document.getElementById(p.ht)?.value)||0)   : 0;
-    const proc = Math.max(totalNum - mat - mill - ht, 0);
-    const td = (v,bold) => `<td style="border:1px solid #ccc;padding:5px 8px;text-align:right;${bold?'font-weight:700;':''}">${v}</td>`;
-    return `<tr>
-      <td style="border:1px solid #ccc;padding:5px 8px;">${p.name}</td>
-      ${td(fmtN(proc))}${td(fmtN(mat))}${td(fmtN(mill))}${td(fmtN(ht))}${td(fmtN(totalNum),true)}
-    </tr>`;
-  }).filter(Boolean).join('');
+function buildPDFTable() {
+  // 項目名稱 → 欄位 mapping
+  const COL_MAP = {
+    '車床':'車床費','基本車床':'車床費','USH車床':'車床費','車牙':'車床費',
+    '基本加工':'車床費','車床費':'車床費','車床×4':'車床費','調質×4':'車床費',
+    '銑床':'銑床費',
+    '一般鑽孔':'鑽孔費','緩衝鑽孔':'鑽孔費','入油口鑽孔':'鑽孔費','鑽孔':'鑽孔費',
+    '研磨':'研磨費',
+    '電鍍':'電鍍費',
+  };
+  const COL_ORDER = ['材料規格','材料費','調質費','銑床費','車床費','鑽孔費','研磨費','電鍍費','其他加工'];
+
+  // 收集所有零件資料
+  const partCalcs = [
+    {name:'前蓋',  items:calcFront(), mat:'frontMatCost', matSpec:'frontMatSpec', mill:'frontMillCost', ht:null},
+    {name:'後蓋',  items:calcRear(),  mat:'rearMatCost',  matSpec:'rearMatSpec',  mill:'rearMillCost',  ht:null},
+    {name:'套板',  items:calcPlate(), mat:'plateMatCost', matSpec:'plateMatSpec', mill:'plateMillCost', ht:null},
+    {name:'襯套',  items:calcBush(),  mat:'bushMatCost',  matSpec:'bushMatSpec',  mill:null,            ht:null},
+    {name:'活塞',  items:calcPist(),  mat:'pistMatCost',  matSpec:'pistMatSpec',  mill:null,            ht:null},
+    {name:'固定柱',items:calcFix(),   mat:'fixMatCost',   matSpec:'fixMatSpec',   mill:null,            ht:'fixHtCost'},
+    {name:'五金',  items:calcHw(),    mat:null,           matSpec:null,           mill:null,            ht:null},
+    {name:'CU+AIR',items:calcCuair(),mat:null,           matSpec:null,           mill:null,            ht:null},
+    {name:'軸心',  items:calcShaft(), mat:'shaftMatCost', matSpec:'shaftMatSpec', mill:null,            ht:'shaftHtCost'},
+    {name:'鋼管',  items:calcPipe(),  mat:'pipeMatCost',  matSpec:'pipeMatSpec',  mill:null,            ht:null},
+    {name:'配件',  items:calcPart(),  mat:null,           matSpec:null,           mill:null,            ht:null},
+  ];
+
+  // 建立每個零件的欄位值
+  const partRows = [];
+  partCalcs.forEach(pc => {
+    const matAmt  = pc.mat  ? (parseInt(document.getElementById(pc.mat)?.value)||0)  : 0;
+    const matSpec = pc.matSpec ? (document.getElementById(pc.matSpec)?.textContent||'') : '';
+    const millAmt = pc.mill ? (parseInt(document.getElementById(pc.mill)?.value)||0) : 0;
+    const htAmt   = pc.ht   ? (parseInt(document.getElementById(pc.ht)?.value)||0)   : 0;
+    const procTotal = pc.items ? pc.items.reduce((a,b)=>a+b.val,0) : 0;
+    const grandAmt = procTotal + matAmt + millAmt + htAmt;
+    if (grandAmt === 0) return;
+
+    // 分類明細項目
+    const cols = {};
+    if (pc.items) {
+      pc.items.forEach(it => {
+        const col = COL_MAP[it.name] || '其他加工';
+        cols[col] = (cols[col]||0) + it.val;
+      });
+    }
+    if (millAmt > 0) cols['銑床費'] = (cols['銑床費']||0) + millAmt;
+    if (htAmt   > 0) cols['調質費'] = (cols['調質費']||0) + htAmt;
+
+    partRows.push({ name: pc.name, matAmt, matSpec, cols, grandAmt });
+  });
+
+  // 其他費用
+  const extraPartRows = [];
+  document.querySelectorAll('.extra-row').forEach(row => {
+    const name   = row.querySelector('.extra-name')?.value  || '其他';
+    const amount = parseInt(row.querySelector('.extra-amount')?.value) || 0;
+    if (!amount) return;
+    extraPartRows.push({ name, matAmt: amount, matSpec: '', cols: {}, grandAmt: amount });
+  });
+
+  const allRows = [...partRows, ...extraPartRows];
+  if (!allRows.length) return '<tr><td colspan="3" style="padding:8px;color:#888;text-align:center;">尚無資料</td></tr>';
+
+  // 決定要顯示哪些欄（動態）
+  const usedCols = new Set();
+  allRows.forEach(r => {
+    if (r.matAmt > 0) usedCols.add('材料費');
+    if (r.matSpec)    usedCols.add('材料規格');
+    Object.keys(r.cols).forEach(c => { if(r.cols[c]>0) usedCols.add(c); });
+  });
+  const activeCols = COL_ORDER.filter(c => usedCols.has(c));
+
+  const thStyle = 'border:1px solid #555;padding:6px 8px;text-align:right;white-space:nowrap;';
+  const thStyleL = 'border:1px solid #555;padding:6px 8px;text-align:left;white-space:nowrap;';
+  const tdStyle = (bold) => `border:1px solid #ddd;padding:5px 8px;text-align:right;${bold?'font-weight:700;color:#c00;':''}`;
+  const tdStyleL = 'border:1px solid #ddd;padding:5px 8px;text-align:left;color:#555;font-size:11px;';
+
+  // 表頭
+  let thead = `<tr style="background:#1a1a1a;color:#fff;">
+    <th style="${thStyleL}text-align:left;min-width:60px;">零件</th>`;
+  activeCols.forEach(c => {
+    thead += `<th style="${c==='材料規格'?thStyleL:thStyle}${c==='材料規格'?'min-width:120px;':''}">${c}</th>`;
+  });
+  thead += `<th style="${thStyle}min-width:70px;">小計</th></tr>`;
+
+  // 資料列
+  let tbody = '';
+  allRows.forEach((r, i) => {
+    const bg = i%2===0 ? 'background:#fafafa;' : '';
+    tbody += `<tr style="${bg}">
+      <td style="border:1px solid #ddd;padding:5px 8px;font-weight:600;">${r.name}</td>`;
+    activeCols.forEach(c => {
+      if (c === '材料規格') {
+        tbody += `<td style="${tdStyleL}">${r.matSpec||'—'}</td>`;
+      } else if (c === '材料費') {
+        tbody += `<td style="${tdStyle(false)}">${r.matAmt>0?fmtN(r.matAmt):'—'}</td>`;
+      } else {
+        const v = r.cols[c]||0;
+        tbody += `<td style="${tdStyle(false)}">${v>0?fmtN(v):'—'}</td>`;
+      }
+    });
+    tbody += `<td style="${tdStyle(true)}">${fmtN(r.grandAmt)}</td></tr>`;
+  });
+
+  const colSpan = activeCols.length + 2;
+  return { thead, tbody, colSpan };
 }
 
 async function downloadPDF() {
@@ -1040,30 +1172,27 @@ async function downloadPDF() {
       <span><b>軸徑：</b>${shaftDia} mm</span>
       <span style="margin-left:auto"><b>日期：</b>${date}</span>
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead>
-        <tr style="background:#1a1a1a;color:#fff;">
-          <th style="border:1px solid #555;padding:7px 8px;text-align:left;width:80px;">零件</th>
-          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">加工費</th>
-          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">材料費</th>
-          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">銑床費</th>
-          <th style="border:1px solid #555;padding:7px 8px;text-align:right;">調質費</th>
-          <th style="border:1px solid #555;padding:7px 8px;text-align:right;width:90px;">小計</th>
-        </tr>
-      </thead>
-      <tbody>${buildPDFRows()}</tbody>
-      <tfoot>
-        <tr style="background:#f5f5f5;">
-          <td colspan="5" style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:14px;">合　計</td>
-          <td style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:15px;color:#c00;">${grandTxt}</td>
-        </tr>
-      </tfoot>
-    </table>
+    <div id="_pdf_table_placeholder_"></div>
     <div style="margin-top:24px;font-size:11px;color:#888;border-top:1px solid #ccc;padding-top:10px;">
       ※ 本報價單僅供參考，實際金額以正式合約為準。
     </div>`;
 
   document.body.appendChild(wrap);
+  // 動態建立 PDF 表格
+  const pdfTableData = buildPDFTable();
+  const placeholder = wrap.querySelector('#_pdf_table_placeholder_');
+  if (placeholder && pdfTableData.thead) {
+    placeholder.outerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>${pdfTableData.thead}</thead>
+      <tbody>${pdfTableData.tbody}</tbody>
+      <tfoot>
+        <tr style="background:#f5f5f5;">
+          <td colspan="${pdfTableData.colSpan}" style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:14px;">合　計</td>
+          <td style="border:1px solid #ccc;padding:7px 8px;text-align:right;font-weight:700;font-size:15px;color:#c00;">${grandTxt}</td>
+        </tr>
+      </tfoot>
+    </table>`;
+  }
   try {
     const canvas = await html2canvas(wrap, {scale:2, useCORS:true, backgroundColor:'#fff'});
     const {jsPDF} = window.jspdf;
@@ -1102,12 +1231,76 @@ document.addEventListener('DOMContentLoaded', function() {
   if (dateEl && !dateEl.value) {
     dateEl.value = new Date().toISOString().slice(0,10);
   }
-  // 嘗試還原上次儲存
+  // 有上次資料就彈出詢問 modal，沒有就直接空白
   const raw = localStorage.getItem(LS_KEY);
   if (raw) {
-    try { loadQuoteState(JSON.parse(raw)); } catch(e) {}
+    document.getElementById('start-modal-overlay').classList.add('open');
   }
 });
+
+// ── 開啟詢問邏輯 ──
+function startContinue() {
+  document.getElementById('start-modal-overlay').classList.remove('open');
+  const raw = localStorage.getItem(LS_KEY);
+  if (raw) { try { loadQuoteState(JSON.parse(raw)); } catch(e) {} }
+}
+function startNew() {
+  document.getElementById('start-modal-overlay').classList.remove('open');
+  localStorage.removeItem(LS_KEY);
+}
+
+
+// ── 其他費用 ──────────────────────────────────────
+let _extraId = 0;
+
+function addExtraRow(name, amount) {
+  const id = ++_extraId;
+  const row = document.createElement('div');
+  row.className = 'extra-row';
+  row.dataset.id = id;
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;';
+  row.innerHTML = `
+    <input class="extra-name" placeholder="項目名稱"
+      style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+             color:var(--text);padding:6px 10px;font-size:14px;outline:none;"
+      oninput="calcExtraTotal()">
+    <input class="extra-amount" placeholder="金額" inputmode="decimal"
+      style="width:130px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+             color:var(--accent);padding:6px 10px;font-size:14px;font-weight:600;outline:none;"
+      oninput="calcExtraTotal()">
+    <button class="mc-open-btn" onclick="mcOpenExtra(${id})" style="white-space:nowrap;">⚙ 計算</button>
+    <button onclick="removeExtraRow(${id})"
+      style="background:none;border:none;color:#c00;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;">✕</button>
+  `;
+  document.getElementById('extra-rows').appendChild(row);
+  if (name)   row.querySelector('.extra-name').value   = name;
+  if (amount) row.querySelector('.extra-amount').value = amount;
+  calcExtraTotal();
+}
+
+function removeExtraRow(id) {
+  const row = document.querySelector(`.extra-row[data-id="${id}"]`);
+  if (row) row.remove();
+  calcExtraTotal();
+}
+
+function calcExtraTotal() {
+  let sum = 0;
+  document.querySelectorAll('.extra-amount').forEach(el => {
+    sum += parseInt(el.value) || 0;
+  });
+  const el = document.getElementById('extraTotal');
+  if (el) el.textContent = sum > 0 ? fmt(sum) : '—';
+  updateGrandTotal();
+  autoSave();
+}
+
+function mcOpenExtra(rowId) {
+  _mcPrefix = 'extra_' + rowId;
+  document.getElementById('mc-label').textContent = '其他費用';
+  document.getElementById('mc-overlay').classList.add('open');
+  document.getElementById('mc-panel').classList.add('open');
+}
 
 </script>
 
@@ -1154,6 +1347,18 @@ window.addEventListener('message', function(e) {
   const {type, amount} = e.data;
   if (!amount || amount <= 0) return;
   let fieldId;
+  // 其他費用區塊處理
+  if (_mcPrefix && _mcPrefix.startsWith('extra_')) {
+    const rowId = _mcPrefix.replace('extra_', '');
+    const row = document.querySelector(`.extra-row[data-id="${rowId}"]`);
+    if (row) {
+      const amtEl = row.querySelector('.extra-amount');
+      if (amtEl) { amtEl.value = amount; }
+    }
+    calcExtraTotal();
+    mcClose();
+    return;
+  }
   if (type === 'MATERIAL_COST')  fieldId = _mcPrefix + 'MatCost';
   else if (type === 'MILLING_COST') fieldId = _mcPrefix + 'MillCost';
   else if (type === 'HT_COST')   fieldId = _mcPrefix + 'HtCost';
@@ -1178,5 +1383,17 @@ window.addEventListener('message', function(e) {
 });
 </script>
 
+
+<!-- ── 開啟詢問 Modal ── -->
+<div id="start-modal-overlay">
+  <div id="start-modal">
+    <h3>📋 報價系統</h3>
+    <p>偵測到上次未完成的報價資料<br>請選擇要如何繼續</p>
+    <div class="modal-btns">
+      <button class="modal-btn continue" onclick="startContinue()">繼續上次</button>
+      <button class="modal-btn new" onclick="startNew()">新報價</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
