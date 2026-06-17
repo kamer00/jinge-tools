@@ -57,6 +57,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .price-table td.px{color:var(--accent);font-weight:600}
 .price-table td.dia{color:var(--muted)}
 .info{background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:3px;padding:8px 12px;font-family:var(--mono);font-size:10px;color:var(--blue);margin-top:10px}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
 </style>
 </head>
 <body>
@@ -88,6 +91,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         </div>
       </div>
   </div>
+
+  <button class="calc-btn" onclick="calculate()">▶ 計算費用</button>
+
+  <div class="result-card" id="result-card">
+    <div class="res-header" id="res-header"></div>
+    <div class="res-body" id="res-body"></div>
+  </div>
+
 <script>
 const RATES = [
   {d:3,    p:2.50},
