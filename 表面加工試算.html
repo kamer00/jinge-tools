@@ -199,10 +199,12 @@ function grindFee(d, l, passes){
   const c1 = a * 2;
   const c2 = a * 2 * 1.5;
   const ld = l / d;
-  const isLong = passes===1 && ld > 25;
-  const sub = passes===1 ? c1 : c1 + c2;
-  const total = Math.max(300, isLong ? sub * 2 : sub);
-  return { area: a, c1, c2, isLong, ld, total, passes };
+  const isLong = ld > 25;
+  const c1Total = isLong ? c1 * 2 : c1;
+  const c2Total = isLong ? c2 * 2 : c2;
+  const sub = passes===1 ? c1Total : c1Total + c2Total;
+  const total = Math.max(300, sub);
+  return { area: a, c1, c2, c1Total, c2Total, isLong, ld, total, passes };
 }
 
 // 膛孔
@@ -447,9 +449,8 @@ function calculate(){
         <div class="result-card anim">
           <div class="result-row"><span class="rl">研磨面積（單件）</span><span class="rv yellow">${g.area.toFixed(2)} in²</span></div>
           <div class="result-row"><span class="rl">L/D 比值</span><span class="rv ${g.isLong?'red':''}">${g.ld.toFixed(1)}${g.isLong?' ⚠️ 細長加倍':''}</span></div>
-          <div class="result-row"><span class="rl">第一次研磨費（×2）</span><span class="rv">${nt(g.c1)}</span></div>`;
-        if(g.passes===2) rows += `<div class="result-row"><span class="rl">第二次研磨費（×2×1.5）</span><span class="rv">${nt(g.c2)}</span></div>`;
-        if(g.isLong)     rows += `<div class="result-row"><span class="rl">細長附加（L/D>25，×2）</span><span class="rv red">${nt(g.passes===1?g.c1:g.c1+g.c2)}</span></div>`;
+          <div class="result-row"><span class="rl">第一次研磨費${g.isLong?' (含細長加倍)':'（×2）'}</span><span class="rv ${g.isLong?'red':''}">${nt(g.c1Total)}</span></div>`;
+        if(g.passes===2) rows += `<div class="result-row"><span class="rl">第二次研磨費${g.isLong?' (含細長加倍)':'（×2×1.5）'}</span><span class="rv ${g.isLong?'red':''}">${nt(g.c2Total)}</span></div>`;
         rows += `<div class="result-row"><span class="rl">費用${g.total===300?' (最低計費)':''}</span><span class="rv green">${nt(g.total)}</span></div></div>`;
         rs.innerHTML = rows;
       } else if(surfaceSel==='polish'){
