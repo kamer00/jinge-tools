@@ -222,11 +222,17 @@
         <div class="sliderRow">
           <div class="lbl">線條顏色</div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn ghost lineColorBtn" data-color="#3a8fd4" style="border-color:#3a8fd4; color:#7fc4ee;">藍圖藍</button>
+            <button class="btn ghost lineColorBtn" data-color="#39ff14" style="border-color:#39ff14; color:#39ff14;">螢光綠</button>
+            <button class="btn ghost lineColorBtn" data-color="#ff2fd0" style="border-color:#ff2fd0; color:#ff2fd0;">桃紅</button>
             <button class="btn ghost lineColorBtn" data-color="#ff7a1a" style="border-color:#ff7a1a; color:#ff7a1a;">警示橙</button>
+            <button class="btn ghost lineColorBtn" data-color="#3a8fd4" style="border-color:#3a8fd4; color:#7fc4ee;">藍圖藍</button>
             <button class="btn ghost lineColorBtn" data-color="#ffffff" style="border-color:#ffffff; color:#ffffff;">白</button>
             <button class="btn ghost lineColorBtn" data-color="#111111" style="border-color:#999; color:#eee;">黑</button>
           </div>
+        </div>
+        <div class="sliderRow">
+          <div class="lbl">線條加粗 <b id="boldVal">1</b></div>
+          <input type="range" id="boldSlider" min="0" max="3" value="1">
         </div>
         <div class="actionRow">
           <button class="btn secondary" id="undoMaskBtn">還原全部</button>
@@ -307,8 +313,8 @@
         </div>
         <div class="ctrlGrid">
           <label>透明</label>
-          <input type="range" id="opacitySlider" min="10" max="100" value="65">
-          <div class="val mono" id="opacityVal">65%</div>
+          <input type="range" id="opacitySlider" min="10" max="100" value="80">
+          <div class="val mono" id="opacityVal">80%</div>
         </div>
         <div class="ctrlGrid">
           <label>縮放</label>
@@ -364,7 +370,8 @@
   // ---------- state ----------
   let drawingImg = null;
   let sourceCanvas = null;
-  let lineColor = [58,143,212];
+  let lineColor = [57,255,20];
+  let boldPx = 1;
   let threshold = 128;
   let baseOverlaySize = {w:0, h:0};
   let finalLineArtDataURL = null;
@@ -500,16 +507,36 @@
       } else {
         const strength = 1 - (lum/threshold);
         d[i] = lineColor[0]; d[i+1] = lineColor[1]; d[i+2] = lineColor[2];
-        d[i+3] = Math.max(160, Math.min(255, Math.round(255*Math.min(1, strength+0.4))));
+        d[i+3] = Math.max(220, Math.min(255, Math.round(255*Math.min(1, strength+0.4))));
       }
     }
     ctx.putImageData(imgData,0,0);
+
+    if(boldPx > 0){
+      const baseCanvas = document.createElement('canvas');
+      baseCanvas.width = w; baseCanvas.height = h;
+      baseCanvas.getContext('2d').drawImage(editCanvas, 0, 0);
+      ctx.clearRect(0,0,w,h);
+      const dirs = [[1,0],[-1,0],[0,1],[0,-1],[0.7,0.7],[0.7,-0.7],[-0.7,0.7],[-0.7,-0.7]];
+      for(let r=1; r<=boldPx; r++){
+        dirs.forEach(([ux,uy])=>{ ctx.drawImage(baseCanvas, ux*r, uy*r); });
+      }
+      ctx.drawImage(baseCanvas, 0, 0);
+    }
+
     baseOverlaySize = {w, h};
   }
 
   threshSlider.addEventListener('input', ()=>{
     threshold = parseInt(threshSlider.value,10);
     threshVal.textContent = threshold;
+    applyThreshold();
+  });
+  const boldSlider = el('boldSlider');
+  const boldVal = el('boldVal');
+  boldSlider.addEventListener('input', ()=>{
+    boldPx = parseInt(boldSlider.value,10);
+    boldVal.textContent = boldPx;
     applyThreshold();
   });
   document.querySelectorAll('.lineColorBtn').forEach(btn=>{
@@ -929,7 +956,7 @@
       updateLockUI();
 
       applyTransform();
-      opacitySlider.value = 65;
+      opacitySlider.value = 80;
       updateOpacity();
       resizeAnnotSvg();
     };
