@@ -89,6 +89,20 @@
   .actionRow{width:100%; display:flex; gap:10px;}
   .actionRow .btn{flex:1; min-width:0;}
 
+  /* ---------- perspective correction ---------- */
+  .perspHandle{position:absolute; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
+    background:var(--accent); border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.4); touch-action:none; z-index:6;}
+  .perspHandle span{position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--text); background:rgba(0,0,0,.5); border-radius:4px; padding:1px 4px; white-space:nowrap;}
+  #perspSvg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5;}
+  #perspEditor{display:none; width:100%; max-width:520px; flex-direction:column; gap:8px;}
+  #perspEditor.show{display:flex;}
+  #perspEditor p{font-size:11.5px;}
+
+  /* ---------- tilt / level widget ---------- */
+  .levelWidget{display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;}
+  .levelWidget .lvlLabel{font-size:9px; color:var(--text-dim);}
+  .levelBtn{margin-top:2px; font-size:10px; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:var(--text); cursor:pointer;}
+
   /* ---------- Overlay compare screen ---------- */
   #compareScreen{padding:0; display:none;}
   #compareScreen.active{display:flex;}
@@ -182,11 +196,21 @@
 
     <!-- STEP 2: threshold + erase (merged, mostly optional) -->
     <div class="screen" id="thresholdScreen" style="display:none;">
-      <div class="editWrap checkerBg"><canvas id="editCanvas"></canvas></div>
+      <div class="editWrap checkerBg" id="editWrap"><canvas id="editCanvas"></canvas><svg id="perspSvg"></svg></div>
       <p style="font-size:11.5px;">不用調整也可以直接比對。想擦掉標註文字，手指直接在圖上塗抹即可。</p>
       <div class="primaryRow"><button class="btn" id="toPhotoBtn">下一步：比對零件 ›</button></div>
       <button class="advToggle" id="advToggleBtn">顯示線稿微調選項 ▾</button>
       <div class="advPanel" id="advPanel">
+        <div class="actionRow">
+          <button class="btn secondary" id="perspBtn">校正圖面透視變形</button>
+        </div>
+        <div id="perspEditor">
+          <p>拖曳四個點對準圖面實際的四個角，套用後會把歪斜的圖拉正。</p>
+          <div class="actionRow">
+            <button class="btn secondary small" id="perspCancelBtn">取消</button>
+            <button class="btn small" id="perspApplyBtn">套用校正</button>
+          </div>
+        </div>
         <div class="sliderRow">
           <div class="lbl">線稿門檻 <b id="threshVal">128</b></div>
           <input type="range" id="threshSlider" min="1" max="254" value="128">
@@ -249,6 +273,15 @@
           <div id="roCalWrap" style="display:none;">比例 <b id="roCal">-</b></div>
         </div>
         <div class="iconBtnRow">
+          <div class="levelWidget" id="levelWidget" style="display:none;">
+            <svg viewBox="0 0 56 56" width="40" height="40">
+              <circle cx="28" cy="28" r="24" fill="rgba(0,0,0,.35)" stroke="#254a6e" stroke-width="1.5"/>
+              <line x1="10" y1="28" x2="46" y2="28" stroke="#254a6e" stroke-width="1"/>
+              <line x1="28" y1="10" x2="28" y2="46" stroke="#254a6e" stroke-width="1"/>
+              <circle id="levelDot" cx="28" cy="28" r="6" fill="#4cc98a"/>
+            </svg>
+            <button class="levelBtn" id="calibrateTiltBtn">校準</button>
+          </div>
           <div class="iconBtn" id="lockBtn" title="鎖定位置">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
           </div>
@@ -330,6 +363,7 @@
 
   // ---------- state ----------
   let drawingImg = null;
+  let sourceCanvas = null;
   let lineColor = [58,143,212];
   let threshold = 128;
   let baseOverlaySize = {w:0, h:0};
@@ -351,6 +385,12 @@
   const compareScreen = el('compareScreen');
   const fileInput = el('fileInput');
   const editCanvas = el('editCanvas');
+  const editWrap = el('editWrap');
+  const perspSvg = el('perspSvg');
+  const perspBtn = el('perspBtn');
+  const perspEditor = el('perspEditor');
+  const perspApplyBtn = el('perspApplyBtn');
+  const perspCancelBtn = el('perspCancelBtn');
   const threshSlider = el('threshSlider');
   const threshVal = el('threshVal');
   const brushSlider = el('brushSlider');
@@ -395,7 +435,7 @@
     img.onload = ()=>{
       drawingImg = img;
       showScreen('threshold');
-      renderLineArt();
+      initSourceFromImage(img);
     };
     img.onerror = ()=> alert('圖片讀取失敗，請換一個檔案試試。');
     img.src = url;
@@ -414,6 +454,9 @@
         img.onload = ()=>{
           drawingImg = null; // imported profile has no raw source to re-threshold
           baseOverlaySize = {w: img.naturalWidth, h: img.naturalHeight};
+          sourceCanvas = document.createElement('canvas');
+          sourceCanvas.width = img.naturalWidth; sourceCanvas.height = img.naturalHeight;
+          sourceCanvas.getContext('2d').drawImage(img,0,0);
           editCanvas.width = img.naturalWidth;
           editCanvas.height = img.naturalHeight;
           editCanvas.getContext('2d').drawImage(img,0,0);
@@ -428,16 +471,26 @@
   });
 
   // ================= STEP 2: threshold + erase (same canvas) =================
-  function renderLineArt(){
-    if(!drawingImg) return; // imported profiles skip regeneration
+  // sourceCanvas = clean working-resolution copy of the drawing (post perspective-correction if used)
+  // editCanvas   = sourceCanvas after threshold+color processing, and the surface the user erases on
+  function initSourceFromImage(img){
     const maxDim = 1400;
-    let w = drawingImg.naturalWidth, h = drawingImg.naturalHeight;
+    let w = img.naturalWidth, h = img.naturalHeight;
     const scale = Math.min(1, maxDim/Math.max(w,h));
     w = Math.round(w*scale); h = Math.round(h*scale);
+    sourceCanvas = document.createElement('canvas');
+    sourceCanvas.width = w; sourceCanvas.height = h;
+    sourceCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    applyThreshold();
+  }
 
+  function applyThreshold(){
+    if(!sourceCanvas) return;
+    const w = sourceCanvas.width, h = sourceCanvas.height;
     editCanvas.width = w; editCanvas.height = h;
     const ctx = editCanvas.getContext('2d');
-    ctx.drawImage(drawingImg, 0, 0, w, h);
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(sourceCanvas, 0, 0);
     const imgData = ctx.getImageData(0,0,w,h);
     const d = imgData.data;
     for(let i=0;i<d.length;i+=4){
@@ -457,12 +510,12 @@
   threshSlider.addEventListener('input', ()=>{
     threshold = parseInt(threshSlider.value,10);
     threshVal.textContent = threshold;
-    renderLineArt();
+    applyThreshold();
   });
   document.querySelectorAll('.lineColorBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       lineColor = hexToRgb(btn.getAttribute('data-color'));
-      renderLineArt();
+      applyThreshold();
     });
   });
 
@@ -472,7 +525,7 @@
     el('advToggleBtn').textContent = showing ? '隱藏線稿微調選項 ▴' : '顯示線稿微調選項 ▾';
   });
 
-  el('undoMaskBtn').addEventListener('click', ()=> renderLineArt());
+  el('undoMaskBtn').addEventListener('click', ()=> applyThreshold());
   el('backToUpload').addEventListener('click', ()=> showScreen('upload'));
 
   // ---- erase by touch, directly on editCanvas ----
@@ -538,6 +591,198 @@
     exportModal.classList.remove('show');
   });
 
+  // ---- perspective correction (dewarp a photographed drawing) ----
+  function solveLinear8(A, B){
+    const n = 8;
+    const M = A.map((row,i)=> row.concat([B[i]]));
+    for(let col=0; col<n; col++){
+      let maxRow = col;
+      for(let r=col+1;r<n;r++){ if(Math.abs(M[r][col]) > Math.abs(M[maxRow][col])) maxRow = r; }
+      if(Math.abs(M[maxRow][col]) < 1e-9) throw new Error('singular matrix');
+      const tmp = M[col]; M[col] = M[maxRow]; M[maxRow] = tmp;
+      const pivot = M[col][col];
+      for(let c=col;c<=n;c++) M[col][c] /= pivot;
+      for(let r=0;r<n;r++){
+        if(r===col) continue;
+        const factor = M[r][col];
+        if(factor===0) continue;
+        for(let c=col;c<=n;c++) M[r][c] -= factor*M[col][c];
+      }
+    }
+    return M.map(row=>row[n]);
+  }
+  function computeHomography(src, dst){
+    const A = [], B = [];
+    for(let i=0;i<4;i++){
+      const sx=src[i].x, sy=src[i].y, dx=dst[i].x, dy=dst[i].y;
+      A.push([sx, sy, 1, 0, 0, 0, -sx*dx, -sy*dx]); B.push(dx);
+      A.push([0, 0, 0, sx, sy, 1, -sx*dy, -sy*dy]); B.push(dy);
+    }
+    const h = solveLinear8(A, B);
+    return [h[0],h[1],h[2], h[3],h[4],h[5], h[6],h[7],1];
+  }
+  function applyH(H, x, y){
+    const denom = H[6]*x + H[7]*y + H[8];
+    return { x:(H[0]*x+H[1]*y+H[2])/denom, y:(H[3]*x+H[4]*y+H[5])/denom };
+  }
+  function warpPerspective(srcCanvas, srcQuad){
+    const [p0,p1,p2,p3] = srcQuad; // TL, TR, BR, BL
+    const widthTop = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+    const widthBottom = Math.hypot(p2.x-p3.x, p2.y-p3.y);
+    const heightLeft = Math.hypot(p3.x-p0.x, p3.y-p0.y);
+    const heightRight = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+    let outW = Math.round(Math.max(widthTop, widthBottom));
+    let outH = Math.round(Math.max(heightLeft, heightRight));
+    outW = Math.max(50, Math.min(2000, outW));
+    outH = Math.max(50, Math.min(2000, outH));
+
+    const dstRect = [{x:0,y:0},{x:outW,y:0},{x:outW,y:outH},{x:0,y:outH}];
+    const Hd2s = computeHomography(dstRect, srcQuad);
+
+    const sctx = srcCanvas.getContext('2d');
+    const sW = srcCanvas.width, sH = srcCanvas.height;
+    const sData = sctx.getImageData(0,0,sW,sH).data;
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outW; outCanvas.height = outH;
+    const octx = outCanvas.getContext('2d');
+    const outImgData = octx.createImageData(outW, outH);
+    const oData = outImgData.data;
+
+    for(let Y=0; Y<outH; Y++){
+      for(let X=0; X<outW; X++){
+        const s = applyH(Hd2s, X, Y);
+        if(!isFinite(s.x) || !isFinite(s.y)) continue;
+        if(s.x<0||s.y<0||s.x>=sW-1||s.y>=sH-1) continue;
+        const x0=Math.floor(s.x), y0=Math.floor(s.y);
+        const fx=s.x-x0, fy=s.y-y0;
+        const oi = (Y*outW+X)*4;
+        for(let ch=0; ch<4; ch++){
+          const c00=sData[(y0*sW+x0)*4+ch];
+          const c10=sData[(y0*sW+x0+1)*4+ch];
+          const c01=sData[((y0+1)*sW+x0)*4+ch];
+          const c11=sData[((y0+1)*sW+x0+1)*4+ch];
+          const top = c00*(1-fx)+c10*fx;
+          const bot = c01*(1-fx)+c11*fx;
+          oData[oi+ch] = top*(1-fy)+bot*fy;
+        }
+      }
+    }
+    octx.putImageData(outImgData,0,0);
+    return outCanvas;
+  }
+
+  let perspHandles = [];
+  let perspDragIdx = -1;
+
+  function enterPerspEdit(){
+    if(!sourceCanvas){ alert('請先上傳圖面。'); return; }
+    const ctx = editCanvas.getContext('2d');
+    ctx.clearRect(0,0,editCanvas.width, editCanvas.height);
+    ctx.drawImage(sourceCanvas, 0, 0);
+
+    perspEditor.classList.add('show');
+    perspBtn.style.display = 'none';
+    document.querySelector('.primaryRow').style.display = 'none';
+    Array.from(el('advPanel').children).forEach(child=>{
+      if(child.contains(perspBtn) || child === perspEditor) return;
+      child.style.display = 'none';
+    });
+    createPerspHandles();
+  }
+
+  function exitPerspEdit(restore){
+    perspEditor.classList.remove('show');
+    perspBtn.style.display = '';
+    document.querySelector('.primaryRow').style.display = '';
+    Array.from(el('advPanel').children).forEach(child=>{ child.style.display = ''; });
+    removePerspHandles();
+    if(restore) applyThreshold();
+  }
+
+  function createPerspHandles(){
+    const wrapRect = editWrap.getBoundingClientRect();
+    const canvasRect = editCanvas.getBoundingClientRect();
+    const offsetX = canvasRect.left - wrapRect.left;
+    const offsetY = canvasRect.top - wrapRect.top;
+    const dispW = canvasRect.width, dispH = canvasRect.height;
+    const insets = [
+      {fx:0.1, fy:0.1, label:'左上'}, {fx:0.9, fy:0.1, label:'右上'},
+      {fx:0.9, fy:0.9, label:'右下'}, {fx:0.1, fy:0.9, label:'左下'}
+    ];
+    perspHandles = insets.map((p,i)=>{
+      const x = offsetX + dispW*p.fx;
+      const y = offsetY + dispH*p.fy;
+      const div = document.createElement('div');
+      div.className = 'perspHandle';
+      div.style.left = x+'px'; div.style.top = y+'px';
+      div.innerHTML = '<span>'+p.label+'</span>';
+      editWrap.appendChild(div);
+      div.addEventListener('pointerdown', ev=>{
+        ev.preventDefault();
+        perspDragIdx = i;
+        div.setPointerCapture(ev.pointerId);
+      });
+      div.addEventListener('pointermove', ev=>{
+        if(perspDragIdx!==i) return;
+        const wr = editWrap.getBoundingClientRect();
+        let nx = Math.max(0, Math.min(wr.width, ev.clientX - wr.left));
+        let ny = Math.max(0, Math.min(wr.height, ev.clientY - wr.top));
+        perspHandles[i].x = nx; perspHandles[i].y = ny;
+        div.style.left = nx+'px'; div.style.top = ny+'px';
+        drawPerspQuad();
+      });
+      const endDrag = ()=>{ if(perspDragIdx===i) perspDragIdx = -1; };
+      div.addEventListener('pointerup', endDrag);
+      div.addEventListener('pointercancel', endDrag);
+      return {el:div, x, y};
+    });
+    resizePerspSvg();
+    drawPerspQuad();
+  }
+
+  function resizePerspSvg(){
+    const wrapRect = editWrap.getBoundingClientRect();
+    perspSvg.setAttribute('width', wrapRect.width);
+    perspSvg.setAttribute('height', wrapRect.height);
+  }
+  function drawPerspQuad(){
+    perspSvg.innerHTML = '';
+    const pts = perspHandles.map(h=>`${h.x},${h.y}`).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', 'rgba(58,143,212,0.15)');
+    poly.setAttribute('stroke', '#3a8fd4');
+    poly.setAttribute('stroke-width', '2');
+    perspSvg.appendChild(poly);
+  }
+  function removePerspHandles(){
+    perspHandles.forEach(h=>h.el.remove());
+    perspHandles = [];
+    perspSvg.innerHTML = '';
+  }
+
+  perspBtn.addEventListener('click', enterPerspEdit);
+  perspCancelBtn.addEventListener('click', ()=> exitPerspEdit(true));
+  perspApplyBtn.addEventListener('click', ()=>{
+    const canvasRect = editCanvas.getBoundingClientRect();
+    const wrapRect = editWrap.getBoundingClientRect();
+    const offsetX = canvasRect.left - wrapRect.left;
+    const offsetY = canvasRect.top - wrapRect.top;
+    const scaleX = editCanvas.width / canvasRect.width;
+    const scaleY = editCanvas.height / canvasRect.height;
+    const srcQuad = perspHandles.map(h=>({ x:(h.x-offsetX)*scaleX, y:(h.y-offsetY)*scaleY }));
+    try{
+      const warped = warpPerspective(sourceCanvas, srcQuad);
+      sourceCanvas = warped;
+      exitPerspEdit(false);
+      applyThreshold();
+    } catch(err){
+      console.error(err);
+      alert('校正失敗，請確認四個點有拉開範圍、不要太接近或排成一直線。');
+    }
+  });
+
   el('toPhotoBtn').addEventListener('click', ()=>{
     finalLineArtDataURL = editCanvas.toDataURL('image/png');
     showScreen('photo');
@@ -557,6 +802,7 @@
       liveVideo.style.display = 'none';
       el('retakePhotoBtn').style.display = 'inline-flex';
       el('stopLiveBtn').style.display = 'none';
+      stopTiltDisplay();
       resetCalibration();
       showScreen('compare');
       initOverlay();
@@ -590,6 +836,7 @@
       el('retakePhotoBtn').style.display = 'none';
       stopLiveBtn.style.display = 'inline-flex';
       liveCameraBtn.textContent = originalText;
+      startTilt();
       resetCalibration();
       showScreen('compare');
       initOverlay();
@@ -604,8 +851,55 @@
   function stopLiveCamera(){
     if(liveStream){ liveStream.getTracks().forEach(t=>t.stop()); liveStream = null; }
     liveVideo.style.display = 'none';
+    stopTiltDisplay();
   }
   stopLiveBtn.addEventListener('click', ()=>{ stopLiveCamera(); showScreen('photo'); });
+
+  // ---- tilt / level widget (live camera mode only) ----
+  let tiltRef = {beta:0, gamma:0};
+  let tiltCurrent = {beta:0, gamma:0};
+  let tiltHandlerAdded = false;
+
+  function tiltHandler(e){
+    if(e.beta===null || e.gamma===null) return;
+    tiltCurrent.beta = e.beta;
+    tiltCurrent.gamma = e.gamma;
+    updateLevelWidget();
+  }
+  function startTilt(){
+    if(!window.DeviceOrientationEvent) return;
+    if(tiltHandlerAdded){ el('levelWidget').style.display = 'flex'; return; }
+    const attach = ()=>{
+      window.addEventListener('deviceorientation', tiltHandler);
+      tiltHandlerAdded = true;
+      el('levelWidget').style.display = 'flex';
+    };
+    if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(state=>{ if(state==='granted') attach(); }).catch(()=>{});
+    } else {
+      attach();
+    }
+  }
+  function stopTiltDisplay(){ el('levelWidget').style.display = 'none'; }
+  function updateLevelWidget(){
+    const dBeta = tiltCurrent.beta - tiltRef.beta;
+    const dGamma = tiltCurrent.gamma - tiltRef.gamma;
+    const maxDeg = 20, radius = 16;
+    let dx = (dGamma/maxDeg)*radius;
+    let dy = (dBeta/maxDeg)*radius;
+    const dist = Math.hypot(dx,dy);
+    if(dist>radius){ dx = dx/dist*radius; dy = dy/dist*radius; }
+    const dot = el('levelDot');
+    dot.setAttribute('cx', 28+dx);
+    dot.setAttribute('cy', 28+dy);
+    const devDist = Math.hypot(dBeta,dGamma);
+    dot.setAttribute('fill', devDist<3 ? '#4cc98a' : (devDist<8 ? '#ffb020' : '#e8543e'));
+  }
+  el('calibrateTiltBtn').addEventListener('click', ()=>{
+    tiltRef.beta = tiltCurrent.beta;
+    tiltRef.gamma = tiltCurrent.gamma;
+    updateLevelWidget();
+  });
 
   // ================= STEP 4: overlay compare =================
   function initOverlay(){
