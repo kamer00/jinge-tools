@@ -1434,6 +1434,14 @@ function mkSpecInput(id, specs, prefix, onchangeFn) {
     hint.style.color = ok ? 'var(--green)' : 'var(--accent2)';
   }
   inp.addEventListener('input', function(){ refresh(); if(onchangeFn) onchangeFn.call(inp); });
+  // 聚焦時暫時清空，讓瀏覽器顯示完整建議清單；沒選新值就離開時還原
+  inp.addEventListener('focus', function(){
+    if(inp.value) { inp.dataset.last = inp.value; inp.value = ''; }
+  });
+  inp.addEventListener('blur', function(){
+    if(!inp.value && inp.dataset.last) { inp.value = inp.dataset.last; }
+    delete inp.dataset.last;
+  });
   wrap.appendChild(inp); wrap.appendChild(dl); wrap.appendChild(hint);
   refresh();
   return wrap;
