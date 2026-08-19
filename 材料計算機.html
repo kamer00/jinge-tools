@@ -83,11 +83,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .shape-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .shape-btn{
   background:var(--bg);border:1px solid var(--border);
-  color:var(--muted);padding:8px 4px;cursor:pointer;
-  font-family:var(--mono);font-size:9px;text-align:center;
-  transition:all .15s;border-radius:2px;line-height:1.4;
+  color:var(--muted);padding:10px 4px;cursor:pointer;
+  font-family:var(--mono);font-size:13px;font-weight:600;text-align:center;
+  transition:all .15s;border-radius:2px;line-height:1.3;
 }
-.shape-btn .icon{font-size:18px;display:block;margin-bottom:3px}
+.shape-btn .icon{font-size:30px;display:block;margin-bottom:5px}
+.shape-btn .icon svg{width:30px;height:30px}
 .bar-sub{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
 .shape-btn:hover{border-color:var(--accent);color:var(--accent)}
 .shape-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
@@ -216,7 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .spec-tag{background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:2px;cursor:pointer;transition:all .1s}
 .spec-tag:hover{border-color:var(--accent);color:var(--accent)}
 .spec-count{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
-.lookup-btn{background:var(--card2);border:1px solid var(--accent);color:var(--accent);padding:9px 14px;font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .15s;white-space:nowrap}
+.lookup-btn{background:var(--card2);border:1px solid var(--accent);color:var(--accent);padding:12px 20px;font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .15s;display:block;margin-left:auto;margin-right:auto}
 .lookup-btn:hover{background:var(--accent);color:#000}
 </style>
 </head>
@@ -234,13 +235,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <!-- ── 左側輸入 ── -->
   <div class="panel">
 
-    <button class="lookup-btn" onclick="openLookup()" style="width:100%;margin-bottom:16px">🔍 查詢現貨規格清單</button>
-
-    <!-- 模式切換 -->
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="mode-btn-calc" onclick="setMode('calc')">▶ 計算模式</button>
-      <button class="mode-btn" id="mode-btn-reverse" onclick="setMode('reverse')">⇄ 反查模式</button>
-    </div>
+    <button class="lookup-btn" onclick="openLookup()" style="margin-bottom:16px">🔍 查詢現貨規格清單</button>
 
     <!-- 材質 -->
     <!-- 形狀 -->
@@ -254,10 +249,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
           <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="3.5" cy="10" rx="2.5" ry="5"/><rect x="3.5" y="5" width="13" height="10"/><ellipse cx="16.5" cy="10" rx="2.5" ry="5" opacity=".7"/></svg></span>棒材
         </button>
         <button class="shape-btn" onclick="setShape('pipe')" id="btn-pipe">
-          <span class="icon">◎</span>管料
+          <span class="icon">◎</span>管料(13A/配管/...)
         </button>
         <button class="shape-btn" onclick="setShape('prod_pipe')" id="btn-prod_pipe">
-          <span class="icon">⊙</span>鋼管
+          <span class="icon">⊙</span>管(13C/AL/SUS)
         </button>
         <button class="shape-btn" onclick="setShape('shaft')" id="btn-shaft">
           <span class="icon">⊕</span>硬鉻軸
@@ -284,6 +279,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         </select>
         <div id="density-tag" class="density-tag">密度：7.85 g/cm³</div>
       </div>
+    </div>
+
+    <!-- 模式切換 -->
+    <div class="mode-toggle" style="margin-top:16px">
+      <button class="mode-btn active" id="mode-btn-calc" onclick="setMode('calc')">▶ 計算模式</button>
+      <button class="mode-btn" id="mode-btn-reverse" onclick="setMode('reverse')">⇄ 反查模式</button>
     </div>
 
     <!-- 尺寸 -->
@@ -366,7 +367,7 @@ const SPECS = {
     'S45C_L': [8,9,10,11,12,12.7,13,14,15,16,17,18,19,20,22,23,24,25,25.4,26,28,30,32,35,36,38,40,42,45,46,48,50,50.8,55,60,65,70,75,80,85,90,95,100],
     'S45C_B': [22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560],
     'S20C':  [25,30,32,35,38,40,45,50,55,60,65,70,145,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420],
-    'SCM440':[13,14,16,19,20,22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260],
+    'SCM440':[13,14,16,19,20,22,24,25,26,28,30,32,34,36,38,40,42,44,45,46,48,50,55,60,65,70,75,80,85,90,95,100,105,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460],
     'SCM415':[16,19,22,26,28,30,32,34,36,38,40,42,44,46,48,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330],
     'C3604':[25.4, 38.1, 42, 47.6, 50.8, 54, 57.1, 63.5, 70, 73, 76.2, 82.5, 92, 102, 114.3, 127],
     'FCD45':[30, 35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 105, 115, 120, 125, 130, 135, 145, 155, 165, 170, 185, 205, 225, 260, 265, 310, 360],
@@ -775,17 +776,8 @@ function checkSpec(shape, dims, matCode) {
   const tol = 0.05;
   const near = (arr, v) => arr && arr.some(x => Math.abs(Number(x)-v) <= tol);
   if(shape==='pipe') {
-    const pipeMat = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-    if(pipeMat==='sus') {
-      const ok = SUS_PIPE_PRICES.some(r => Math.abs(r.od-dims.OD)<=0.1 && Math.abs(r.id-dims.ID)<=0.1);
-      return {ok, msg: ok ? 'Ø'+dims.OD+'×Ø'+dims.ID+' ✓ 現貨規格（洋田）' : '⚠ Ø'+dims.OD+'×Ø'+dims.ID+' 洋田無此規格'};
-    } else if(pipeMat==='al') {
-      const ok = AL_PIPE_PRICES.some(r => Math.abs(r.od-dims.OD)<=0.1 && Math.abs(r.id-dims.ID)<=0.1);
-      return {ok, msg: ok ? 'Ø'+dims.OD+'×Ø'+dims.ID+' ✓ 現貨規格（洋田）' : '⚠ Ø'+dims.OD+'×Ø'+dims.ID+' 洋田無此規格'};
-    } else {
-      // STKM13A：從下拉選的就是建興現貨，直接顯示確認
-      return {ok: true, msg: 'Ø'+dims.OD+'×Ø'+dims.ID+' ✓ 現貨規格（建興）'};
-    }
+    const ok = PIPE_SPEC.some(([o,i]) => Math.abs(o-dims.OD)<=0.1 && Math.abs(i-dims.ID)<=0.1);
+    return {ok, msg: ok ? 'Ø'+dims.ID+'×Ø'+dims.OD+' ✓ 現貨規格（建興）' : '⚠ Ø'+dims.ID+'×Ø'+dims.OD+' 非建興現貨規格，請確認採購'};
   }
   const arr = getSpecArr(matCode, shape);
   if(!arr || arr.length===0) return {ok:true, msg:''};
@@ -1428,6 +1420,28 @@ function mkSpecSel(id, specs, prefix, onchangeFn) {
   return sel;
 }
 
+// 規格欄位：輸入框 + 建議清單（datalist），非現貨規格照樣可算，僅顯示⚠提示
+function mkSpecInput(id, specs, prefix, onchangeFn) {
+  const wrap = mk('div',{style:'display:flex;flex-direction:column;gap:4px;width:100%'});
+  const listId = id+'-list';
+  const inp = mk('input',{type:'number',id,step:'0.1',placeholder:(prefix||'')+'mm',style:selStyle});
+  inp.setAttribute('list', listId);
+  const dl = mk('datalist',{id:listId});
+  (specs||[]).forEach(v => dl.appendChild(mk('option',{value:v})));
+  const hint = mk('div',{id:id+'-hint',style:'font-family:var(--mono);font-size:10px;min-height:12px'});
+  function refresh() {
+    const v = parseFloat(inp.value);
+    if(!v || !specs || specs.length===0) { hint.textContent=''; return; }
+    const ok = specs.some(s => Math.abs(Number(s)-v) <= 0.05);
+    hint.textContent = ok ? '✓ 現貨規格' : '⚠ 非現貨規格，請確認採購';
+    hint.style.color = ok ? 'var(--green)' : 'var(--accent2)';
+  }
+  inp.addEventListener('input', function(){ refresh(); if(onchangeFn) onchangeFn.call(inp); });
+  wrap.appendChild(inp); wrap.appendChild(dl); wrap.appendChild(hint);
+  refresh();
+  return wrap;
+}
+
 function getSpecsForMat(shape) {
   const matCode = document.getElementById('mat')?.value.split('|')[0] || '';
   if(shape==='plate') return SPECS.plate;
@@ -1520,7 +1534,7 @@ function renderDims() {
       });
     } else {
       // ── 採購尺寸模式（原本邏輯）
-      const tWidget = mkSpecSel('dim-T', plateSpecs, '', autoFillUnitPrice);
+      const tWidget = mkSpecInput('dim-T', plateSpecs, '', autoFillUnitPrice);
       const tf=mkField(plateSpecLabel, tWidget);
       tf.style.flex='1';
       const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
@@ -1537,7 +1551,7 @@ function renderDims() {
     const isHollowCopper = hollowCopperMats.includes(matCode0);
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
     const specsD = getSpecsForMat('bar_rnd');
-    const dInput = specsD.length > 0 ? mkSpecSel('dim-D', specsD, 'Ø', autoFillUnitPrice) : mkInput('dim-D','0.1');
+    const dInput = mkSpecInput('dim-D', specsD, 'Ø', autoFillUnitPrice);
     const df=mkField('Ø（外徑）',dInput); df.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
@@ -1561,7 +1575,7 @@ function renderDims() {
 
   } else if(currentShape==='bar_sq') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const aSel=mkSpecSel('dim-A', getSpecsForMat('bar_sq'), '□', autoFillUnitPrice);
+    const aSel=mkSpecInput('dim-A', getSpecsForMat('bar_sq'), '□', autoFillUnitPrice);
     const af=mkField('A（邊長）',aSel); af.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
@@ -1570,7 +1584,7 @@ function renderDims() {
 
   } else if(currentShape==='bar_hex') {
     const g=mk('div',{style:'display:flex;align-items:flex-end;gap:4px'});
-    const sSel=mkSpecSel('dim-S', getSpecsForMat('bar_hex'), '⬡', autoFillUnitPrice);
+    const sSel=mkSpecInput('dim-S', getSpecsForMat('bar_hex'), '⬡', autoFillUnitPrice);
     const sf=mkField('S（對邊）',sSel); sf.style.flex='1';
     const x1=mk('div',{style:'color:var(--muted);font-size:13px;padding-bottom:8px;flex-shrink:0'}, '×');
     const lf=mkField('L（長）',mkInput('dim-L','1')); lf.style.flex='1';
@@ -1578,91 +1592,34 @@ function renderDims() {
     area.appendChild(g);
 
   } else if(currentShape==='pipe') {
-    // 材質選單
-    const matSel = mk('select',{id:'pipe-mat-sel',style:selStyle});
-    [['stkm','STKM13A（建興）'],['sus','SUS304 不鏽鋼管（洋田）'],['al','鋁管（洋田）']].forEach(([v,t])=>{
-      matSel.appendChild(mk('option',{value:v},t));
-    });
-    const matField = mk('div',{className:'field',style:'margin-bottom:8px'});
-    matField.appendChild(mk('label',{},'管料材質'));
-    matField.appendChild(matSel);
-    area.appendChild(matField);
-
-    // 三個子區塊（預先全建，CSS切換）
-    // — STKM13A 下拉
-    const steelDiv = mk('div',{id:'pipe-steel-area'});
-    const stkmSel = mk('select',{id:'dim-STKM_SPEC',style:selStyle});
-    PIPE_SPEC.forEach(([od,id_],i)=>stkmSel.appendChild(mk('option',{value:i},'Ø'+id_+'×Ø'+od)));
-    const stkmG=mk('div',{className:'dim-grid',style:'gap:8px'});
-    stkmSel.onchange = function() {
-      const [od_, id__] = PIPE_SPEC[parseInt(this.value)];
-      const matches = lookupSTKM13APrice(od_, id__);
-      const h = document.getElementById('pipe-price-hint');
-      const upEl = document.getElementById('unit-price');
-      if(h && matches.length) {
-        const rows = matches.map(r =>
-          '<div style="display:flex;justify-content:space-between">'
-          + '<span style="color:var(--muted);font-size:10px">'+r.desc+' | 壁厚 '+r.wall.toFixed(1)+'mm</span>'
-          + '<span style="color:var(--accent);font-weight:700">'+r.price+' 元/kg</span>'
-          + '</div>'
-        ).join('');
-        h.innerHTML = '<div style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px">建興 STKM13A 參考單價<br>'+rows+'</div>';
-        if(upEl && upEl.value === '') upEl.value = matches[0].price;
-      } else if(h) {
-        h.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">⚠ 此規格不在建興定價範圍，請手動輸入單價</div>';
-      }
-    };
-    stkmG.appendChild(mkField('規格（ID×OD）',stkmSel));
-    stkmG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-steel','1')));
-    steelDiv.appendChild(stkmG);
-    area.appendChild(steelDiv);
-
-    // — SUS管
-    const susDiv = mk('div',{id:'pipe-sus-area',style:'display:none'});
-    const susSel = mk('select',{id:'dim-SUS_SPEC',style:selStyle});
-    SUS_PIPE_PRICES.forEach((p,i)=>susSel.appendChild(mk('option',{value:i},'Ø'+p.id+'×Ø'+p.od)));
-    const susG=mk('div',{className:'dim-grid',style:'gap:8px'});
-    susG.appendChild(mkField('規格（ID×OD）',susSel));
-    susG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-sus','1')));
-    susDiv.appendChild(susG);
-    area.appendChild(susDiv);
-
-    // — 鋁管
-    const alDiv = mk('div',{id:'pipe-al-area',style:'display:none'});
-    const alSel = mk('select',{id:'dim-AL_SPEC',style:selStyle});
-    AL_PIPE_PRICES.forEach((p,i)=>alSel.appendChild(mk('option',{value:i},'Ø'+p.id+'×Ø'+p.od)));
-    const alG=mk('div',{className:'dim-grid',style:'gap:8px'});
-    alG.appendChild(mkField('規格（ID×OD）',alSel));
-    alG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-al','1')));
-    alDiv.appendChild(alG);
-    area.appendChild(alDiv);
-
-    // 報價提示
+    // 管料：只有 STKM13A（素材內外皆未加工），跟鐵材同樣算重量、可自由輸入非現貨規格
+    const odVals = [...new Set(PIPE_SPEC.map(p=>p[0]))].sort((a,b)=>a-b);
+    const idVals = [...new Set(PIPE_SPEC.map(p=>p[1]))].sort((a,b)=>a-b);
+    const g = mk('div',{className:'dim-grid',style:'gap:8px'});
+    g.appendChild(mkField('Ø（外徑OD）', mkSpecInput('dim-OD', odVals, 'Ø', updatePipeSteelHint)));
+    g.appendChild(mkField('Ø（內徑ID）', mkSpecInput('dim-ID', idVals, 'Ø', updatePipeSteelHint)));
+    area.appendChild(g);
+    const lf = mk('div',{className:'field',style:'margin-top:8px'});
+    lf.appendChild(mk('label',{},'長度 L（mm）'));
+    lf.appendChild(mkInput('dim-L','1'));
+    area.appendChild(lf);
     area.appendChild(mk('div',{id:'pipe-price-hint',style:'margin-top:6px'}));
 
-    // 事件
-    matSel.onchange = function() {
-      steelDiv.style.display = this.value==='stkm' ? '' : 'none';
-      susDiv.style.display   = this.value==='sus'  ? '' : 'none';
-      alDiv.style.display    = this.value==='al'   ? '' : 'none';
-      document.getElementById('pipe-price-hint').innerHTML = '';
-    };
-    susSel.onchange = function() {
-      const p = SUS_PIPE_PRICES[parseInt(this.value)];
-      const h = document.getElementById('pipe-price-hint');
-      if(h && p) h.innerHTML = '<div style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">洋田報價　</span><span style="color:var(--accent)">整支 '+(p.whole||'—')+' 元/mm　</span><span style="color:var(--green)">定尺 '+(p.cut||'—')+' 元/mm</span></div>';
-    };
-    alSel.onchange = function() {
-      const p = AL_PIPE_PRICES[parseInt(this.value)];
-      const h = document.getElementById('pipe-price-hint');
-      if(h && p) h.innerHTML = '<div style="background:rgba(61,186,120,.1);border:1px solid rgba(61,186,120,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">洋田報價　</span><span style="color:var(--accent)">整支 '+(p.whole||'—')+' 元/mm　</span><span style="color:var(--green)">定尺 '+(p.cut||'—')+' 元/mm</span></div>';
-    };
-
   } else if(currentShape==='prod_pipe') {
-    // 規格選單
+    // 材質選單：STKM13C／SUS304／鋁管
+    const ppMatSel = mk('select',{id:'pp-mat-sel',style:selStyle});
+    [['stkm13c','STKM13C（建興）'],['sus','SUS304 不鏽鋼管（洋田）'],['al','鋁管（洋田）']].forEach(([v,t])=>{
+      ppMatSel.appendChild(mk('option',{value:v},t));
+    });
+    const ppMatField = mk('div',{className:'field',style:'margin-bottom:8px'});
+    ppMatField.appendChild(mk('label',{},'成品管材質'));
+    ppMatField.appendChild(ppMatSel);
+    area.appendChild(ppMatField);
+
+    // — STKM13C（成品管/素管/電鍍管 + 規格）
+    const stkmcDiv = mk('div',{id:'pp-stkm13c-area'});
     const specSel = mk('select',{id:'dim-PP_SPEC',style:selStyle});
     STKM_PRICES.forEach((p,i)=>specSel.appendChild(mk('option',{value:i},'Ø'+p.id+'×Ø'+p.od)));
-    // 種類選單
     const typeSel = mk('select',{id:'dim-PP_TYPE',style:selStyle});
     [['fin','成品管'],['raw','素管'],['plt','電鍍管']].forEach(([v,t])=>{
       typeSel.appendChild(mk('option',{value:v},t));
@@ -1673,13 +1630,51 @@ function renderDims() {
     sf.appendChild(specSel);
     g.appendChild(sf);
     g.appendChild(mkField('種類',typeSel));
-    g.appendChild(mkField('長度 L（mm）',mkInput('dim-L','1')));
-    area.appendChild(g);
-    // 種類切換時更新提示
+    g.appendChild(mkField('長度 L（mm）',mkInput('dim-L-stkm13c','1')));
+    stkmcDiv.appendChild(g);
     typeSel.onchange = function() { updateProdPipeHint(); };
     specSel.onchange = function() { updateProdPipeHint(); };
+    area.appendChild(stkmcDiv);
+
+    // — SUS304
+    const susDiv = mk('div',{id:'pp-sus-area',style:'display:none'});
+    const susSel = mk('select',{id:'dim-SUS_SPEC',style:selStyle});
+    SUS_PIPE_PRICES.forEach((p,i)=>susSel.appendChild(mk('option',{value:i},'Ø'+p.id+'×Ø'+p.od)));
+    const susG=mk('div',{className:'dim-grid',style:'gap:8px'});
+    susG.appendChild(mkField('規格（ID×OD）',susSel));
+    susG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-sus','1')));
+    susDiv.appendChild(susG);
+    area.appendChild(susDiv);
+
+    // — 鋁管
+    const alDiv = mk('div',{id:'pp-al-area',style:'display:none'});
+    const alSel = mk('select',{id:'dim-AL_SPEC',style:selStyle});
+    AL_PIPE_PRICES.forEach((p,i)=>alSel.appendChild(mk('option',{value:i},'Ø'+p.id+'×Ø'+p.od)));
+    const alG=mk('div',{className:'dim-grid',style:'gap:8px'});
+    alG.appendChild(mkField('規格（ID×OD）',alSel));
+    alG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-al','1')));
+    alDiv.appendChild(alG);
+    area.appendChild(alDiv);
+
     const hintDiv = mk('div',{id:'prod-pipe-hint',style:'margin-top:6px'});
     area.appendChild(hintDiv);
+
+    ppMatSel.onchange = function() {
+      stkmcDiv.style.display = this.value==='stkm13c' ? '' : 'none';
+      susDiv.style.display   = this.value==='sus'      ? '' : 'none';
+      alDiv.style.display    = this.value==='al'        ? '' : 'none';
+      document.getElementById('prod-pipe-hint').innerHTML = '';
+    };
+    susSel.onchange = function() {
+      const p = SUS_PIPE_PRICES[parseInt(this.value)];
+      const h = document.getElementById('prod-pipe-hint');
+      if(h && p) h.innerHTML = '<div style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">洋田報價　</span><span style="color:var(--accent)">整支 '+(p.whole||'—')+' 元/mm　</span><span style="color:var(--green)">定尺 '+(p.cut||'—')+' 元/mm</span></div>';
+    };
+    alSel.onchange = function() {
+      const p = AL_PIPE_PRICES[parseInt(this.value)];
+      const h = document.getElementById('prod-pipe-hint');
+      if(h && p) h.innerHTML = '<div style="background:rgba(61,186,120,.1);border:1px solid rgba(61,186,120,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px"><span style="color:var(--muted)">洋田報價　</span><span style="color:var(--accent)">整支 '+(p.whole||'—')+' 元/mm　</span><span style="color:var(--green)">定尺 '+(p.cut||'—')+' 元/mm</span></div>';
+    };
 
   } else if(currentShape==='shaft') {
     const shaftFilterMap = {
@@ -1749,6 +1744,34 @@ function calcWeight(shape, dims, density) {
 }
 
 
+function updatePipeSteelHint() {
+  const od = parseFloat(document.getElementById('dim-OD')?.value);
+  const id_ = parseFloat(document.getElementById('dim-ID')?.value);
+  const h = document.getElementById('pipe-price-hint');
+  if(!h) return;
+  if(!od || !id_ || od<=id_) { h.innerHTML=''; return; }
+  const inStock = PIPE_SPEC.some(([o,i]) => Math.abs(o-od)<=0.1 && Math.abs(i-id_)<=0.1);
+  const stockNote = inStock
+    ? '<div class="warn-ok" style="margin-bottom:6px">✓ Ø'+id_+'×Ø'+od+' 現貨規格（建興）</div>'
+    : '<div class="warn" style="margin-bottom:6px">⚠ Ø'+id_+'×Ø'+od+' 非建興現貨規格，請確認採購</div>';
+  const matches = lookupSTKM13APrice(od, id_);
+  const upEl = document.getElementById('unit-price');
+  let priceNote;
+  if(matches.length) {
+    const rows = matches.map(r =>
+      '<div style="display:flex;justify-content:space-between">'
+      + '<span style="color:var(--muted);font-size:10px">'+r.desc+' | 壁厚 '+r.wall.toFixed(1)+'mm</span>'
+      + '<span style="color:var(--accent);font-weight:700">'+r.price+' 元/kg</span>'
+      + '</div>'
+    ).join('');
+    priceNote = '<div style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);padding:8px 12px;border-radius:2px;font-family:var(--mono);font-size:11px">建興 STKM13A 參考單價<br>'+rows+'</div>';
+    if(upEl && upEl.value === '') upEl.value = matches[0].price;
+  } else {
+    priceNote = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">此外徑/壁厚無建興參考單價，請手動輸入單價</div>';
+  }
+  h.innerHTML = stockNote + priceNote;
+}
+
 function updateProdPipeHint() {
   const si = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
   const tp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
@@ -1797,25 +1820,23 @@ function calculate() {
   }
   // 管料/成品管/硬鉻軸：材質區隱藏，依形狀給預設密度
   let density = parseFloat(matVal[1]);
-  if(isNaN(density)) {
-    if(currentShape==='pipe') {
-      const pm = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-      density = pm==='al' ? 2.70 : 7.85;
-    } else {
-      density = 7.85;
-    }
-  }
+  if(isNaN(density)) density = 7.85;
   // 管料/成品管/硬鉻軸的顯示材質
   if(currentShape==='pipe') {
-    const pm = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-    const pmMap = {stkm:'STKM13A', sus:'SUS304', al:'鋁管 A6061'};
-    matDisplay = pmMap[pm] || 'STKM13A';
+    matDisplay = 'STKM13A';
   } else if(currentShape==='prod_pipe') {
-    const pidx = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
-    const pp = STKM_PRICES[pidx];
-    const ptp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
-    const ptmap = {fin:'成品管',raw:'素管',plt:'電鍍管'};
-    matDisplay = 'STKM13C '+ptmap[ptp]+' Ø'+pp.id+'×Ø'+pp.od;
+    const ppMat = document.getElementById('pp-mat-sel')?.value || 'stkm13c';
+    if(ppMat==='stkm13c') {
+      const pidx = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
+      const pp = STKM_PRICES[pidx];
+      const ptp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
+      const ptmap = {fin:'成品管',raw:'素管',plt:'電鍍管'};
+      matDisplay = 'STKM13C '+ptmap[ptp]+' Ø'+pp.id+'×Ø'+pp.od;
+    } else if(ppMat==='sus') {
+      matDisplay = 'SUS304 不鏽鋼管';
+    } else {
+      matDisplay = '鋁管 A6061';
+    }
   } else if(currentShape==='shaft') {
     const smat = document.getElementById('dim-SH_MAT')?.value || 's45c';
     const smap = {s45c:'S45C 硬鉻', scm:'SCM440+QT', hf:'高週波', sus:'SUS304'};
@@ -1829,13 +1850,56 @@ function calculate() {
 
   const fmt = n => n.toLocaleString('zh-TW', {minimumFractionDigits:2, maximumFractionDigits:4});
   const fmtNT = n => Math.round(n).toLocaleString('zh-TW');
-  const shapeNames = {plate:'板材',bar_rnd:'圓棒',bar_sq:'四角棒',bar_hex:'六角棒',pipe:'管料',prod_pipe:'成品鋼管',shaft:'硬鉻軸心'};
+  const shapeNames = {plate:'板材',bar_rnd:'圓棒',bar_sq:'四角棒',bar_hex:'六角棒',pipe:'管料',prod_pipe:'成品管',shaft:'硬鉻軸心'};
 
   // ── 成品管 ──
   if(currentShape==='prod_pipe') {
+    const ppMat = document.getElementById('pp-mat-sel')?.value || 'stkm13c';
+
+    if(ppMat==='sus' || ppMat==='al') {
+      const priceTable = ppMat==='sus' ? SUS_PIPE_PRICES : AL_PIPE_PRICES;
+      const idx = parseInt(document.getElementById(ppMat==='sus'?'dim-SUS_SPEC':'dim-AL_SPEC')?.value||'0');
+      const p = priceTable[idx];
+      const L = g(ppMat==='sus'?'dim-L-sus':'dim-L-al');
+      if(!L) { alert('請填入長度'); return; }
+      const sawFee = Math.round(p.od / 10 * 10) / 10;
+      const matLabel = ppMat==='sus' ? 'SUS304 不鏽鋼管（洋田）' : '鋁管 A6061（洋田）';
+      const cands = [{name:'洋田整支',px:p.whole},{name:'洋田定尺',px:p.cut}].filter(x=>x.px);
+      if(!cands.length) {
+        document.getElementById('result').innerHTML = '<div class="warn">⚠ Ø'+p.id+'×Ø'+p.od+' mm '+matLabel+' 無廠商報價資料</div>';
+        return;
+      }
+      const best = cands.reduce((a,b)=>a.px>b.px?a:b);
+      const total = best.px * L * qty + sawFee;
+      const sawNote = sawFee > 0 ? '<div class="res-row"><span class="res-label">切工費</span><span class="res-val" style="color:var(--muted)">NT$ '+sawFee+'（OD÷10）</span></div>' : '';
+      document.getElementById('result').innerHTML =
+        '<div class="res-card"><div class="res-card-header">'+matLabel+' Ø'+p.id+'×Ø'+p.od+' ／ '+L+' mm</div>'+
+        '<div class="res-card-body"><div class="price-big"><div class="price-label-sm">HIGHEST PRICE</div>'+
+        '<div class="price-num">NT$ '+fmtNT(total)+'</div>'+
+        '<div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+' mm'+(sawFee>0?' + 切工 NT$'+sawFee:'')+'</div></div>'+
+        '<div style="margin-top:12px">'+
+        '<div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+': '+x.px+' 元/mm').join('　')+'</span></div>'+
+        sawNote+
+        '</div></div></div>';
+      if(window.self!==window.top){
+        const _pia=Math.round(total);
+        const _pispec=matLabel+' Ø'+p.id+'×Ø'+p.od+' / L'+L+'mm';
+        const _pid=document.createElement('div');
+        _pid.style.cssText='margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
+        const _pib=document.createElement('button');
+        _pib.textContent='✓ 套用到報價系統　NT$ '+_pia.toLocaleString('zh-TW');
+        _pib.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;';
+        _pib.onclick=function(){ applyToQuote(_pia,'MATERIAL_COST',_pispec); };
+        _pid.appendChild(_pib);
+        document.getElementById('result').appendChild(_pid);
+      }
+      return;
+    }
+
+    // STKM13C
     const si = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
     const tp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
-    const L = g('dim-L');
+    const L = g('dim-L-stkm13c');
     if(!L) { alert('請填入長度'); return; }
     const p = STKM_PRICES[si];
     const typeLabel = {fin:'成品管', raw:'素管', plt:'電鍍管'};
@@ -1910,69 +1974,12 @@ function calculate() {
     dims = {S:g('dim-S'), L:g('dim-L')};
     if(!dims.S || !dims.L) valid=false;
   } else if(currentShape==='pipe') {
-    const pipeMat = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-    if(pipeMat==='sus') {
-      const idx = parseInt(document.getElementById('dim-SUS_SPEC')?.value||'0');
-      const p = SUS_PIPE_PRICES[idx];
-      dims = {OD:p.od, ID:p.id, L:g('dim-L-sus')};
-    } else if(pipeMat==='al') {
-      const idx = parseInt(document.getElementById('dim-AL_SPEC')?.value||'0');
-      const p = AL_PIPE_PRICES[idx];
-      dims = {OD:p.od, ID:p.id, L:g('dim-L-al')};
-    } else {
-      // STKM13A：從 PIPE_SPEC 取 [OD, ID]
-      const si = parseInt(document.getElementById('dim-STKM_SPEC')?.value||'0');
-      const [od_, id__] = PIPE_SPEC[si];
-      const L_ = parseFloat(document.getElementById('dim-L-steel')?.value)||0;
-      dims = {OD:od_, ID:id__, L:L_};
-    }
-    if(!dims.OD || !dims.ID || !dims.L) valid=false;
+    // STKM13A：直接讀輸入框（可自由輸入非現貨規格）
+    dims = {OD:g('dim-OD'), ID:g('dim-ID'), L:g('dim-L')};
+    if(!dims.OD || !dims.ID || dims.OD<=dims.ID || !dims.L) valid=false;
   }
 
   if(!valid) { alert('請填入所有尺寸'); return; }
-
-  // SUS / AL 管料：長度計價（元/mm），自動帶 DB 行情
-  if(currentShape==='pipe') {
-    const pm = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-    if(pm==='sus' || pm==='al') {
-      const priceTable = pm==='sus' ? SUS_PIPE_PRICES : AL_PIPE_PRICES;
-      const idx = parseInt(document.getElementById(pm==='sus'?'dim-SUS_SPEC':'dim-AL_SPEC')?.value||'0');
-      const p = priceTable[idx];
-      const L = dims.L;
-      const sawFee = Math.round(dims.OD / 10 * 10) / 10;
-      const matLabel = pm==='sus' ? 'SUS304 不鏽鋼管（洋田）' : '鋁管 A6061（洋田）';
-      const cands = [{name:'洋田整支',px:p.whole},{name:'洋田定尺',px:p.cut}].filter(x=>x.px);
-      if(!cands.length) {
-        document.getElementById('result').innerHTML = '<div class="warn">⚠ Ø'+p.id+'×Ø'+p.od+' mm '+matLabel+' 無廠商報價資料</div>';
-        return;
-      }
-      const best = cands.reduce((a,b)=>a.px>b.px?a:b);
-      const total = best.px * L * qty + sawFee;
-      const sawNote = sawFee > 0 ? '<div class="res-row"><span class="res-label">切工費</span><span class="res-val" style="color:var(--muted)">NT$ '+sawFee+'（OD÷10）</span></div>' : '';
-      document.getElementById('result').innerHTML =
-        '<div class="res-card"><div class="res-card-header">'+matLabel+' Ø'+p.id+'×Ø'+p.od+' ／ '+L+' mm</div>'+
-        '<div class="res-card-body"><div class="price-big"><div class="price-label-sm">HIGHEST PRICE</div>'+
-        '<div class="price-num">NT$ '+fmtNT(total)+'</div>'+
-        '<div class="price-sub">'+best.name+'　'+best.px+' 元/mm × '+L+' mm'+(sawFee>0?' + 切工 NT$'+sawFee:'')+'</div></div>'+
-        '<div style="margin-top:12px">'+
-        '<div class="res-row"><span class="res-label">各廠報價</span><span class="res-val" style="font-size:11px">'+cands.map(x=>x.name+': '+x.px+' 元/mm').join('　')+'</span></div>'+
-        sawNote+
-        '</div></div></div>';
-      if(window.self!==window.top){
-        const _pia=Math.round(total);
-        const _pispec=matLabel+' Ø'+p.id+'×Ø'+p.od+' / L'+L+'mm';
-        const _pid=document.createElement('div');
-        _pid.style.cssText='margin-top:16px;padding-top:16px;border-top:1px solid #444c56';
-        const _pib=document.createElement('button');
-        _pib.textContent='✓ 套用到報價系統　NT$ '+_pia.toLocaleString('zh-TW');
-        _pib.style.cssText='width:100%;background:#1a3a1a;border:2px solid #3fb950;border-radius:2px;color:#3fb950;cursor:pointer;font-size:14px;font-weight:700;padding:14px;';
-        _pib.onclick=function(){ applyToQuote(_pia,'MATERIAL_COST',_pispec); };
-        _pid.appendChild(_pib);
-        document.getElementById('result').appendChild(_pid);
-      }
-      return;
-    }
-  }
 
   // 銅料圓棒：正向模式 外徑+7、內徑-7、長度+5，密度9，×1.03；反查模式實寸
   const copperBarMats = ['C3604','BC6','PBC3','ALBC3','HBrass'];
@@ -2257,20 +2264,19 @@ function renderLookup() {
   const countEl = document.getElementById('lookup-count');
   const matSel = document.getElementById('lookup-mat');
 
-  // 管料：重建材質選單
-  if(shape==='pipe') {
+  // 成品管：重建材質選單（STKM13C／SUS304／鋁管）
+  if(shape==='prod_pipe') {
     matWrap.style.display = '';
-    const curVal = matSel.value;
-    const hasPipeOpts = matSel.querySelector('option[value="pipe_stkm"]');
+    const hasPipeOpts = matSel.querySelector('option[value="pipe_stkm13c"]');
     if(!hasPipeOpts) {
       matSel.innerHTML = '';
-      [['pipe_stkm','STKM13A（建興）'],['pipe_sus','SUS304（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
+      [['pipe_stkm13c','STKM13C（建興）'],['pipe_sus','SUS304（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
         const o=document.createElement('option'); o.value=v; o.textContent=t; matSel.appendChild(o);
       });
       matSel.onchange = renderLookup;
     }
   } else {
-    matWrap.style.display = ['plate','prod_pipe'].includes(shape) ? 'none' : '';
+    matWrap.style.display = ['plate','pipe'].includes(shape) ? 'none' : '';
     // 依形狀給對應材質選單
     const matsByShape = {
       bar_rnd: [
@@ -2296,13 +2302,13 @@ function renderLookup() {
   const mat = matSel.value;
   let specs = [], titleText = '';
   if(shape==='plate') { specs=SPECS.plate; titleText='板材板厚（mm）'; }
-  else if(shape==='pipe') {
-    const pipeMat = document.getElementById('lookup-mat').value;
-    if(pipeMat==='pipe_sus') { specs=SUS_PIPE_PRICES; titleText='SUS304 不鏽鋼管 Ø內×Ø外（mm）（洋田）'; }
-    else if(pipeMat==='pipe_al') { specs=AL_PIPE_PRICES; titleText='鋁管 Ø內×Ø外（mm）（洋田）'; }
-    else { specs=PIPE_SPEC; titleText='STKM13A 管料 Ø內×Ø外（mm）（建興）'; }
+  else if(shape==='pipe') { specs=PIPE_SPEC; titleText='STKM13A 管料 Ø內×Ø外（mm）（建興）'; }
+  else if(shape==='prod_pipe') {
+    const ppMat = document.getElementById('lookup-mat').value;
+    if(ppMat==='pipe_sus') { specs=SUS_PIPE_PRICES; titleText='SUS304 不鏽鋼管 Ø內×Ø外（mm）（洋田）'; }
+    else if(ppMat==='pipe_al') { specs=AL_PIPE_PRICES; titleText='鋁管 Ø內×Ø外（mm）（洋田）'; }
+    else { specs=STKM_PRICES; titleText='STKM13C 鋼管規格 Ø內×Ø外（mm）'; }
   }
-  else if(shape==='prod_pipe') { specs=STKM_PRICES; titleText='STKM13C 鋼管規格 Ø內×Ø外（mm）'; }
   else if(shape==='shaft') {
     specs=SHAFT_PRICES;
     const shaftMatNames = {s45c:'S45C 硬鉻', scm:'SCM440+QT', hf:'高週波', sus:'SUS304'};
@@ -2321,22 +2327,22 @@ function renderLookup() {
 
   const sym = {bar_rnd:'Ø',bar_sq:'□',bar_hex:'⬡'};
   if(shape==='pipe') {
-    const pipeMat2 = document.getElementById('lookup-mat').value;
-    if(pipeMat2==='pipe_sus') {
+    tags.innerHTML = PIPE_SPEC.map(([od,id_])=>
+      '<span class="spec-tag" onclick="applyPipeSpec('+od+','+id_+')">Ø'+id_+'×Ø'+od+'</span>'
+    ).join('');
+  } else if(shape==='prod_pipe') {
+    const ppMat2 = document.getElementById('lookup-mat').value;
+    if(ppMat2==='pipe_sus') {
       tags.innerHTML = SUS_PIPE_PRICES.map((p,i)=>
         '<span class="spec-tag" onclick="applySpecialPipe(&quot;sus&quot;,'+i+')">Ø'+p.id+'×Ø'+p.od+'</span>'
       ).join('');
-    } else if(pipeMat2==='pipe_al') {
+    } else if(ppMat2==='pipe_al') {
       tags.innerHTML = AL_PIPE_PRICES.map((p,i)=>
         '<span class="spec-tag" onclick="applySpecialPipe(&quot;al&quot;,'+i+')">Ø'+p.id+'×Ø'+p.od+'</span>'
       ).join('');
     } else {
-      tags.innerHTML = PIPE_SPEC.map(([od,id_])=>
-        '<span class="spec-tag" onclick="applyPipeSpec('+od+','+id_+')">Ø'+id_+'×Ø'+od+'</span>'
-      ).join('');
+      tags.innerHTML = specs.map((p,i)=>'<span class="spec-tag" onclick="applyProdPipe('+i+')">Ø'+p.id+'×Ø'+p.od+'</span>').join('');
     }
-  } else if(shape==='prod_pipe') {
-    tags.innerHTML = specs.map((p,i)=>'<span class="spec-tag" onclick="applyProdPipe('+i+')">Ø'+p.id+'×Ø'+p.od+'</span>').join('');
   } else if(shape==='shaft') {
     const shaftMat = matSel.value || 's45c';
     const shaftFilterMap = {
@@ -2380,21 +2386,28 @@ function applyPipeSpec(od, id_) {
     const eID=document.getElementById('dim-ID');
     if(eOD) eOD.value=od;
     if(eID) eID.value=id_;
+    updatePipeSteelHint();
     closeLookup();
   },50);
 }
 function applyProdPipe(idx) {
   setShape('prod_pipe');
-  setTimeout(()=>{ const el=document.getElementById('dim-PP_SPEC'); if(el) el.value=idx; closeLookup(); },80);
+  setTimeout(()=>{
+    const matSel=document.getElementById('pp-mat-sel');
+    if(matSel) { matSel.value='stkm13c'; matSel.onchange(); }
+    const el=document.getElementById('dim-PP_SPEC'); if(el) el.value=idx;
+    updateProdPipeHint();
+    closeLookup();
+  },80);
 }
 function applyShaft(idx) {
   setShape('shaft');
   setTimeout(()=>{ const el=document.getElementById('dim-SH_DIA'); if(el) el.value=idx; closeLookup(); },80);
 }
 function applySpecialPipe(pipeType, idx) {
-  setShape('pipe');
+  setShape('prod_pipe');
   setTimeout(()=>{
-    const matSel=document.getElementById('pipe-mat-sel');
+    const matSel=document.getElementById('pp-mat-sel');
     if(matSel) {
       matSel.value = pipeType;
       matSel.onchange();
@@ -2434,21 +2447,34 @@ function reverseCalc() {
 
   // ── 成品管 ──
   if(currentShape==='prod_pipe') {
-    const si = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
-    const tp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
-    const L  = g('dim-L');
-    if(!L) { alert('請填入長度'); return; }
-    const p = STKM_PRICES[si];
-    const typeLabel = {fin:'成品管',raw:'素管',plt:'電鍍管'};
-    const keyMap = {
-      fin:[{name:'益陽',k:'yi_fin'},{name:'東祐',k:'dy_fin'},{name:'金亞洲',k:'jy_fin'}],
-      raw:[{name:'益陽',k:'yi_raw'},{name:'東祐',k:'dy_raw'}],
-      plt:[{name:'益陽',k:'yi_plt'},{name:'金亞洲',k:'jy_plt'}]
-    };
-    dbPrices  = keyMap[tp].map(x=>({name:x.name,px:p[x.k]})).filter(x=>x.px);
-    impliedPx = purchaseAmt / L;
-    unit      = '元/mm';
-    specDesc  = 'STKM13C '+typeLabel[tp]+' Ø'+p.id+'×Ø'+p.od+' × '+L+' mm';
+    const ppMat = document.getElementById('pp-mat-sel')?.value || 'stkm13c';
+    if(ppMat==='sus' || ppMat==='al') {
+      const priceTable = ppMat==='sus' ? SUS_PIPE_PRICES : AL_PIPE_PRICES;
+      const idx = parseInt(document.getElementById(ppMat==='sus'?'dim-SUS_SPEC':'dim-AL_SPEC')?.value||'0');
+      const p = priceTable[idx];
+      const L = g(ppMat==='sus'?'dim-L-sus':'dim-L-al');
+      if(!L) { alert('請填入長度'); return; }
+      dbPrices  = [{name:'洋田整支',px:p.whole},{name:'洋田定尺',px:p.cut}].filter(x=>x.px);
+      impliedPx = purchaseAmt / L;
+      unit      = '元/mm';
+      specDesc  = (ppMat==='sus'?'SUS304 不鏽鋼管':'鋁管 A6061')+' Ø'+p.id+'×Ø'+p.od+' × '+L+' mm';
+    } else {
+      const si = parseInt(document.getElementById('dim-PP_SPEC')?.value||'0');
+      const tp = document.getElementById('dim-PP_TYPE')?.value || 'fin';
+      const L  = g('dim-L-stkm13c');
+      if(!L) { alert('請填入長度'); return; }
+      const p = STKM_PRICES[si];
+      const typeLabel = {fin:'成品管',raw:'素管',plt:'電鍍管'};
+      const keyMap = {
+        fin:[{name:'益陽',k:'yi_fin'},{name:'東祐',k:'dy_fin'},{name:'金亞洲',k:'jy_fin'}],
+        raw:[{name:'益陽',k:'yi_raw'},{name:'東祐',k:'dy_raw'}],
+        plt:[{name:'益陽',k:'yi_plt'},{name:'金亞洲',k:'jy_plt'}]
+      };
+      dbPrices  = keyMap[tp].map(x=>({name:x.name,px:p[x.k]})).filter(x=>x.px);
+      impliedPx = purchaseAmt / L;
+      unit      = '元/mm';
+      specDesc  = 'STKM13C '+typeLabel[tp]+' Ø'+p.id+'×Ø'+p.od+' × '+L+' mm';
+    }
   }
   // ── 硬鉻軸心 ──
   else if(currentShape==='shaft') {
@@ -2470,43 +2496,17 @@ function reverseCalc() {
     unit      = '元/mm';
     specDesc  = '硬鉻軸心 '+matMap[mat]+' Ø'+s.dia+' × '+L+' mm';
   }
-  // ── 管料 ──
+  // ── 管料（STKM13A）──
   else if(currentShape==='pipe') {
-    const pipeMat = document.getElementById('pipe-mat-sel')?.value || 'stkm';
-    let OD, ID, L;
-    if(pipeMat==='sus') {
-      const idx = parseInt(document.getElementById('dim-SUS_SPEC')?.value||'0');
-      const p = SUS_PIPE_PRICES[idx];
-      OD=p.od; ID=p.id; L=g('dim-L-sus');
-      dbPrices = [{name:'洋田整支',px:p.whole},{name:'洋田定尺',px:p.cut}].filter(x=>x.px);
-    } else if(pipeMat==='al') {
-      const idx = parseInt(document.getElementById('dim-AL_SPEC')?.value||'0');
-      const p = AL_PIPE_PRICES[idx];
-      OD=p.od; ID=p.id; L=g('dim-L-al');
-      dbPrices = [{name:'洋田整支',px:p.whole},{name:'洋田定尺',px:p.cut}].filter(x=>x.px);
-    } else {
-      // STKM13A：重量計價（元/kg）
-      const si = parseInt(document.getElementById('dim-STKM_SPEC')?.value||'0');
-      const [od_,id__] = PIPE_SPEC[si];
-      OD=od_; ID=id__; L=parseFloat(document.getElementById('dim-L-steel')?.value)||0;
-      // STKM13A 無元/kg行情可比，dbPrices 留空
-    }
+    const OD = g('dim-OD'), ID = g('dim-ID'), L = g('dim-L');
     if(!OD || !ID || !L) { alert('請填入所有尺寸'); return; }
     sawFee = Math.round(OD / 10 * 10) / 10;
-
-    if(pipeMat==='stkm') {
-      // ── STKM13A 重量計價 ──
-      const {kg:k} = calcWeight('pipe', {OD, ID, L}, 7.85);
-      weight    = k;
-      impliedPx = weight > 0 ? (purchaseAmt - sawFee) / weight : 0;
-      unit      = '元/kg';
-    } else {
-      // ── SUS / AL 元/mm 計價 ──
-      impliedPx = (purchaseAmt - sawFee) / L;
-      unit      = '元/mm';
-    }
-    const pmMap = {stkm:'STKM13A', sus:'SUS304管', al:'鋁管'};
-    specDesc = pmMap[pipeMat]+' Ø'+ID+'×Ø'+OD+' × '+L+' mm';
+    // STKM13A：重量計價（元/kg），無元/kg行情表可比，dbPrices 留空
+    const {kg:k} = calcWeight('pipe', {OD, ID, L}, 7.85);
+    weight    = k;
+    impliedPx = weight > 0 ? (purchaseAmt - sawFee) / weight : 0;
+    unit      = '元/kg';
+    specDesc  = 'STKM13A Ø'+ID+'×Ø'+OD+' × '+L+' mm';
   }
   // ── 板材 + 棒材 ──
   else {
@@ -2637,7 +2637,7 @@ function reverseCalc() {
             <option value="bar_sq">四角棒</option>
             <option value="bar_hex">六角棒</option>
             <option value="pipe">管料</option>
-            <option value="prod_pipe">鋼管（STKM13C）</option>
+            <option value="prod_pipe">成品管</option>
             <option value="shaft">硬鉻軸心</option>
           </select>
         </div>
