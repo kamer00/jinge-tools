@@ -1408,6 +1408,30 @@ function mkField(lbl, child) {
 
 const selStyle = 'background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;width:100%;border-radius:2px';
 
+// 內徑→外徑二層下拉選單：選內徑後，外徑選單只列出該內徑實際搭配的外徑（不可自由輸入）
+function mkIdOdCascadeSelect(idFieldId, odFieldId, table, onchangeFn) {
+  const idSel = mk('select',{id:idFieldId,style:selStyle});
+  const idVals = [...new Set(table.map(r=>r.id))].sort((a,b)=>a-b);
+  idSel.appendChild(mk('option',{value:''},'選擇內徑'));
+  idVals.forEach(v=>idSel.appendChild(mk('option',{value:v},'Ø'+v)));
+
+  const odSel = mk('select',{id:odFieldId,style:selStyle});
+  odSel.appendChild(mk('option',{value:''},'請先選內徑'));
+
+  function rebuildOD() {
+    const idVal = parseFloat(idSel.value);
+    odSel.innerHTML = '';
+    if(!idVal) { odSel.appendChild(mk('option',{value:''},'請先選內徑')); return; }
+    const ods = table.filter(r=>Math.abs(r.id-idVal)<=0.05).map(r=>r.od).sort((a,b)=>a-b);
+    odSel.appendChild(mk('option',{value:''},'選擇外徑'));
+    ods.forEach(v=>odSel.appendChild(mk('option',{value:v},'Ø'+v)));
+  }
+  idSel.onchange = function(){ rebuildOD(); if(onchangeFn) onchangeFn(); };
+  odSel.onchange = function(){ if(onchangeFn) onchangeFn(); };
+  rebuildOD();
+  return {idSel, odSel, rebuildOD};
+}
+
 // 依「內徑」動態過濾「外徑」建議清單；table 可為 PIPE_SPEC（[od,id]陣列）或報價表（{id,od,...}陣列）
 function bindIdOdFilter(idInputId, odInputId, table) {
   const idEl = document.getElementById(idInputId);
@@ -1617,7 +1641,7 @@ function renderDims() {
   } else if(currentShape==='pipe') {
     // 材質選單：13A（管料，可自由輸入非現貨規格）／13C／鋁管／不鏽鋼管（成品管，有廠商報價）
     const pMatSel = mk('select',{id:'pipe-mat-sel',style:selStyle});
-    [['a13','13A（管料）'],['c13','13C（成品管）'],['al','鋁管（成品管）'],['sus','不鏽鋼管（成品管）']].forEach(([v,t])=>{
+    [['a13','13A（素材）'],['c13','13C（成品管/素管/電鍍管）'],['al','鋁管（成品管）'],['sus','不鏽鋼管（成品管）']].forEach(([v,t])=>{
       pMatSel.appendChild(mk('option',{value:v},t));
     });
     const pMatField = mk('div',{className:'field',style:'margin-bottom:8px'});
@@ -1625,63 +1649,58 @@ function renderDims() {
     pMatField.appendChild(pMatSel);
     area.appendChild(pMatField);
 
-    // — 13A（STKM13A管料：跟鐵材同樣算重量、可自由輸入非現貨規格）
+    // — 13A（STKM13A管料：下拉選單選現有規格，跟鐵材同樣算重量）
     const a13Div = mk('div',{id:'pipe-a13-area'});
-    const odVals = [...new Set(PIPE_SPEC.map(p=>p[0]))].sort((a,b)=>a-b);
-    const idVals = [...new Set(PIPE_SPEC.map(p=>p[1]))].sort((a,b)=>a-b);
-    const a13G = mk('div',{className:'dim-grid',style:'gap:8px'});
-    a13G.appendChild(mkField('Ø（內徑ID）', mkSpecInput('dim-ID', idVals, 'Ø', updatePipeSteelHint)));
-    a13G.appendChild(mkField('Ø（外徑OD）', mkSpecInput('dim-OD', odVals, 'Ø', updatePipeSteelHint)));
-    a13Div.appendChild(a13G);
+    const stkmSel = mk('select',{id:'dim-STKM_SPEC',style:selStyle});
+    stkmSel.appendChild(mk('option',{value:''},'選擇規格'));
+    PIPE_SPEC.forEach(([od,id_],i)=>stkmSel.appendChild(mk('option',{value:i},'Ø'+id_+'×Ø'+od)));
+    const a13Sf = mk('div',{className:'field'});
+    a13Sf.appendChild(mk('label',{},'規格（內徑×外徑）'));
+    a13Sf.appendChild(stkmSel);
+    a13Div.appendChild(a13Sf);
     const a13Lf = mk('div',{className:'field',style:'margin-top:8px'});
     a13Lf.appendChild(mk('label',{},'長度 L（mm）'));
     a13Lf.appendChild(mkInput('dim-L','1'));
     a13Div.appendChild(a13Lf);
     a13Div.appendChild(mk('div',{id:'pipe-price-hint',style:'margin-top:6px'}));
+    stkmSel.onchange = function() { updatePipeSteelHint(); };
     area.appendChild(a13Div);
-    bindIdOdFilter('dim-ID','dim-OD', PIPE_SPEC);
 
-    // — 13C（成品管/素管/電鍍管 + 內徑/外徑）
+    // — 13C（成品管/素管/電鍍管 + 內徑→外徑二層下拉）
     const stkmcDiv = mk('div',{id:'pp-stkm13c-area',style:'display:none'});
     const typeSel = mk('select',{id:'dim-PP_TYPE',style:selStyle});
     [['fin','成品管'],['raw','素管'],['plt','電鍍管']].forEach(([v,t])=>{
       typeSel.appendChild(mk('option',{value:v},t));
     });
-    const stkmIdVals = [...new Set(STKM_PRICES.map(p=>p.id))].sort((a,b)=>a-b);
-    const stkmOdVals = [...new Set(STKM_PRICES.map(p=>p.od))].sort((a,b)=>a-b);
     const g=mk('div',{className:'dim-grid',style:'gap:8px'});
-    g.appendChild(mkField('Ø（內徑ID）', mkSpecInput('dim-PP-ID', stkmIdVals, 'Ø', updateProdPipeHint)));
-    g.appendChild(mkField('Ø（外徑OD）', mkSpecInput('dim-PP-OD', stkmOdVals, 'Ø', updateProdPipeHint)));
+    const stkmCascade = mkIdOdCascadeSelect('dim-PP-ID','dim-PP-OD', STKM_PRICES, updateProdPipeHint);
+    g.appendChild(mkField('內徑', stkmCascade.idSel));
+    g.appendChild(mkField('外徑', stkmCascade.odSel));
     g.appendChild(mkField('種類',typeSel));
     g.appendChild(mkField('長度 L（mm）',mkInput('dim-L-stkm13c','1')));
     stkmcDiv.appendChild(g);
     typeSel.onchange = function() { updateProdPipeHint(); };
     area.appendChild(stkmcDiv);
-    bindIdOdFilter('dim-PP-ID','dim-PP-OD', STKM_PRICES);
 
-    // — 不鏽鋼管（SUS304）
+    // — 不鏽鋼管（SUS304，內徑→外徑二層下拉）
     const susDiv = mk('div',{id:'pp-sus-area',style:'display:none'});
-    const susIdVals = [...new Set(SUS_PIPE_PRICES.map(p=>p.id))].sort((a,b)=>a-b);
-    const susOdVals = [...new Set(SUS_PIPE_PRICES.map(p=>p.od))].sort((a,b)=>a-b);
     const susG=mk('div',{className:'dim-grid',style:'gap:8px'});
-    susG.appendChild(mkField('Ø（內徑ID）', mkSpecInput('dim-SUS-ID', susIdVals, 'Ø', updateProdPipeHint)));
-    susG.appendChild(mkField('Ø（外徑OD）', mkSpecInput('dim-SUS-OD', susOdVals, 'Ø', updateProdPipeHint)));
+    const susCascade = mkIdOdCascadeSelect('dim-SUS-ID','dim-SUS-OD', SUS_PIPE_PRICES, updateProdPipeHint);
+    susG.appendChild(mkField('內徑', susCascade.idSel));
+    susG.appendChild(mkField('外徑', susCascade.odSel));
     susG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-sus','1')));
     susDiv.appendChild(susG);
     area.appendChild(susDiv);
-    bindIdOdFilter('dim-SUS-ID','dim-SUS-OD', SUS_PIPE_PRICES);
 
-    // — 鋁管
+    // — 鋁管（內徑→外徑二層下拉）
     const alDiv = mk('div',{id:'pp-al-area',style:'display:none'});
-    const alIdVals = [...new Set(AL_PIPE_PRICES.map(p=>p.id))].sort((a,b)=>a-b);
-    const alOdVals = [...new Set(AL_PIPE_PRICES.map(p=>p.od))].sort((a,b)=>a-b);
     const alG=mk('div',{className:'dim-grid',style:'gap:8px'});
-    alG.appendChild(mkField('Ø（內徑ID）', mkSpecInput('dim-AL-ID', alIdVals, 'Ø', updateProdPipeHint)));
-    alG.appendChild(mkField('Ø（外徑OD）', mkSpecInput('dim-AL-OD', alOdVals, 'Ø', updateProdPipeHint)));
+    const alCascade = mkIdOdCascadeSelect('dim-AL-ID','dim-AL-OD', AL_PIPE_PRICES, updateProdPipeHint);
+    alG.appendChild(mkField('內徑', alCascade.idSel));
+    alG.appendChild(mkField('外徑', alCascade.odSel));
     alG.appendChild(mkField('長度 L（mm）',mkInput('dim-L-al','1')));
     alDiv.appendChild(alG);
     area.appendChild(alDiv);
-    bindIdOdFilter('dim-AL-ID','dim-AL-OD', AL_PIPE_PRICES);
 
     area.appendChild(mk('div',{id:'prod-pipe-hint',style:'margin-top:6px'}));
 
@@ -1763,15 +1782,11 @@ function calcWeight(shape, dims, density) {
 
 
 function updatePipeSteelHint() {
-  const od = parseFloat(document.getElementById('dim-OD')?.value);
-  const id_ = parseFloat(document.getElementById('dim-ID')?.value);
   const h = document.getElementById('pipe-price-hint');
   if(!h) return;
-  if(!od || !id_ || od<=id_) { h.innerHTML=''; return; }
-  const inStock = PIPE_SPEC.some(([o,i]) => Math.abs(o-od)<=0.1 && Math.abs(i-id_)<=0.1);
-  const stockNote = inStock
-    ? '<div class="warn-ok" style="margin-bottom:6px">✓ Ø'+id_+'×Ø'+od+' 現貨規格（建興）</div>'
-    : '<div class="warn" style="margin-bottom:6px">⚠ Ø'+id_+'×Ø'+od+' 非建興現貨規格，請確認採購</div>';
+  const idx = parseInt(document.getElementById('dim-STKM_SPEC')?.value);
+  if(isNaN(idx)) { h.innerHTML=''; return; }
+  const [od, id_] = PIPE_SPEC[idx];
   const matches = lookupSTKM13APrice(od, id_);
   const upEl = document.getElementById('unit-price');
   let priceNote;
@@ -1787,7 +1802,7 @@ function updatePipeSteelHint() {
   } else {
     priceNote = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">此外徑/壁厚無建興參考單價，請手動輸入單價</div>';
   }
-  h.innerHTML = stockNote + priceNote;
+  h.innerHTML = priceNote;
 }
 
 function updateProdPipeHint() {
@@ -2012,9 +2027,13 @@ function calculate() {
     dims = {S:g('dim-S'), L:g('dim-L')};
     if(!dims.S || !dims.L) valid=false;
   } else if(currentShape==='pipe') {
-    // STKM13A：直接讀輸入框（可自由輸入非現貨規格）
-    dims = {OD:g('dim-OD'), ID:g('dim-ID'), L:g('dim-L')};
-    if(!dims.OD || !dims.ID || dims.OD<=dims.ID || !dims.L) valid=false;
+    // STKM13A：從下拉選單讀取規格（保證為現貨規格）
+    const idx = parseInt(document.getElementById('dim-STKM_SPEC')?.value);
+    if(!isNaN(idx) && PIPE_SPEC[idx]) {
+      const [od_,id__] = PIPE_SPEC[idx];
+      dims = {OD:od_, ID:id__, L:g('dim-L')};
+    }
+    if(!dims.OD || !dims.ID || !dims.L) valid=false;
   }
 
   if(!valid) { alert('請填入所有尺寸'); return; }
@@ -2308,7 +2327,7 @@ function renderLookup() {
     const hasPipeOpts = matSel.querySelector('option[value="pipe_a13"]');
     if(!hasPipeOpts) {
       matSel.innerHTML = '';
-      [['pipe_a13','13A（管料）'],['pipe_c13','13C（成品管）'],['pipe_sus','不鏽鋼管（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
+      [['pipe_a13','13A（素材）'],['pipe_c13','13C（成品管/素管/電鍍管）'],['pipe_sus','不鏽鋼管（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
         const o=document.createElement('option'); o.value=v; o.textContent=t; matSel.appendChild(o);
       });
       matSel.onchange = renderLookup;
@@ -2422,11 +2441,9 @@ function applyPipeSpec(od, id_) {
   setTimeout(()=>{
     const matSel=document.getElementById('pipe-mat-sel');
     if(matSel) { matSel.value='a13'; matSel.onchange(); }
-    const eID=document.getElementById('dim-ID');
-    const eOD=document.getElementById('dim-OD');
-    if(eID) { eID.value=id_; eID.dispatchEvent(new Event('input',{bubbles:true})); }
-    if(eOD) { eOD.value=od; eOD.dispatchEvent(new Event('input',{bubbles:true})); }
-    updatePipeSteelHint();
+    const idx = PIPE_SPEC.findIndex(([o,i]) => Math.abs(o-od)<=0.05 && Math.abs(i-id_)<=0.05);
+    const specSel=document.getElementById('dim-STKM_SPEC');
+    if(specSel && idx>=0) { specSel.value=idx; specSel.onchange(); }
     closeLookup();
   },50);
 }
@@ -2438,8 +2455,8 @@ function applyProdPipe(idx) {
     const p = STKM_PRICES[idx];
     const eID=document.getElementById('dim-PP-ID');
     const eOD=document.getElementById('dim-PP-OD');
-    if(eID && p) { eID.value=p.id; eID.dispatchEvent(new Event('input',{bubbles:true})); }
-    if(eOD && p) { eOD.value=p.od; eOD.dispatchEvent(new Event('input',{bubbles:true})); }
+    if(eID && p) { eID.value=p.id; eID.onchange(); }
+    if(eOD && p) { eOD.value=p.od; }
     updateProdPipeHint();
     closeLookup();
   },80);
@@ -2463,8 +2480,8 @@ function applySpecialPipe(pipeType, idx) {
       const odFieldId = pipeType==='sus' ? 'dim-SUS-OD' : 'dim-AL-OD';
       const eID=document.getElementById(idFieldId);
       const eOD=document.getElementById(odFieldId);
-      if(eID && p) { eID.value=p.id; eID.dispatchEvent(new Event('input',{bubbles:true})); }
-      if(eOD && p) { eOD.value=p.od; eOD.dispatchEvent(new Event('input',{bubbles:true})); }
+      if(eID && p) { eID.value=p.id; eID.onchange(); }
+      if(eOD && p) { eOD.value=p.od; }
       updateProdPipeHint();
       closeLookup();
     },80);
@@ -2499,9 +2516,11 @@ function reverseCalc() {
   if(currentShape==='pipe') {
     const pipeMat = document.getElementById('pipe-mat-sel')?.value || 'a13';
     if(pipeMat==='a13') {
-      // STKM13A：重量計價（元/kg），無元/kg行情表可比，dbPrices 留空
-      const OD = g('dim-OD'), ID = g('dim-ID'), L = g('dim-L');
-      if(!OD || !ID || !L) { alert('請填入所有尺寸'); return; }
+      // STKM13A：從下拉選單讀取規格，重量計價（元/kg），無元/kg行情表可比，dbPrices 留空
+      const idx = parseInt(document.getElementById('dim-STKM_SPEC')?.value);
+      const L = g('dim-L');
+      if(isNaN(idx) || !PIPE_SPEC[idx] || !L) { alert('請選擇規格並填入長度'); return; }
+      const [OD, ID] = PIPE_SPEC[idx];
       sawFee = Math.round(OD / 10 * 10) / 10;
       const {kg:k} = calcWeight('pipe', {OD, ID, L}, 7.85);
       weight    = k;
@@ -2803,8 +2822,8 @@ window.addEventListener('message', function(e) {
       if (matSel) { matSel.value='c13'; matSel.onchange(); }
       const eID = document.getElementById('dim-PP-ID');
       const eOD = document.getElementById('dim-PP-OD');
-      if (eID && best) { eID.value=best.id; eID.dispatchEvent(new Event('input',{bubbles:true})); }
-      if (eOD && best) { eOD.value=best.od; eOD.dispatchEvent(new Event('input',{bubbles:true})); }
+      if (eID && best) { eID.value=best.id; eID.onchange(); }
+      if (eOD && best) { eOD.value=best.od; }
       updateProdPipeHint();
     }
   }
