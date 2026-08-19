@@ -241,18 +241,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <!-- 形狀 -->
     <div>
       <div class="sec-title">01 ／ 形狀</div>
-      <div style="margin-top:12px" class="shape-grid">
+      <div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
         <button class="shape-btn active" onclick="setShape('plate')" id="btn-plate">
-          <span class="icon">▬</span>板材
+          <span class="icon" style="font-size:38px">▬</span>板材
         </button>
         <button class="shape-btn" onclick="selectBarGroup()" id="btn-bar_group">
           <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="3.5" cy="10" rx="2.5" ry="5"/><rect x="3.5" y="5" width="13" height="10"/><ellipse cx="16.5" cy="10" rx="2.5" ry="5" opacity=".7"/></svg></span>棒材
         </button>
-        <button class="shape-btn" onclick="setShape('pipe')" id="btn-pipe">
-          <span class="icon">◎</span>管料(13A/配管/...)
-        </button>
-        <button class="shape-btn" onclick="setShape('prod_pipe')" id="btn-prod_pipe">
-          <span class="icon">⊙</span>管(13C/AL/SUS)
+        <button class="shape-btn" onclick="selectPipeGroup()" id="btn-pipe_group">
+          <span class="icon">◎</span>管
         </button>
         <button class="shape-btn" onclick="setShape('shaft')" id="btn-shaft">
           <span class="icon">⊕</span>硬鉻軸
@@ -267,6 +264,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         </button>
         <button class="shape-btn" onclick="setShape('bar_hex')" id="btn-bar_hex">
           <span class="icon">⬡</span>六角棒
+        </button>
+      </div>
+      <div class="bar-sub" id="pipe-sub-row" style="display:none;grid-template-columns:repeat(2,1fr)">
+        <button class="shape-btn" onclick="setShape('pipe')" id="btn-pipe">
+          <span class="icon">◎</span>管料
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">13A</div>
+        </button>
+        <button class="shape-btn" onclick="setShape('prod_pipe')" id="btn-prod_pipe">
+          <span class="icon">⊙</span>成品管
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">13C/AL/SUS</div>
         </button>
       </div>
     </div>
@@ -1356,6 +1363,8 @@ function setCopperType(type) {
 function selectBarGroup() {
   const sub = document.getElementById('bar-sub-row');
   const isVisible = sub.style.display !== 'none';
+  document.getElementById('pipe-sub-row').style.display = 'none';
+  document.getElementById('btn-pipe_group').classList.remove('active');
   if(isVisible) {
     sub.style.display = 'none';
     document.getElementById('btn-bar_group').classList.remove('active');
@@ -1366,21 +1375,41 @@ function selectBarGroup() {
   }
 }
 
+function selectPipeGroup() {
+  const sub = document.getElementById('pipe-sub-row');
+  const isVisible = sub.style.display !== 'none';
+  document.getElementById('bar-sub-row').style.display = 'none';
+  document.getElementById('btn-bar_group').classList.remove('active');
+  if(isVisible) {
+    sub.style.display = 'none';
+    document.getElementById('btn-pipe_group').classList.remove('active');
+  } else {
+    sub.style.display = 'grid';
+    document.getElementById('btn-pipe_group').classList.add('active');
+    setShape('pipe');
+  }
+}
+
 function setShape(s) {
   currentShape = s;
   const isBar = ['bar_rnd','bar_sq','bar_hex'].includes(s);
-  ['plate','pipe','prod_pipe','shaft'].forEach(id => {
+  const isPipe = ['pipe','prod_pipe'].includes(s);
+  ['plate','shaft'].forEach(id => {
     const btn = document.getElementById('btn-'+id);
     if(btn) btn.classList.toggle('active', id===s);
   });
-  ['bar_rnd','bar_sq','bar_hex'].forEach(id => {
+  ['bar_rnd','bar_sq','bar_hex','pipe','prod_pipe'].forEach(id => {
     const btn = document.getElementById('btn-'+id);
     if(btn) btn.classList.toggle('active', id===s);
   });
   const grpBtn = document.getElementById('btn-bar_group');
   if(grpBtn) grpBtn.classList.toggle('active', isBar);
+  const pipeGrpBtn = document.getElementById('btn-pipe_group');
+  if(pipeGrpBtn) pipeGrpBtn.classList.toggle('active', isPipe);
   const subRow = document.getElementById('bar-sub-row');
   if(subRow) subRow.style.display = isBar ? 'grid' : 'none';
+  const pipeSubRow = document.getElementById('pipe-sub-row');
+  if(pipeSubRow) pipeSubRow.style.display = isPipe ? 'grid' : 'none';
   updateMatOptions(s);
   renderDims();
 }
@@ -1608,7 +1637,7 @@ function renderDims() {
   } else if(currentShape==='prod_pipe') {
     // 材質選單：STKM13C／SUS304／鋁管
     const ppMatSel = mk('select',{id:'pp-mat-sel',style:selStyle});
-    [['stkm13c','STKM13C（建興）'],['sus','SUS304 不鏽鋼管（洋田）'],['al','鋁管（洋田）']].forEach(([v,t])=>{
+    [['stkm13c','STKM13C'],['sus','SUS304 不鏽鋼管（洋田）'],['al','鋁管（洋田）']].forEach(([v,t])=>{
       ppMatSel.appendChild(mk('option',{value:v},t));
     });
     const ppMatField = mk('div',{className:'field',style:'margin-bottom:8px'});
@@ -2270,7 +2299,7 @@ function renderLookup() {
     const hasPipeOpts = matSel.querySelector('option[value="pipe_stkm13c"]');
     if(!hasPipeOpts) {
       matSel.innerHTML = '';
-      [['pipe_stkm13c','STKM13C（建興）'],['pipe_sus','SUS304（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
+      [['pipe_stkm13c','STKM13C'],['pipe_sus','SUS304（洋田）'],['pipe_al','鋁管（洋田）']].forEach(([v,t])=>{
         const o=document.createElement('option'); o.value=v; o.textContent=t; matSel.appendChild(o);
       });
       matSel.onchange = renderLookup;
