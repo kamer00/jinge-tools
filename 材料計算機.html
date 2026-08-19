@@ -767,37 +767,6 @@ function lookupPlatePrice(thickness, matCode, plateType) {
 }
 
 // ══════════════════════════════════════════════════
-// 規格警示
-// ══════════════════════════════════════════════════
-function checkSpec(shape, dims, matCode) {
-  const tol = 0.05;
-  const near = (arr, v) => arr && arr.some(x => Math.abs(Number(x)-v) <= tol);
-  if(shape==='pipe') {
-    const ok = PIPE_SPEC.some(([o,i]) => Math.abs(o-dims.OD)<=0.1 && Math.abs(i-dims.ID)<=0.1);
-    return {ok, msg: ok ? 'Ø'+dims.ID+'×Ø'+dims.OD+' ✓ 現貨規格（建興）' : '⚠ Ø'+dims.ID+'×Ø'+dims.OD+' 非建興現貨規格，請確認採購'};
-  }
-  const arr = getSpecArr(matCode, shape);
-  if(!arr || arr.length===0) return {ok:true, msg:''};
-  if(shape==='plate') {
-    const ok=near(arr,dims.T);
-    return {ok, msg:ok?'板厚 '+dims.T+'mm ✓ 現貨規格':'⚠ 板厚 '+dims.T+'mm 非現貨規格，請確認採購'};
-  }
-  if(shape==='bar_rnd') {
-    const ok=near(arr,dims.D);
-    return {ok, msg:ok?'Ø'+dims.D+'mm ✓ 現貨規格（'+matCode+'）':'⚠ Ø'+dims.D+'mm 非現貨規格（'+matCode+'），請確認採購'};
-  }
-  if(shape==='bar_sq') {
-    const ok=near(arr,dims.A);
-    return {ok, msg:ok?'□'+dims.A+'mm ✓ 現貨規格（'+matCode+'）':'⚠ □'+dims.A+'mm 非現貨規格（'+matCode+'），請確認採購'};
-  }
-  if(shape==='bar_hex') {
-    const ok=near(arr,dims.S);
-    return {ok, msg:ok?'⬡'+dims.S+'mm ✓ 現貨規格（'+matCode+'）':'⚠ ⬡'+dims.S+'mm 非現貨規格（'+matCode+'），請確認採購'};
-  }
-  return {ok:true, msg:''};
-}
-
-// ══════════════════════════════════════════════════
 // 材質切換
 // ══════════════════════════════════════════════════
 
@@ -1430,25 +1399,6 @@ function mkIdOdCascadeSelect(idFieldId, odFieldId, table, onchangeFn) {
   odSel.onchange = function(){ if(onchangeFn) onchangeFn(); };
   rebuildOD();
   return {idSel, odSel, rebuildOD};
-}
-
-// 依「內徑」動態過濾「外徑」建議清單；table 可為 PIPE_SPEC（[od,id]陣列）或報價表（{id,od,...}陣列）
-function bindIdOdFilter(idInputId, odInputId, table) {
-  const idEl = document.getElementById(idInputId);
-  const odDl = document.getElementById(odInputId+'-list');
-  if(!idEl || !odDl) return;
-  function getId(r) { return Array.isArray(r) ? r[1] : r.id; }
-  function getOd(r) { return Array.isArray(r) ? r[0] : r.od; }
-  function refresh() {
-    const idVal = parseFloat(idEl.value);
-    let ods = table.filter(r => Math.abs(getId(r)-idVal) <= 0.05).map(getOd);
-    if(!idVal || ods.length===0) ods = table.map(getOd);
-    ods = [...new Set(ods)].sort((a,b)=>a-b);
-    odDl.innerHTML = '';
-    ods.forEach(v => odDl.appendChild(mk('option',{value:v})));
-  }
-  idEl.addEventListener('input', refresh);
-  refresh();
 }
 
 // 依 ID+OD 找出報價表對應那一列（容許 0.05mm 誤差）
@@ -2750,84 +2700,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-
-// ── 報價系統 PREFILL 整合 ──────────────────────────────────────
-window.addEventListener('message', function(e) {
-  if (!e.data || e.data.type !== 'PREFILL') return;
-  const d = e.data;
-
-  if (d.shape === 'shaft') {
-    // 切換到硬鉻軸形狀
-    setShape('shaft');
-    if (d.dia > 0) {
-      let bestIdx = -1, bestDiff = Infinity;
-      SHAFT_PRICES.forEach((s, i) => {
-        if ((s.jy_s45c || s.yi_s45c) && Math.abs(s.dia - d.dia) < bestDiff) {
-          bestDiff = Math.abs(s.dia - d.dia);
-          bestIdx = i;
-        }
-      });
-      if (bestIdx >= 0) {
-        const sel = document.getElementById('dim-SH_DIA');
-        if (sel) sel.value = bestIdx;
-      }
-    }
-  } else if (d.shape === 'bar_rnd') {
-    // 切換到圓棒，選指定材質，自動選比軸徑大 5mm 以上最近的規格
-    setShape('bar_rnd');
-    setTimeout(function() {
-      const matSel = document.getElementById('mat');
-      if (matSel && d.mat) {
-        // 找材質 option
-        const opts = Array.from(matSel.options);
-        const target = opts.find(o => o.value.startsWith(d.mat + '|'));
-        if (target) {
-          matSel.value = target.value;
-          if (typeof onMatChange === 'function') onMatChange();
-        }
-      }
-      if (d.dia > 0) {
-        // 自動填入比軸徑大 5mm 以上最近的規格到 dim-D
-        setTimeout(function() {
-          const dimD = document.getElementById('dim-D');
-          if (!dimD) return;
-          // 從 select options 中找
-          if (dimD.tagName === 'SELECT') {
-            const opts = Array.from(dimD.options).map(o => parseFloat(o.value)).filter(v => !isNaN(v));
-            const valid = opts.filter(v => v >= d.dia + 5);
-            if (valid.length > 0) {
-              const best = valid.reduce((a, b) => Math.abs(a - d.dia) < Math.abs(b - d.dia) ? a : b);
-              dimD.value = best;
-              if (typeof autoFillUnitPrice === 'function') autoFillUnitPrice();
-            }
-          } else {
-            // input 欄位直接填入 ceil(dia+5) 取整到最近 5mm
-            const target = Math.ceil((d.dia + 5) / 5) * 5;
-            dimD.value = target;
-          }
-        }, 80);
-      }
-    }, 80);
-  } else if (d.shape === 'prod_pipe') {
-    // 切換到管形狀，材質選13C（成品管）
-    setShape('pipe');
-    if (d.bore > 0) {
-      // 找 id（內徑）最接近缸徑的規格
-      let best = STKM_PRICES[0], bestDiff = Infinity;
-      STKM_PRICES.forEach(p => {
-        const diff = Math.abs(p.id - d.bore);
-        if (diff < bestDiff) { bestDiff = diff; best = p; }
-      });
-      const matSel = document.getElementById('pipe-mat-sel');
-      if (matSel) { matSel.value='c13'; matSel.onchange(); }
-      const eID = document.getElementById('dim-PP-ID');
-      const eOD = document.getElementById('dim-PP-OD');
-      if (eID && best) { eID.value=best.id; eID.onchange(); }
-      if (eOD && best) { eOD.value=best.od; }
-      updateProdPipeHint();
-    }
-  }
-});
 
 // 套用到報價單（postMessage 傳回父頁面）
 function applyToQuote(amount, type, spec) {
