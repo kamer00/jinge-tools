@@ -148,7 +148,9 @@
   .pillBtn{appearance:none; border:1px solid var(--line); background:rgba(19,40,66,.85); color:var(--text);
     border-radius:20px; padding:7px 12px; font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:5px; cursor:pointer;}
   .pillBtn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .pillBtn:disabled{opacity:.35; pointer-events:none; cursor:default;}
   .pillBtn .badge{background:rgba(255,255,255,.25); border-radius:10px; padding:0 6px; font-size:10px;}
+  .calGateHint{font-size:11px; color:var(--text-dim); padding:2px 4px;}
 
   .logPanel{display:none; flex-direction:column; gap:6px; max-height:34vh; overflow-y:auto;
     background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:10px; padding:8px;}
@@ -239,14 +241,15 @@
       </label>
       <p style="font-size:11.5px; color:var(--text-dim); max-width:280px;">檔案是 PDF？請先在 PDF App 裡截圖（或用「分享→儲存影像」），再上傳截圖的圖片檔即可。</p>
 
-      <div class="recentWrap" id="recentWrap"></div>
-
-      <button class="btn ghost" id="importBtn">或匯入先前存過的線稿檔（.json）</button>
-      <input type="file" id="importInput" accept="application/json,.json" class="visually-hidden">
-
-      <div class="altEntryRow">
-        <button class="btn ghost" id="noDrawingBtn">沒有圖面，直接量實物尺寸</button>
-        <button class="btn ghost" id="straightLineBtn">使用直線基準（檢查真直度）</button>
+      <button class="advToggle" id="moreWaysToggle">更多上傳方式 ▾</button>
+      <div class="advPanel" id="moreWaysPanel">
+        <div class="recentWrap" id="recentWrap"></div>
+        <button class="btn ghost" id="importBtn">或匯入先前存過的線稿檔（.json）</button>
+        <input type="file" id="importInput" accept="application/json,.json" class="visually-hidden">
+        <div class="altEntryRow">
+          <button class="btn ghost" id="noDrawingBtn">沒有圖面，直接量實物尺寸</button>
+          <button class="btn ghost" id="straightLineBtn">使用直線基準（檢查真直度）</button>
+        </div>
       </div>
     </div>
 
@@ -346,7 +349,7 @@
             </svg>
             <button class="levelBtn" id="calibrateTiltBtn">校準</button>
           </div>
-          <div class="iconBtn needsLineArt" id="lockBtn" title="鎖定位置">
+          <div class="iconBtn needsLineArt advOnly" id="lockBtn" title="鎖定位置">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
           </div>
           <div class="iconBtn needsLineArt" id="resetBtn" title="重置位置">
@@ -357,12 +360,14 @@
 
       <div class="hud">
         <div class="toolRow">
-          <button class="pillBtn" id="calibrateBtn">📏 校正比例尺</button>
-          <button class="pillBtn" id="measureBtn">📐 量距離</button>
-          <button class="pillBtn" id="angleBtn">∠ 量角度</button>
-          <button class="pillBtn" id="logToggleBtn">📋 量測記錄 <span class="badge" id="logCountBadge">0</span></button>
-          <button class="pillBtn" id="specToggleBtn">🎯 規格表</button>
+          <button class="pillBtn" id="advModeToggle">⚙ 進階工具</button>
+          <button class="pillBtn advOnly" id="calibrateBtn">📏 校正比例尺</button>
+          <button class="pillBtn advOnly" id="measureBtn">📐 量距離</button>
+          <button class="pillBtn advOnly" id="angleBtn">∠ 量角度</button>
+          <button class="pillBtn advOnly" id="logToggleBtn">📋 量測記錄 <span class="badge" id="logCountBadge">0</span></button>
+          <button class="pillBtn advOnly" id="specToggleBtn">🎯 規格表</button>
         </div>
+        <div class="calGateHint advOnly" id="calGateHint" style="display:none;">先按「校正比例尺」才能量距離／角度</div>
         <div class="specTableWrap" id="specTableWrap">
           <div id="specList"></div>
           <button class="btn secondary small" id="specAddBtn">+ 新增規格項目</button>
@@ -375,7 +380,7 @@
             <button class="btn small" id="logExportBtn">匯出記錄</button>
           </div>
         </div>
-        <div class="nudgeRow needsLineArt" id="nudgeRow">
+        <div class="nudgeRow needsLineArt advOnly" id="nudgeRow">
           <label>位置</label>
           <div class="nudgePad">
             <div class="nudgeBtn" id="nudgeLeft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
@@ -452,6 +457,19 @@
   </div>
 </div>
 
+<div class="modalOverlay" id="onboardModal">
+  <div class="modalCard" style="text-align:center;">
+    <div id="onboardIcon" style="font-size:36px; margin-bottom:8px;">📄</div>
+    <h3 id="onboardTitle">① 上傳圖面</h3>
+    <p id="onboardDesc">上傳零件圖面的照片或截圖，系統會自動轉成線稿。</p>
+    <div id="onboardDots" style="display:flex; justify-content:center; gap:6px; margin-bottom:14px;"></div>
+    <div class="modalActions">
+      <button class="btn secondary small" id="onboardSkipBtn">跳過</button>
+      <button class="btn small" id="onboardNextBtn">下一步</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -485,6 +503,9 @@
   let activeSlotIdx = -1;
   let slotIdCounter = 1;
   let addingSlot = false;
+
+  let advancedMode = false;
+  try{ advancedMode = localStorage.getItem('jinge_overlay_advmode')==='1'; } catch(e){}
 
   // ========================= elements =========================
   const el = id => document.getElementById(id);
@@ -551,6 +572,12 @@
     };
     img.onerror = ()=> alert('圖片讀取失敗，請換一個檔案試試。');
     img.src = url;
+  });
+
+  el('moreWaysToggle').addEventListener('click', ()=>{
+    const panel = el('moreWaysPanel');
+    const showing = panel.classList.toggle('show');
+    el('moreWaysToggle').textContent = showing ? '隱藏更多上傳方式 ▴' : '更多上傳方式 ▾';
   });
 
   el('importBtn').addEventListener('click', ()=> el('importInput').click());
@@ -1048,10 +1075,39 @@
   el('backToThreshold').addEventListener('click', ()=> showScreen('threshold'));
 
   function applyNeedsLineArtVisibility(){
-    document.querySelectorAll('.needsLineArt').forEach(elm=>{
-      elm.style.display = hasLineArt ? '' : 'none';
-    });
+    updateControlVisibility();
   }
+
+  function updateControlVisibility(){
+    document.querySelectorAll('.needsLineArt, .advOnly').forEach(elm=>{
+      const okLine = elm.classList.contains('needsLineArt') ? hasLineArt : true;
+      const okAdv = elm.classList.contains('advOnly') ? advancedMode : true;
+      elm.style.display = (okLine && okAdv) ? '' : 'none';
+    });
+    const toggle = el('advModeToggle');
+    toggle.classList.toggle('active', advancedMode);
+    toggle.textContent = advancedMode ? '⚙ 進階工具（開）' : '⚙ 進階工具';
+    if(!advancedMode){
+      el('logPanel').classList.remove('show');
+      el('specTableWrap').classList.remove('show');
+      if(appMode !== 'normal') exitMode();
+    }
+    renderSlotTabs();
+  }
+
+  function updateMeasureGating(){
+    const canMeasure = !!calibration;
+    el('measureBtn').disabled = !canMeasure;
+    el('angleBtn').disabled = !canMeasure;
+    el('calGateHint').style.display = (advancedMode && !canMeasure) ? 'block' : 'none';
+  }
+
+  el('advModeToggle').addEventListener('click', ()=>{
+    advancedMode = !advancedMode;
+    try{ localStorage.setItem('jinge_overlay_advmode', advancedMode?'1':'0'); } catch(e){}
+    updateControlVisibility();
+    updateMeasureGating();
+  });
 
   function startNewSession(){
     photoSlots = [];
@@ -1066,6 +1122,7 @@
     renderLog();
     el('logPanel').classList.remove('show');
     el('specTableWrap').classList.remove('show');
+    updateMeasureGating();
   }
 
   cameraInput.addEventListener('change', e=>{
@@ -1183,12 +1240,13 @@
     if(calibration) el('roCal').textContent = calibration.pxPerMm.toFixed(2)+' px/mm';
     clearAnnotations();
     exitMode();
+    updateMeasureGating();
     renderSlotTabs();
   }
   function renderSlotTabs(){
     const wrap = el('slotTabs');
     const hudTop = el('hudTop');
-    if(currentMode !== 'photo' || photoSlots.length===0){
+    if(!advancedMode || currentMode !== 'photo' || photoSlots.length===0){
       wrap.style.display = 'none';
       hudTop.classList.remove('withSlots');
       return;
@@ -1500,6 +1558,7 @@
     drawLineWithLabel(p1, p2, mm.toFixed(1)+'mm', '#4cc98a');
     calModal.classList.remove('show');
     exitMode();
+    updateMeasureGating();
   });
 
   function finishMeasureTap(){
@@ -1750,7 +1809,43 @@
     renderSpecTable();
   });
 
+  // ---- first-time onboarding tour ----
+  const onboardSteps = [
+    {icon:'📄', title:'① 上傳圖面', desc:'上傳零件圖面的照片或截圖，系統會自動轉成線稿。'},
+    {icon:'📷', title:'② 對準零件', desc:'把線稿疊在實物照片上，拖曳調整位置、大小，讓它對齊。'},
+    {icon:'👁️', title:'③ 看疊圖對不對', desc:'孔位、外型對齊就正常，有落差就要注意。需要量出數字或留記錄，可以打開「進階工具」。'}
+  ];
+  let onboardIdx = 0;
+  function renderOnboardStep(){
+    const s = onboardSteps[onboardIdx];
+    el('onboardIcon').textContent = s.icon;
+    el('onboardTitle').textContent = s.title;
+    el('onboardDesc').textContent = s.desc;
+    el('onboardDots').innerHTML = onboardSteps.map((_,i)=>
+      `<span style="width:6px;height:6px;border-radius:50%;display:inline-block;background:${i===onboardIdx?'#3a8fd4':'#254a6e'};"></span>`
+    ).join('');
+    el('onboardNextBtn').textContent = onboardIdx===onboardSteps.length-1 ? '開始使用' : '下一步';
+  }
+  function closeOnboarding(){
+    el('onboardModal').classList.remove('show');
+    try{ localStorage.setItem('jinge_overlay_onboarded','1'); } catch(e){}
+  }
+  el('onboardNextBtn').addEventListener('click', ()=>{
+    if(onboardIdx < onboardSteps.length-1){ onboardIdx++; renderOnboardStep(); }
+    else { closeOnboarding(); }
+  });
+  el('onboardSkipBtn').addEventListener('click', closeOnboarding);
+  function maybeShowOnboarding(){
+    let seen = false;
+    try{ seen = localStorage.getItem('jinge_overlay_onboarded')==='1'; } catch(e){}
+    if(seen) return;
+    onboardIdx = 0;
+    renderOnboardStep();
+    el('onboardModal').classList.add('show');
+  }
+
   showScreen('upload');
+  maybeShowOnboarding();
 })();
 </script>
 </body>
