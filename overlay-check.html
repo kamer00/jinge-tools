@@ -38,7 +38,7 @@
   .stage{flex:1; position:relative; overflow:hidden; background:#08101c;
     display:flex; align-items:center; justify-content:center;}
 
-  .screen{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:14px; text-align:center; overflow-y:auto;}
+  .screen{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:12px; text-align:center; overflow-y:auto;}
 
   .icon-badge{width:50px; height:50px; border-radius:14px; background:var(--panel2); border:1px solid var(--line);
     display:flex; align-items:center; justify-content:center; margin-bottom:2px; flex-shrink:0;}
@@ -69,6 +69,13 @@
       linear-gradient(-45deg,transparent 75%,#1a3a5c 75%) 0 0/16px 16px,
       #0f2136;
   }
+
+  /* ---------- Step 1: upload ---------- */
+  .recentWrap{display:none; flex-direction:column; gap:6px; width:100%; max-width:320px;}
+  .recentLabel{font-size:11px; color:var(--text-dim); text-align:left;}
+  .recentRow{display:flex; gap:6px; flex-wrap:wrap; justify-content:center;}
+  .recentChip{font-size:12px; padding:7px 12px; border-radius:16px; background:var(--panel2); border:1px solid var(--line); color:var(--text); cursor:pointer;}
+  .altEntryRow{display:flex; flex-direction:column; gap:8px; width:100%; max-width:320px;}
 
   /* ---------- Step 2: threshold + erase (merged) ---------- */
   #thresholdScreen{padding:12px; gap:8px;}
@@ -116,11 +123,18 @@
   .crosshair::before{left:50%; top:0; width:1px; height:100%; margin-left:-.5px;}
   .crosshair::after{top:50%; left:0; height:1px; width:100%; margin-top:-.5px;}
 
+  .slotTabs{display:none; position:absolute; top:0; left:0; right:0; z-index:4; gap:6px; padding:calc(6px + env(safe-area-inset-top)) 10px 6px;
+    overflow-x:auto; background:linear-gradient(180deg, rgba(8,16,28,.85), transparent);}
+  .slotTab{flex-shrink:0; font-size:11.5px; padding:6px 12px; border-radius:14px; background:rgba(19,40,66,.85); border:1px solid var(--line); color:var(--text-dim); cursor:pointer; white-space:nowrap;}
+  .slotTab.active{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700;}
+  .slotTab.slotTabAdd{color:var(--cyan); border-style:dashed;}
+
   .hud{position:absolute; left:0; right:0; bottom:0; padding:8px 12px calc(8px + env(safe-area-inset-bottom));
     background:linear-gradient(0deg, rgba(8,16,28,.94), rgba(8,16,28,.6) 75%, transparent);
-    display:flex; flex-direction:column; gap:7px;}
+    display:flex; flex-direction:column; gap:7px; max-height:78vh; overflow-y:auto;}
   .hudTop{position:absolute; top:0; left:0; right:0; padding:calc(8px + env(safe-area-inset-top)) 12px 26px;
     background:linear-gradient(180deg, rgba(8,16,28,.94), transparent); display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .hudTop.withSlots{padding-top:calc(38px + env(safe-area-inset-top));}
   .readout{display:flex; flex-wrap:wrap; gap:6px; font-size:10.5px;}
   .readout div{background:rgba(0,0,0,.35); border:1px solid var(--line); border-radius:6px; padding:3px 7px; white-space:nowrap;}
   .readout b{color:var(--cyan);}
@@ -136,16 +150,35 @@
   .pillBtn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
   .pillBtn .badge{background:rgba(255,255,255,.25); border-radius:10px; padding:0 6px; font-size:10px;}
 
-  .logPanel{display:none; flex-direction:column; gap:6px; max-height:32vh; overflow-y:auto;
+  .logPanel{display:none; flex-direction:column; gap:6px; max-height:34vh; overflow-y:auto;
     background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:10px; padding:8px;}
   .logPanel.show{display:flex;}
-  .logRow{display:flex; align-items:center; gap:8px; font-size:12px; background:rgba(255,255,255,.05); border-radius:7px; padding:5px 8px;}
-  .logRow .logLabel{flex:1; background:none; border:none; color:var(--text); font-size:12px; padding:2px 4px; border-radius:4px;}
+  .logSummary{display:flex; justify-content:space-between; align-items:center; font-size:11.5px; padding:2px 4px 4px;}
+  .logSummary .sumOk{color:var(--ok); font-weight:700;}
+  .logSummary .sumNg{color:var(--danger); font-weight:700;}
+  .logRow{display:flex; align-items:center; gap:6px; font-size:12px; background:rgba(255,255,255,.05); border-radius:7px; padding:5px 8px;}
+  .logRow.ng{background:rgba(232,84,62,.18); box-shadow:inset 0 0 0 1px rgba(232,84,62,.5);}
+  .logRow.ok{background:rgba(76,201,138,.14);}
+  .logRow .logMeta{display:flex; flex-direction:column; flex:1; min-width:0;}
+  .logRow .logLabel{background:none; border:none; color:var(--text); font-size:12px; padding:2px 4px; border-radius:4px; width:100%;}
   .logRow .logLabel:focus{background:rgba(255,255,255,.1); outline:1px solid var(--accent);}
+  .logRow .logSlot{font-size:9.5px; color:var(--text-dim); padding:0 4px;}
   .logRow .logVal{color:var(--cyan); font-weight:700; white-space:nowrap;}
+  .logRow .logPassBadge{font-size:10px; font-weight:700; white-space:nowrap;}
+  .logRow .logPassBadge.pass{color:var(--ok);}
+  .logRow .logPassBadge.fail{color:var(--danger);}
+  .logRow .logTolBtn{background:none; border:1px solid var(--line); color:var(--text-dim); font-size:11px; border-radius:6px; padding:2px 6px; cursor:pointer; flex-shrink:0;}
   .logRow .logDel{color:var(--danger); background:none; border:none; font-size:15px; cursor:pointer; padding:0 4px; flex-shrink:0;}
   .logEmpty{font-size:11.5px; color:var(--text-dim); text-align:center; padding:6px;}
   .logActions{display:flex; gap:8px;}
+  .specTableWrap{display:flex; flex-direction:column; gap:6px; max-height:26vh; overflow-y:auto;
+    background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:10px; padding:8px; display:none;}
+  .specTableWrap.show{display:flex;}
+  .specRow{display:flex; gap:6px; align-items:center; font-size:11.5px;}
+  .specRow input{background:rgba(255,255,255,.06); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:4px 6px; font-size:11.5px;}
+  .specRow input.specLabel{flex:1.4; min-width:0;}
+  .specRow input.specNum{flex:1; min-width:0;}
+  .specRow .specDel{color:var(--danger); background:none; border:none; font-size:14px; cursor:pointer; flex-shrink:0;}
 
   .ctrlGrid{display:flex; gap:8px; align-items:center;}
   .ctrlGrid label{font-size:10.5px; color:var(--text-dim); width:38px; flex-shrink:0;}
@@ -177,7 +210,10 @@
   .modalCard h3{margin:0 0 6px; font-size:15px;}
   .modalCard p{margin:0 0 14px; font-size:12.5px; color:var(--text-dim); line-height:1.5;}
   .modalCard input{width:100%; padding:11px 12px; border-radius:9px; border:1px solid var(--line);
-    background:var(--bg); color:var(--text); font-size:15px; margin-bottom:14px;}
+    background:var(--bg); color:var(--text); font-size:15px; margin-bottom:10px;}
+  .modalCard .modalRow{display:flex; gap:8px;}
+  .modalCard .modalRow input{flex:1;}
+  .modalCard label.chkRow{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); margin-bottom:14px;}
   .modalActions{display:flex; gap:8px;}
   .modalActions .btn{flex:1; min-width:0;}
 </style>
@@ -185,7 +221,7 @@
 <body>
 <div id="app">
   <header>
-    <div class="title">疊圖比對 <span class="mono" style="color:var(--text-dim); font-weight:400;">v0.3</span></div>
+    <div class="title">疊圖比對 <span class="mono" style="color:var(--text-dim); font-weight:400;">v0.6</span></div>
     <div class="step" id="stepIndicator">STEP 1 <span>/ 上傳圖面</span></div>
   </header>
 
@@ -202,8 +238,16 @@
         <input type="file" id="fileInput" accept="image/*" class="visually-hidden">
       </label>
       <p style="font-size:11.5px; color:var(--text-dim); max-width:280px;">檔案是 PDF？請先在 PDF App 裡截圖（或用「分享→儲存影像」），再上傳截圖的圖片檔即可。</p>
+
+      <div class="recentWrap" id="recentWrap"></div>
+
       <button class="btn ghost" id="importBtn">或匯入先前存過的線稿檔（.json）</button>
       <input type="file" id="importInput" accept="application/json,.json" class="visually-hidden">
+
+      <div class="altEntryRow">
+        <button class="btn ghost" id="noDrawingBtn">沒有圖面，直接量實物尺寸</button>
+        <button class="btn ghost" id="straightLineBtn">使用直線基準（檢查真直度）</button>
+      </div>
     </div>
 
     <!-- STEP 2: threshold + erase (merged, mostly optional) -->
@@ -213,7 +257,7 @@
       <div class="primaryRow"><button class="btn" id="toPhotoBtn">下一步：比對零件 ›</button></div>
       <button class="advToggle" id="advToggleBtn">顯示線稿微調選項 ▾</button>
       <div class="advPanel" id="advPanel">
-        <div class="actionRow">
+        <div class="actionRow" id="perspBtnRow">
           <button class="btn secondary" id="perspBtn">校正圖面透視變形</button>
         </div>
         <div id="perspEditor">
@@ -223,7 +267,7 @@
             <button class="btn small" id="perspApplyBtn">套用校正</button>
           </div>
         </div>
-        <div class="sliderRow">
+        <div class="sliderRow" id="thresholdSliderRow">
           <div class="lbl">線稿門檻 <b id="threshVal">128</b></div>
           <input type="range" id="threshSlider" min="1" max="254" value="128">
         </div>
@@ -247,10 +291,11 @@
           <input type="range" id="boldSlider" min="0" max="3" value="1">
         </div>
         <div class="actionRow">
+          <button class="btn secondary" id="undoStepBtn">上一步</button>
           <button class="btn secondary" id="undoMaskBtn">還原全部</button>
-          <button class="btn secondary" id="exportMaskBtn">匯出線稿檔</button>
         </div>
         <div class="actionRow">
+          <button class="btn secondary" id="exportMaskBtn">匯出線稿檔</button>
           <button class="btn ghost" id="backToUpload">重新上傳圖面</button>
         </div>
       </div>
@@ -262,7 +307,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13.5" r="3.3"/></svg>
       </div>
       <h2>對工件比對</h2>
-      <p>「即時相機」：線稿固定在畫面上，移動零件/手機對齊即可，適合快速目視初篩。「拍照比對」：先拍一張固定照片再疊圖，適合需要用比例尺量出數字的情況。</p>
+      <p>「即時相機」：線稿固定在畫面上，移動零件/手機對齊即可，適合快速目視初篩。「拍照比對」：先拍一張固定照片再疊圖，適合需要用比例尺量出數字的情況，也支援多面照片管理。</p>
       <button class="btn" id="liveCameraBtn">開啟即時相機比對</button>
       <label class="btn secondary" id="photoBtnLabel">改用拍照比對（可量測）
         <input type="file" id="cameraInput" accept="image/*" capture="environment" class="visually-hidden">
@@ -279,12 +324,13 @@
       <svg id="annotSvg"></svg>
       <div class="crosshair"></div>
       <div id="gestureCatcher"></div>
+      <div class="slotTabs" id="slotTabs"></div>
       <div class="modeBanner" id="modeBanner">
         <span id="modeBannerText"></span>
         <button class="exitBtn" id="modeExitBtn">取消</button>
       </div>
 
-      <div class="hudTop">
+      <div class="hudTop" id="hudTop">
         <div class="readout mono">
           <div>縮放 <b id="roScale">100%</b></div>
           <div>旋轉 <b id="roRotate">0°</b></div>
@@ -300,10 +346,10 @@
             </svg>
             <button class="levelBtn" id="calibrateTiltBtn">校準</button>
           </div>
-          <div class="iconBtn" id="lockBtn" title="鎖定位置">
+          <div class="iconBtn needsLineArt" id="lockBtn" title="鎖定位置">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
           </div>
-          <div class="iconBtn" id="resetBtn" title="重置位置">
+          <div class="iconBtn needsLineArt" id="resetBtn" title="重置位置">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           </div>
         </div>
@@ -312,17 +358,24 @@
       <div class="hud">
         <div class="toolRow">
           <button class="pillBtn" id="calibrateBtn">📏 校正比例尺</button>
-          <button class="pillBtn" id="measureBtn">📐 量測</button>
+          <button class="pillBtn" id="measureBtn">📐 量距離</button>
+          <button class="pillBtn" id="angleBtn">∠ 量角度</button>
           <button class="pillBtn" id="logToggleBtn">📋 量測記錄 <span class="badge" id="logCountBadge">0</span></button>
+          <button class="pillBtn" id="specToggleBtn">🎯 規格表</button>
+        </div>
+        <div class="specTableWrap" id="specTableWrap">
+          <div id="specList"></div>
+          <button class="btn secondary small" id="specAddBtn">+ 新增規格項目</button>
         </div>
         <div class="logPanel" id="logPanel">
+          <div class="logSummary" id="logSummary"></div>
           <div id="logList"><div class="logEmpty">還沒有量測記錄</div></div>
           <div class="logActions">
             <button class="btn secondary small" id="logClearBtn">清空記錄</button>
             <button class="btn small" id="logExportBtn">匯出記錄</button>
           </div>
         </div>
-        <div class="nudgeRow">
+        <div class="nudgeRow needsLineArt" id="nudgeRow">
           <label>位置</label>
           <div class="nudgePad">
             <div class="nudgeBtn" id="nudgeLeft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
@@ -331,17 +384,17 @@
             <div class="nudgeBtn" id="nudgeRight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
           </div>
         </div>
-        <div class="ctrlGrid">
+        <div class="ctrlGrid needsLineArt">
           <label>透明</label>
           <input type="range" id="opacitySlider" min="10" max="100" value="80">
           <div class="val mono" id="opacityVal">80%</div>
         </div>
-        <div class="ctrlGrid">
+        <div class="ctrlGrid needsLineArt">
           <label>縮放</label>
           <input type="range" id="scaleSlider" min="20" max="400" value="100">
           <div class="val mono" id="scaleValTxt">100%</div>
         </div>
-        <div class="ctrlGrid">
+        <div class="ctrlGrid needsLineArt">
           <label>旋轉</label>
           <input type="range" id="rotateSlider" min="-180" max="180" value="0">
           <div class="val mono" id="rotateValTxt">0°</div>
@@ -349,7 +402,7 @@
         <div class="bottomBtns">
           <button class="btn secondary" id="retakePhotoBtn">重新拍照</button>
           <button class="btn secondary" id="stopLiveBtn" style="display:none;">關閉相機</button>
-          <button class="btn secondary" id="reeditLineBtn">調整線稿</button>
+          <button class="btn secondary needsLineArt" id="reeditLineBtn">調整線稿</button>
         </div>
       </div>
     </div>
@@ -374,7 +427,7 @@
 <div class="modalOverlay" id="exportModal">
   <div class="modalCard">
     <h3>匯出線稿檔</h3>
-    <p>幫這份線稿取個名稱（例如料號），下次可以直接匯入使用。</p>
+    <p>幫這份線稿取個名稱（例如料號），下次可以直接匯入使用；已設定的規格表也會一起存進去。</p>
     <input type="text" id="exportNameInput" placeholder="例如 CY-2201-缸筒">
     <div class="modalActions">
       <button class="btn secondary small" id="exportCancelBtn">取消</button>
@@ -383,29 +436,57 @@
   </div>
 </div>
 
+<div class="modalOverlay" id="tolModal">
+  <div class="modalCard">
+    <h3>設定公差</h3>
+    <p id="tolModalDesc">目標值與允許誤差，會自動判定合格／NG。</p>
+    <div class="modalRow">
+      <input type="number" id="tolTargetInput" inputmode="decimal" placeholder="目標值">
+      <input type="number" id="tolToleranceInput" inputmode="decimal" placeholder="± 公差">
+    </div>
+    <label class="chkRow"><input type="checkbox" id="tolSaveSpecChk" checked> 同時存入規格表（下次同名項目自動套用）</label>
+    <div class="modalActions">
+      <button class="btn secondary small" id="tolCancelBtn">取消</button>
+      <button class="btn small" id="tolConfirmBtn">確認</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
-  // ---------- state ----------
+  // ========================= state =========================
   let drawingImg = null;
   let sourceCanvas = null;
+  let sourceMode = 'photo'; // 'photo' | 'synthetic' (straight-line reference)
   let lineColor = [57,255,20];
   let boldPx = 1;
   let threshold = 128;
   let baseOverlaySize = {w:0, h:0};
   let finalLineArtDataURL = null;
+  let hasLineArt = true;
+
+  let undoStack = [];
+  const UNDO_LIMIT = 20;
 
   const overlayState = {x:0, y:0, scale:1, rotate:0, locked:false};
-  let currentMode = 'photo';
+  let currentMode = 'photo'; // 'photo' | 'live'
   let liveStream = null;
 
-  let appMode = 'normal';
+  let appMode = 'normal'; // 'normal' | 'calibrate' | 'measure' | 'angle'
   let calibration = null;
   let tapPoints = [];
   let measurementLog = [];
   let logNextId = 1;
+  let specTable = {}; // label -> {target, tolerance}
 
+  let photoSlots = [];
+  let activeSlotIdx = -1;
+  let slotIdCounter = 1;
+  let addingSlot = false;
+
+  // ========================= elements =========================
   const el = id => document.getElementById(id);
   const stepIndicator = el('stepIndicator');
   const uploadScreen = el('uploadScreen');
@@ -438,7 +519,7 @@
   function showScreen(name){
     [uploadScreen, thresholdScreen, photoScreen].forEach(s=>s.style.display='none');
     compareScreen.classList.remove('active');
-    if(name==='upload'){ uploadScreen.style.display='flex'; setStep(1,'上傳圖面'); }
+    if(name==='upload'){ uploadScreen.style.display='flex'; setStep(1,'上傳圖面'); renderRecents(); }
     if(name==='threshold'){ thresholdScreen.style.display='flex'; setStep(2,'調整線稿（可跳過）'); }
     if(name==='photo'){ photoScreen.style.display='flex'; setStep(3,'選擇比對方式'); }
     if(name==='compare'){ compareScreen.classList.add('active'); setStep(4,'疊圖比對'); }
@@ -463,8 +544,10 @@
     const img = new Image();
     img.onload = ()=>{
       drawingImg = img;
+      sourceMode = 'photo';
+      hasLineArt = true;
       showScreen('threshold');
-      initSourceFromImage(img);
+      renderLineArt();
     };
     img.onerror = ()=> alert('圖片讀取失敗，請換一個檔案試試。');
     img.src = url;
@@ -481,14 +564,15 @@
         if(!data.lineArtDataURL) throw new Error('missing image');
         const img = new Image();
         img.onload = ()=>{
-          drawingImg = null; // imported profile has no raw source to re-threshold
+          drawingImg = null;
+          sourceMode = 'photo';
+          hasLineArt = true;
           baseOverlaySize = {w: img.naturalWidth, h: img.naturalHeight};
-          sourceCanvas = document.createElement('canvas');
-          sourceCanvas.width = img.naturalWidth; sourceCanvas.height = img.naturalHeight;
-          sourceCanvas.getContext('2d').drawImage(img,0,0);
           editCanvas.width = img.naturalWidth;
           editCanvas.height = img.naturalHeight;
           editCanvas.getContext('2d').drawImage(img,0,0);
+          undoStack = [];
+          specTable = (data.specs && typeof data.specs==='object') ? data.specs : {};
           showScreen('threshold');
         };
         img.src = data.lineArtDataURL;
@@ -499,18 +583,121 @@
     reader.readAsText(f);
   });
 
+  // ---- no-drawing quick measurement entry ----
+  el('noDrawingBtn').addEventListener('click', ()=>{
+    finalLineArtDataURL = null;
+    hasLineArt = false;
+    baseOverlaySize = {w:0, h:0};
+    showScreen('photo');
+  });
+
+  // ---- synthetic straight-line reference (for straightness checks) ----
+  function generateStraightLineReference(){
+    const w = 1200, h = 900;
+    const cvs = document.createElement('canvas');
+    cvs.width = w; cvs.height = h;
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle = `rgb(${lineColor.join(',')})`;
+    ctx.lineWidth = 2 + boldPx*2;
+    const rows = 5;
+    for(let i=1;i<=rows;i++){
+      const y = Math.round(h*i/(rows+1));
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+    }
+    ctx.globalAlpha = 0.45;
+    const cols = 3;
+    for(let i=1;i<=cols;i++){
+      const x = Math.round(w*i/(cols+1));
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    editCanvas.width = w; editCanvas.height = h;
+    editCanvas.getContext('2d').clearRect(0,0,w,h);
+    editCanvas.getContext('2d').drawImage(cvs,0,0);
+    baseOverlaySize = {w, h};
+    undoStack = [];
+  }
+  el('straightLineBtn').addEventListener('click', ()=>{
+    drawingImg = null;
+    sourceCanvas = null;
+    sourceMode = 'synthetic';
+    hasLineArt = true;
+    generateStraightLineReference();
+    updateAdvPanelForSourceMode();
+    showScreen('threshold');
+  });
+
+  function updateAdvPanelForSourceMode(){
+    const synthetic = sourceMode === 'synthetic';
+    el('perspBtnRow').style.display = synthetic ? 'none' : '';
+    el('thresholdSliderRow').style.display = synthetic ? 'none' : '';
+  }
+
+  // ---- recent drawings (localStorage — this file runs on your own jinge-tools
+  // domain rather than inside Claude's own preview, so this behaves the same
+  // way your other jinge-tools already use localStorage for save/load) ----
+  const RECENTS_KEY = 'jinge_overlay_recent';
+  function loadRecents(){
+    try{ return JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveToRecents(dataURL, w, h){
+    try{
+      const name = new Date().toLocaleString('zh-TW', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      let list = loadRecents();
+      list.unshift({name, dataURL, w, h, specs: specTable, savedAt: Date.now()});
+      list = list.slice(0,5);
+      localStorage.setItem(RECENTS_KEY, JSON.stringify(list));
+    } catch(e){ /* storage unavailable — ignore, feature just won't persist */ }
+  }
+  function renderRecents(){
+    const wrap = el('recentWrap');
+    const list = loadRecents();
+    if(list.length===0){ wrap.style.display='none'; wrap.innerHTML=''; return; }
+    wrap.style.display = 'flex';
+    wrap.innerHTML = '<div class="recentLabel">最近使用</div>';
+    const row = document.createElement('div');
+    row.className = 'recentRow';
+    list.forEach(item=>{
+      const chip = document.createElement('button');
+      chip.className = 'recentChip';
+      chip.textContent = item.name;
+      chip.addEventListener('click', ()=>{
+        const img = new Image();
+        img.onload = ()=>{
+          drawingImg = null;
+          sourceMode = 'photo';
+          hasLineArt = true;
+          baseOverlaySize = {w:item.w, h:item.h};
+          editCanvas.width = item.w; editCanvas.height = item.h;
+          editCanvas.getContext('2d').clearRect(0,0,item.w,item.h);
+          editCanvas.getContext('2d').drawImage(img,0,0);
+          undoStack = [];
+          specTable = item.specs || {};
+          updateAdvPanelForSourceMode();
+          showScreen('threshold');
+        };
+        img.src = item.dataURL;
+      });
+      row.appendChild(chip);
+    });
+    wrap.appendChild(row);
+  }
+
   // ================= STEP 2: threshold + erase (same canvas) =================
-  // sourceCanvas = clean working-resolution copy of the drawing (post perspective-correction if used)
-  // editCanvas   = sourceCanvas after threshold+color processing, and the surface the user erases on
-  function initSourceFromImage(img){
+  function renderLineArt(){
+    if(!drawingImg) return;
     const maxDim = 1400;
-    let w = img.naturalWidth, h = img.naturalHeight;
+    let w = drawingImg.naturalWidth, h = drawingImg.naturalHeight;
     const scale = Math.min(1, maxDim/Math.max(w,h));
     w = Math.round(w*scale); h = Math.round(h*scale);
+
     sourceCanvas = document.createElement('canvas');
     sourceCanvas.width = w; sourceCanvas.height = h;
-    sourceCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    sourceCanvas.getContext('2d').drawImage(drawingImg, 0, 0, w, h);
     applyThreshold();
+    updateAdvPanelForSourceMode();
   }
 
   function applyThreshold(){
@@ -547,6 +734,13 @@
     }
 
     baseOverlaySize = {w, h};
+    undoStack = [];
+  }
+
+  function regenerateSource(){
+    // re-run whatever produced the current editCanvas content, discarding erasures
+    if(sourceMode === 'synthetic'){ generateStraightLineReference(); }
+    else { applyThreshold(); }
   }
 
   threshSlider.addEventListener('input', ()=>{
@@ -559,12 +753,12 @@
   boldSlider.addEventListener('input', ()=>{
     boldPx = parseInt(boldSlider.value,10);
     boldVal.textContent = boldPx;
-    applyThreshold();
+    regenerateSource();
   });
   document.querySelectorAll('.lineColorBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       lineColor = hexToRgb(btn.getAttribute('data-color'));
-      applyThreshold();
+      regenerateSource();
     });
   });
 
@@ -574,10 +768,10 @@
     el('advToggleBtn').textContent = showing ? '隱藏線稿微調選項 ▴' : '顯示線稿微調選項 ▾';
   });
 
-  el('undoMaskBtn').addEventListener('click', ()=> applyThreshold());
+  el('undoMaskBtn').addEventListener('click', ()=> regenerateSource());
   el('backToUpload').addEventListener('click', ()=> showScreen('upload'));
 
-  // ---- erase by touch, directly on editCanvas ----
+  // ---- erase by touch, directly on editCanvas, with step-undo ----
   let brushSize = 28;
   let drawing = false;
   let lastPt = null;
@@ -599,9 +793,17 @@
     ctx.stroke();
     ctx.restore();
   }
+  function pushUndoSnapshot(){
+    try{
+      const snap = editCanvas.getContext('2d').getImageData(0,0,editCanvas.width, editCanvas.height);
+      undoStack.push(snap);
+      if(undoStack.length > UNDO_LIMIT) undoStack.shift();
+    } catch(e){ /* ignore snapshot failure, undo just won't have this step */ }
+  }
   editCanvas.addEventListener('pointerdown', e=>{
     editCanvas.setPointerCapture(e.pointerId);
     drawing = true;
+    pushUndoSnapshot();
     const pt = canvasPointFromEvent(e);
     lastPt = pt;
     eraseAt(pt, null);
@@ -615,6 +817,13 @@
   function endDraw(){ drawing = false; lastPt = null; }
   editCanvas.addEventListener('pointerup', endDraw);
   editCanvas.addEventListener('pointercancel', endDraw);
+
+  el('undoStepBtn').addEventListener('click', ()=>{
+    if(undoStack.length===0) return;
+    const snap = undoStack.pop();
+    editCanvas.width = editCanvas.width; // no-op guard, dims already match
+    editCanvas.getContext('2d').putImageData(snap, 0, 0);
+  });
 
   brushSlider.addEventListener('input', ()=>{
     brushSize = parseInt(brushSlider.value,10);
@@ -630,7 +839,7 @@
   el('exportConfirmBtn').addEventListener('click', ()=>{
     const name = (el('exportNameInput').value || 'lineart').trim();
     const dataURL = editCanvas.toDataURL('image/png');
-    const payload = { version:1, name, lineArtDataURL: dataURL, exportedAt: new Date().toISOString() };
+    const payload = { version:2, name, lineArtDataURL: dataURL, specs: specTable, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -675,7 +884,7 @@
     return { x:(H[0]*x+H[1]*y+H[2])/denom, y:(H[3]*x+H[4]*y+H[5])/denom };
   }
   function warpPerspective(srcCanvas, srcQuad){
-    const [p0,p1,p2,p3] = srcQuad; // TL, TR, BR, BL
+    const [p0,p1,p2,p3] = srcQuad;
     const widthTop = Math.hypot(p1.x-p0.x, p1.y-p0.y);
     const widthBottom = Math.hypot(p2.x-p3.x, p2.y-p3.y);
     const heightLeft = Math.hypot(p3.x-p0.x, p3.y-p0.y);
@@ -739,7 +948,6 @@
     });
     createPerspHandles();
   }
-
   function exitPerspEdit(restore){
     perspEditor.classList.remove('show');
     perspBtn.style.display = '';
@@ -748,7 +956,6 @@
     removePerspHandles();
     if(restore) applyThreshold();
   }
-
   function createPerspHandles(){
     const wrapRect = editWrap.getBoundingClientRect();
     const canvasRect = editCanvas.getBoundingClientRect();
@@ -789,7 +996,6 @@
     resizePerspSvg();
     drawPerspQuad();
   }
-
   function resizePerspSvg(){
     const wrapRect = editWrap.getBoundingClientRect();
     perspSvg.setAttribute('width', wrapRect.width);
@@ -834,17 +1040,58 @@
 
   el('toPhotoBtn').addEventListener('click', ()=>{
     finalLineArtDataURL = editCanvas.toDataURL('image/png');
+    if(sourceMode === 'photo'){ saveToRecents(finalLineArtDataURL, baseOverlaySize.w, baseOverlaySize.h); }
     showScreen('photo');
   });
 
   // ================= STEP 3: choose mode =================
   el('backToThreshold').addEventListener('click', ()=> showScreen('threshold'));
 
+  function applyNeedsLineArtVisibility(){
+    document.querySelectorAll('.needsLineArt').forEach(elm=>{
+      elm.style.display = hasLineArt ? '' : 'none';
+    });
+  }
+
+  function startNewSession(){
+    photoSlots = [];
+    activeSlotIdx = -1;
+    calibration = null;
+    measurementLog = [];
+    logNextId = 1;
+    specTable = specTable || {};
+    el('roCalWrap').style.display = 'none';
+    clearAnnotations();
+    exitMode();
+    renderLog();
+    el('logPanel').classList.remove('show');
+    el('specTableWrap').classList.remove('show');
+  }
+
   cameraInput.addEventListener('change', e=>{
     const f = e.target.files[0];
     if(!f) return;
-    stopLiveCamera();
     const url = URL.createObjectURL(f);
+
+    if(addingSlot && photoSlots.length>0){
+      addingSlot = false;
+      const defaultName = '面'+(photoSlots.length+1);
+      const name = (prompt('這張照片是哪一面？（例如：側面、底面）', defaultName) || defaultName).trim() || defaultName;
+      const img = new Image();
+      img.onload = ()=>{
+        saveActiveSlotState();
+        const newSlot = { id: slotIdCounter++, name, imageDataURL:url,
+          overlayState:{x:overlayState.x,y:overlayState.y,scale:overlayState.scale,rotate:overlayState.rotate,locked:false},
+          calibration:null };
+        photoSlots.push(newSlot);
+        switchToSlot(photoSlots.length-1);
+      };
+      img.src = url;
+      return;
+    }
+
+    stopLiveCamera();
+    startNewSession();
     photoLayer.onload = ()=>{
       currentMode = 'photo';
       photoLayer.style.display = 'block';
@@ -852,9 +1099,15 @@
       el('retakePhotoBtn').style.display = 'inline-flex';
       el('stopLiveBtn').style.display = 'none';
       stopTiltDisplay();
-      resetCalibration();
+      applyNeedsLineArtVisibility();
       showScreen('compare');
-      initOverlay();
+      const slot0 = { id: slotIdCounter++, name:'正面', imageDataURL:url,
+        overlayState:{x:0,y:0,scale:1,rotate:0,locked:false}, calibration:null };
+      photoSlots = [slot0];
+      activeSlotIdx = 0;
+      if(hasLineArt) initOverlay();
+      saveActiveSlotState();
+      renderSlotTabs();
     };
     photoLayer.src = url;
   });
@@ -886,9 +1139,11 @@
       stopLiveBtn.style.display = 'inline-flex';
       liveCameraBtn.textContent = originalText;
       startTilt();
-      resetCalibration();
+      startNewSession();
+      applyNeedsLineArtVisibility();
       showScreen('compare');
-      initOverlay();
+      if(hasLineArt) initOverlay();
+      renderSlotTabs();
     } catch(err){
       console.error(err);
       liveCameraBtn.textContent = originalText;
@@ -903,6 +1158,57 @@
     stopTiltDisplay();
   }
   stopLiveBtn.addEventListener('click', ()=>{ stopLiveCamera(); showScreen('photo'); });
+
+  // ---- multi-photo (per-face) slot management — photo mode only ----
+  function saveActiveSlotState(){
+    if(activeSlotIdx<0 || !photoSlots[activeSlotIdx]) return;
+    const slot = photoSlots[activeSlotIdx];
+    slot.overlayState = {...overlayState};
+    slot.calibration = calibration;
+  }
+  function switchToSlot(idx){
+    saveActiveSlotState();
+    activeSlotIdx = idx;
+    const slot = photoSlots[idx];
+    calibration = slot.calibration;
+    overlayState.x = slot.overlayState.x; overlayState.y = slot.overlayState.y;
+    overlayState.scale = slot.overlayState.scale; overlayState.rotate = slot.overlayState.rotate;
+    overlayState.locked = slot.overlayState.locked;
+    photoLayer.src = slot.imageDataURL;
+    photoLayer.style.display = 'block';
+    liveVideo.style.display = 'none';
+    updateLockUI();
+    if(hasLineArt) applyTransform();
+    el('roCalWrap').style.display = calibration ? 'block' : 'none';
+    if(calibration) el('roCal').textContent = calibration.pxPerMm.toFixed(2)+' px/mm';
+    clearAnnotations();
+    exitMode();
+    renderSlotTabs();
+  }
+  function renderSlotTabs(){
+    const wrap = el('slotTabs');
+    const hudTop = el('hudTop');
+    if(currentMode !== 'photo' || photoSlots.length===0){
+      wrap.style.display = 'none';
+      hudTop.classList.remove('withSlots');
+      return;
+    }
+    wrap.style.display = 'flex';
+    hudTop.classList.add('withSlots');
+    wrap.innerHTML = '';
+    photoSlots.forEach((slot, idx)=>{
+      const b = document.createElement('button');
+      b.className = 'slotTab' + (idx===activeSlotIdx ? ' active' : '');
+      b.textContent = slot.name;
+      b.addEventListener('click', ()=>{ if(idx!==activeSlotIdx) switchToSlot(idx); });
+      wrap.appendChild(b);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'slotTab slotTabAdd';
+    addBtn.textContent = '+ 拍下一面';
+    addBtn.addEventListener('click', ()=>{ addingSlot = true; cameraInput.click(); });
+    wrap.appendChild(addBtn);
+  }
 
   // ---- tilt / level widget (live camera mode only) ----
   let tiltRef = {beta:0, gamma:0};
@@ -1034,7 +1340,7 @@
     gestureCatcher.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, {x:e.clientX, y:e.clientY, downX:e.clientX, downY:e.clientY});
     if(appMode !== 'normal') return;
-    if(overlayState.locked) return;
+    if(!hasLineArt || overlayState.locked) return;
     if(pointers.size===1){
       gestureStart = { mode:'pan', startX:e.clientX, startY:e.clientY, ox:overlayState.x, oy:overlayState.y };
     } else if(pointers.size===2){
@@ -1049,7 +1355,7 @@
     if(!pointers.has(e.pointerId)) return;
     const rec = pointers.get(e.pointerId);
     rec.x = e.clientX; rec.y = e.clientY;
-    if(appMode !== 'normal' || overlayState.locked || !gestureStart) return;
+    if(appMode !== 'normal' || !hasLineArt || overlayState.locked || !gestureStart) return;
     if(gestureStart.mode==='pan' && pointers.size===1){
       overlayState.x = gestureStart.ox + (e.clientX - gestureStart.startX);
       overlayState.y = gestureStart.oy + (e.clientY - gestureStart.startY);
@@ -1095,6 +1401,7 @@
 
   const calibrateBtn = el('calibrateBtn');
   const measureBtn = el('measureBtn');
+  const angleBtn = el('angleBtn');
   const modeExitBtn = el('modeExitBtn');
   const roCalWrap = el('roCalWrap');
   const roCal = el('roCal');
@@ -1105,12 +1412,14 @@
     modeBanner.classList.add('show');
     calibrateBtn.classList.toggle('active', mode==='calibrate');
     measureBtn.classList.toggle('active', mode==='measure');
+    angleBtn.classList.toggle('active', mode==='angle');
   }
   function exitMode(){
     appMode = 'normal'; tapPoints = [];
     modeBanner.classList.remove('show');
     calibrateBtn.classList.remove('active');
     measureBtn.classList.remove('active');
+    angleBtn.classList.remove('active');
   }
   modeExitBtn.addEventListener('click', exitMode);
 
@@ -1126,16 +1435,19 @@
     if(appMode==='measure'){ exitMode(); return; }
     enterMode('measure', '請點選要量測的兩個位置點');
   });
+  angleBtn.addEventListener('click', ()=>{
+    if(appMode==='angle'){ exitMode(); return; }
+    enterMode('angle', '依序點：頂點 → 第一邊 → 第二邊（共 3 點）');
+  });
 
   function registerTap(clientX, clientY){
     const pt = stagePoint(clientX, clientY);
-    if(appMode==='measure' && tapPoints.length===0){ clearAnnotations(); }
+    if((appMode==='measure' || appMode==='angle') && tapPoints.length===0){ clearAnnotations(); }
     tapPoints.push(pt);
     drawMarker(pt);
-    if(tapPoints.length===2){
-      if(appMode==='calibrate') finishCalibrationTap();
-      else if(appMode==='measure') finishMeasureTap();
-    }
+    if(appMode==='calibrate' && tapPoints.length===2) finishCalibrationTap();
+    else if(appMode==='measure' && tapPoints.length===2) finishMeasureTap();
+    else if(appMode==='angle' && tapPoints.length===3) finishAngleTap();
   }
 
   function svgEl(tag, attrs){
@@ -1152,6 +1464,15 @@
     const mx = (p1.x+p2.x)/2, my = (p1.y+p2.y)/2;
     annotSvg.appendChild(svgEl('rect', {x:mx-34, y:my-12, width:68, height:20, rx:5, fill:'rgba(13,27,46,.9)', stroke:color, 'stroke-width':1}));
     const txt = svgEl('text', {x:mx, y:my+4, 'text-anchor':'middle', 'font-size':11, fill:'#eaf1f8', 'font-family':'monospace'});
+    txt.textContent = label;
+    annotSvg.appendChild(txt);
+  }
+  function drawAngleAnnotation(vertex, a, b, label){
+    annotSvg.appendChild(svgEl('line', {x1:vertex.x, y1:vertex.y, x2:a.x, y2:a.y, stroke:'#ff2fd0', 'stroke-width':2}));
+    annotSvg.appendChild(svgEl('line', {x1:vertex.x, y1:vertex.y, x2:b.x, y2:b.y, stroke:'#ff2fd0', 'stroke-width':2}));
+    const lx = vertex.x, ly = vertex.y - 22;
+    annotSvg.appendChild(svgEl('rect', {x:lx-34, y:ly-12, width:68, height:20, rx:5, fill:'rgba(13,27,46,.9)', stroke:'#ff2fd0', 'stroke-width':1}));
+    const txt = svgEl('text', {x:lx, y:ly+4, 'text-anchor':'middle', 'font-size':11, fill:'#eaf1f8', 'font-family':'monospace'});
     txt.textContent = label;
     annotSvg.appendChild(txt);
   }
@@ -1184,55 +1505,118 @@
   function finishMeasureTap(){
     const [p1, p2] = tapPoints;
     const pxDist = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-    let label, mmValue;
-    if(calibration){ mmValue = pxDist / calibration.pxPerMm; label = mmValue.toFixed(2)+'mm'; }
-    else { label = Math.round(pxDist)+'px'; mmValue = null; }
+    let label, numericValue, unit;
+    if(calibration){ numericValue = pxDist / calibration.pxPerMm; label = numericValue.toFixed(2)+'mm'; unit = 'mm'; }
+    else { numericValue = pxDist; label = Math.round(pxDist)+'px'; unit = 'px'; }
     drawLineWithLabel(p1, p2, label, '#3a8fd4');
     tapPoints = [];
-    addLogEntry(label, mmValue);
+    addLogEntry(label, numericValue, unit);
   }
 
-  function resetCalibration(){
+  function finishAngleTap(){
+    const [vertex, a, b] = tapPoints;
+    const v1 = {x:a.x-vertex.x, y:a.y-vertex.y};
+    const v2 = {x:b.x-vertex.x, y:b.y-vertex.y};
+    const dot = v1.x*v2.x + v1.y*v2.y;
+    const mag = Math.hypot(v1.x,v1.y) * Math.hypot(v2.x,v2.y);
+    let angleDeg = 0;
+    if(mag > 1e-6){
+      const cosv = Math.max(-1, Math.min(1, dot/mag));
+      angleDeg = Math.acos(cosv) * 180/Math.PI;
+    }
+    const label = angleDeg.toFixed(1)+'°';
+    drawAngleAnnotation(vertex, a, b, label);
+    tapPoints = [];
+    addLogEntry(label, angleDeg, '°');
+  }
+
+  function resetCalibrationOnly(){
     calibration = null;
     roCalWrap.style.display = 'none';
     clearAnnotations();
     exitMode();
-    measurementLog = [];
-    logNextId = 1;
-    renderLog();
-    el('logPanel').classList.remove('show');
   }
 
-  // ---- measurement log ----
+  // ---- measurement log with pass/fail ----
   const logToggleBtn = el('logToggleBtn');
   const logPanel = el('logPanel');
   const logList = el('logList');
   const logCountBadge = el('logCountBadge');
+  const logSummary = el('logSummary');
 
-  function addLogEntry(valueText, mmValue){
+  function currentSlotName(){
+    if(currentMode !== 'photo' || activeSlotIdx<0 || !photoSlots[activeSlotIdx]) return '';
+    return photoSlots[activeSlotIdx].name;
+  }
+
+  function addLogEntry(valueText, numericValue, unit){
     const id = logNextId++;
-    measurementLog.push({ id, label: '量測'+id, valueText, mmValue });
+    const label = '量測'+id;
+    const entry = { id, label, valueText, numericValue, unit, target:null, tolerance:null, slotName: currentSlotName() };
+    const spec = specTable[label];
+    if(spec){ entry.target = spec.target; entry.tolerance = spec.tolerance; }
+    measurementLog.push(entry);
     renderLog();
     logPanel.classList.add('show');
   }
 
+  function passFail(entry){
+    if(entry.target===null || entry.target===undefined) return null;
+    return Math.abs(entry.numericValue - entry.target) <= entry.tolerance;
+  }
+
   function renderLog(){
     logCountBadge.textContent = measurementLog.length;
+    let okCount=0, judgedCount=0;
+    measurementLog.forEach(e=>{ const p=passFail(e); if(p!==null){ judgedCount++; if(p) okCount++; } });
+    if(judgedCount===0){
+      logSummary.innerHTML = '';
+    } else {
+      const anyNg = okCount < judgedCount;
+      logSummary.innerHTML = `<span>整體判定</span><span class="${anyNg?'sumNg':'sumOk'}">${okCount}/${judgedCount} 合格${anyNg?'　有 NG':''}</span>`;
+    }
     if(measurementLog.length===0){
       logList.innerHTML = '<div class="logEmpty">還沒有量測記錄</div>';
       return;
     }
     logList.innerHTML = '';
     measurementLog.forEach(entry=>{
+      const pass = passFail(entry);
       const row = document.createElement('div');
-      row.className = 'logRow';
+      row.className = 'logRow' + (pass===true?' ok':'') + (pass===false?' ng':'');
+
+      const meta = document.createElement('div');
+      meta.className = 'logMeta';
       const labelInput = document.createElement('input');
       labelInput.className = 'logLabel';
       labelInput.value = entry.label;
-      labelInput.addEventListener('change', ()=>{ entry.label = labelInput.value || entry.label; });
+      labelInput.addEventListener('change', ()=>{
+        entry.label = labelInput.value || entry.label;
+        const spec = specTable[entry.label];
+        if(spec){ entry.target = spec.target; entry.tolerance = spec.tolerance; }
+        renderLog();
+      });
+      meta.appendChild(labelInput);
+      if(entry.slotName){
+        const slotTag = document.createElement('div');
+        slotTag.className = 'logSlot';
+        slotTag.textContent = entry.slotName;
+        meta.appendChild(slotTag);
+      }
+
       const val = document.createElement('div');
       val.className = 'logVal';
       val.textContent = entry.valueText;
+
+      const passBadge = document.createElement('div');
+      passBadge.className = 'logPassBadge' + (pass===true?' pass':'') + (pass===false?' fail':'');
+      passBadge.textContent = pass===true ? '✓ 合格' : (pass===false ? '✕ NG' : '—');
+
+      const tolBtn = document.createElement('button');
+      tolBtn.className = 'logTolBtn';
+      tolBtn.textContent = '±';
+      tolBtn.addEventListener('click', ()=> openTolModal(entry));
+
       const del = document.createElement('button');
       del.className = 'logDel';
       del.textContent = '×';
@@ -1240,12 +1624,45 @@
         measurementLog = measurementLog.filter(e=>e.id!==entry.id);
         renderLog();
       });
-      row.appendChild(labelInput);
+
+      row.appendChild(meta);
       row.appendChild(val);
+      row.appendChild(passBadge);
+      row.appendChild(tolBtn);
       row.appendChild(del);
       logList.appendChild(row);
     });
   }
+
+  const tolModal = el('tolModal');
+  let tolTargetEntry = null;
+  function openTolModal(entry){
+    tolTargetEntry = entry;
+    el('tolModalDesc').textContent = '「'+entry.label+'」的目標值與允許誤差（單位：'+entry.unit+'），會自動判定合格／NG。';
+    el('tolTargetInput').value = entry.target!==null && entry.target!==undefined ? entry.target : '';
+    el('tolToleranceInput').value = entry.tolerance!==null && entry.tolerance!==undefined ? entry.tolerance : '';
+    el('tolSaveSpecChk').checked = true;
+    tolModal.classList.add('show');
+  }
+  el('tolCancelBtn').addEventListener('click', ()=> tolModal.classList.remove('show'));
+  el('tolConfirmBtn').addEventListener('click', ()=>{
+    const target = parseFloat(el('tolTargetInput').value);
+    const tolerance = parseFloat(el('tolToleranceInput').value);
+    if(isNaN(target) || isNaN(tolerance) || tolerance<0){
+      alert('請輸入有效的目標值與公差。');
+      return;
+    }
+    if(tolTargetEntry){
+      tolTargetEntry.target = target;
+      tolTargetEntry.tolerance = tolerance;
+      if(el('tolSaveSpecChk').checked){
+        specTable[tolTargetEntry.label] = {target, tolerance};
+        renderSpecTable();
+      }
+    }
+    tolModal.classList.remove('show');
+    renderLog();
+  });
 
   logToggleBtn.addEventListener('click', ()=> logPanel.classList.toggle('show'));
   el('logClearBtn').addEventListener('click', ()=>{
@@ -1259,17 +1676,78 @@
     const lines = [
       '疊圖比對 量測記錄',
       '匯出時間：'+new Date().toLocaleString('zh-TW'),
-      '比例校正：'+(calibration ? calibration.pxPerMm.toFixed(3)+' px/mm' : '未校正（僅像素數值，非實際 mm）'),
       '比對模式：'+(currentMode==='live' ? '即時相機' : '拍照比對'),
-      '', '項目\t數值'
+      '', '面／位置\t項目\t數值\t判定'
     ];
-    measurementLog.forEach(e=> lines.push(e.label+'\t'+e.valueText));
+    measurementLog.forEach(e=>{
+      const p = passFail(e);
+      const verdict = p===true ? '合格' : (p===false ? 'NG' : '-');
+      lines.push((e.slotName||'-')+'\t'+e.label+'\t'+e.valueText+'\t'+verdict);
+    });
     const blob = new Blob([lines.join('\n')], {type:'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = '量測記錄_'+new Date().toISOString().slice(0,10)+'.txt';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  });
+
+  // ---- spec table (reusable target/tolerance per label) ----
+  const specToggleBtn = el('specToggleBtn');
+  const specTableWrap = el('specTableWrap');
+  const specList = el('specList');
+
+  specToggleBtn.addEventListener('click', ()=> specTableWrap.classList.toggle('show'));
+
+  function renderSpecTable(){
+    specList.innerHTML = '';
+    const labels = Object.keys(specTable);
+    if(labels.length===0){
+      const empty = document.createElement('div');
+      empty.className = 'logEmpty';
+      empty.textContent = '還沒有規格項目';
+      specList.appendChild(empty);
+    }
+    labels.forEach(label=>{
+      const spec = specTable[label];
+      const row = document.createElement('div');
+      row.className = 'specRow';
+      const labelInput = document.createElement('input');
+      labelInput.className = 'specLabel';
+      labelInput.value = label;
+      const targetInput = document.createElement('input');
+      targetInput.className = 'specNum'; targetInput.type='number'; targetInput.placeholder='目標值';
+      targetInput.value = spec.target;
+      const tolInput = document.createElement('input');
+      tolInput.className = 'specNum'; tolInput.type='number'; tolInput.placeholder='±公差';
+      tolInput.value = spec.tolerance;
+      const del = document.createElement('button');
+      del.className = 'specDel'; del.textContent = '×';
+
+      function commit(){
+        const newLabel = labelInput.value.trim() || label;
+        const t = parseFloat(targetInput.value);
+        const tol = parseFloat(tolInput.value);
+        delete specTable[label];
+        if(newLabel && !isNaN(t) && !isNaN(tol)){
+          specTable[newLabel] = {target:t, tolerance:tol};
+        }
+        measurementLog.forEach(e=>{ if(e.label===newLabel && specTable[newLabel]){ e.target=specTable[newLabel].target; e.tolerance=specTable[newLabel].tolerance; } });
+        renderLog();
+      }
+      labelInput.addEventListener('change', commit);
+      targetInput.addEventListener('change', commit);
+      tolInput.addEventListener('change', commit);
+      del.addEventListener('click', ()=>{ delete specTable[label]; renderSpecTable(); });
+
+      row.appendChild(labelInput); row.appendChild(targetInput); row.appendChild(tolInput); row.appendChild(del);
+      specList.appendChild(row);
+    });
+  }
+  el('specAddBtn').addEventListener('click', ()=>{
+    let n=1; while(specTable['規格'+n]) n++;
+    specTable['規格'+n] = {target:0, tolerance:0.1};
+    renderSpecTable();
   });
 
   showScreen('upload');
