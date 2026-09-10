@@ -263,7 +263,8 @@
         <button class="zoomResetBtn" id="zoomResetBtn" title="重置縮放">⤢</button>
       </div>
       <p style="font-size:11.5px;">不用調整也可以直接比對。雙指可縮放檢查線稿細節。</p>
-      <div class="primaryRow"><button class="btn" id="toPhotoBtn">下一步：比對零件 ›</button></div>
+      <div class="primaryRow"><button class="btn" id="toPhotoBtn">下一步：開啟相機比對 ›</button></div>
+      <button class="btn ghost" id="photoModeFromThresholdBtn">改用拍照比對（可量測）</button>
       <button class="advToggle" id="advToggleBtn">顯示線稿微調選項 ▾</button>
       <div class="advPanel" id="advPanel">
         <div class="actionRow" id="perspBtnRow">
@@ -1053,10 +1054,22 @@
     }
   });
 
-  el('toPhotoBtn').addEventListener('click', ()=>{
+  el('toPhotoBtn').addEventListener('click', async ()=>{
     finalLineArtDataURL = editCanvas.toDataURL('image/png');
     if(sourceMode === 'photo'){ saveToRecents(finalLineArtDataURL, baseOverlaySize.w, baseOverlaySize.h); }
-    showScreen('photo');
+    const btn = el('toPhotoBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '開啟相機中…';
+    btn.disabled = true;
+    await tryStartLiveCamera();
+    btn.textContent = originalText;
+    btn.disabled = false;
+  });
+
+  el('photoModeFromThresholdBtn').addEventListener('click', ()=>{
+    finalLineArtDataURL = editCanvas.toDataURL('image/png');
+    if(sourceMode === 'photo'){ saveToRecents(finalLineArtDataURL, baseOverlaySize.w, baseOverlaySize.h); }
+    cameraInput.click();
   });
 
   // ================= STEP 3: choose mode =================
@@ -1161,15 +1174,14 @@
   const cameraErrorMsg = el('cameraErrorMsg');
   const stopLiveBtn = el('stopLiveBtn');
 
-  liveCameraBtn.addEventListener('click', async ()=>{
+  async function tryStartLiveCamera(){
     cameraErrorMsg.style.display = 'none';
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      showScreen('photo');
       cameraErrorMsg.textContent = '此瀏覽器不支援即時相機，請改用「拍照比對」。';
       cameraErrorMsg.style.display = 'block';
-      return;
+      return false;
     }
-    const originalText = liveCameraBtn.textContent;
-    liveCameraBtn.textContent = '開啟相機中…';
     try{
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } }, audio: false
@@ -1182,19 +1194,29 @@
       photoLayer.style.display = 'none';
       el('retakePhotoBtn').style.display = 'none';
       stopLiveBtn.style.display = 'inline-flex';
-      liveCameraBtn.textContent = originalText;
       startTilt();
       startNewSession();
       applyNeedsLineArtVisibility();
       showScreen('compare');
       if(hasLineArt) initOverlay();
       renderSlotTabs();
+      return true;
     } catch(err){
       console.error(err);
-      liveCameraBtn.textContent = originalText;
+      showScreen('photo');
       cameraErrorMsg.textContent = '無法開啟相機（可能是權限被拒絕，或此瀏覽器/App 內建瀏覽器不支援），請改用下方「拍照比對」。';
       cameraErrorMsg.style.display = 'block';
+      return false;
     }
+  }
+
+  liveCameraBtn.addEventListener('click', async ()=>{
+    const originalText = liveCameraBtn.textContent;
+    liveCameraBtn.textContent = '開啟相機中…';
+    liveCameraBtn.disabled = true;
+    await tryStartLiveCamera();
+    liveCameraBtn.textContent = originalText;
+    liveCameraBtn.disabled = false;
   });
 
   function stopLiveCamera(){
