@@ -134,6 +134,18 @@
   .pillBtn{appearance:none; border:1px solid var(--line); background:rgba(19,40,66,.85); color:var(--text);
     border-radius:20px; padding:7px 12px; font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:5px; cursor:pointer;}
   .pillBtn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .pillBtn .badge{background:rgba(255,255,255,.25); border-radius:10px; padding:0 6px; font-size:10px;}
+
+  .logPanel{display:none; flex-direction:column; gap:6px; max-height:32vh; overflow-y:auto;
+    background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:10px; padding:8px;}
+  .logPanel.show{display:flex;}
+  .logRow{display:flex; align-items:center; gap:8px; font-size:12px; background:rgba(255,255,255,.05); border-radius:7px; padding:5px 8px;}
+  .logRow .logLabel{flex:1; background:none; border:none; color:var(--text); font-size:12px; padding:2px 4px; border-radius:4px;}
+  .logRow .logLabel:focus{background:rgba(255,255,255,.1); outline:1px solid var(--accent);}
+  .logRow .logVal{color:var(--cyan); font-weight:700; white-space:nowrap;}
+  .logRow .logDel{color:var(--danger); background:none; border:none; font-size:15px; cursor:pointer; padding:0 4px; flex-shrink:0;}
+  .logEmpty{font-size:11.5px; color:var(--text-dim); text-align:center; padding:6px;}
+  .logActions{display:flex; gap:8px;}
 
   .ctrlGrid{display:flex; gap:8px; align-items:center;}
   .ctrlGrid label{font-size:10.5px; color:var(--text-dim); width:38px; flex-shrink:0;}
@@ -301,6 +313,14 @@
         <div class="toolRow">
           <button class="pillBtn" id="calibrateBtn">📏 校正比例尺</button>
           <button class="pillBtn" id="measureBtn">📐 量測</button>
+          <button class="pillBtn" id="logToggleBtn">📋 量測記錄 <span class="badge" id="logCountBadge">0</span></button>
+        </div>
+        <div class="logPanel" id="logPanel">
+          <div id="logList"><div class="logEmpty">還沒有量測記錄</div></div>
+          <div class="logActions">
+            <button class="btn secondary small" id="logClearBtn">清空記錄</button>
+            <button class="btn small" id="logExportBtn">匯出記錄</button>
+          </div>
         </div>
         <div class="nudgeRow">
           <label>位置</label>
@@ -383,6 +403,8 @@
   let appMode = 'normal';
   let calibration = null;
   let tapPoints = [];
+  let measurementLog = [];
+  let logNextId = 1;
 
   const el = id => document.getElementById(id);
   const stepIndicator = el('stepIndicator');
@@ -1162,11 +1184,12 @@
   function finishMeasureTap(){
     const [p1, p2] = tapPoints;
     const pxDist = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-    let label;
-    if(calibration){ label = (pxDist / calibration.pxPerMm).toFixed(2)+'mm'; }
-    else { label = Math.round(pxDist)+'px'; }
+    let label, mmValue;
+    if(calibration){ mmValue = pxDist / calibration.pxPerMm; label = mmValue.toFixed(2)+'mm'; }
+    else { label = Math.round(pxDist)+'px'; mmValue = null; }
     drawLineWithLabel(p1, p2, label, '#3a8fd4');
     tapPoints = [];
+    addLogEntry(label, mmValue);
   }
 
   function resetCalibration(){
@@ -1174,7 +1197,80 @@
     roCalWrap.style.display = 'none';
     clearAnnotations();
     exitMode();
+    measurementLog = [];
+    logNextId = 1;
+    renderLog();
+    el('logPanel').classList.remove('show');
   }
+
+  // ---- measurement log ----
+  const logToggleBtn = el('logToggleBtn');
+  const logPanel = el('logPanel');
+  const logList = el('logList');
+  const logCountBadge = el('logCountBadge');
+
+  function addLogEntry(valueText, mmValue){
+    const id = logNextId++;
+    measurementLog.push({ id, label: '量測'+id, valueText, mmValue });
+    renderLog();
+    logPanel.classList.add('show');
+  }
+
+  function renderLog(){
+    logCountBadge.textContent = measurementLog.length;
+    if(measurementLog.length===0){
+      logList.innerHTML = '<div class="logEmpty">還沒有量測記錄</div>';
+      return;
+    }
+    logList.innerHTML = '';
+    measurementLog.forEach(entry=>{
+      const row = document.createElement('div');
+      row.className = 'logRow';
+      const labelInput = document.createElement('input');
+      labelInput.className = 'logLabel';
+      labelInput.value = entry.label;
+      labelInput.addEventListener('change', ()=>{ entry.label = labelInput.value || entry.label; });
+      const val = document.createElement('div');
+      val.className = 'logVal';
+      val.textContent = entry.valueText;
+      const del = document.createElement('button');
+      del.className = 'logDel';
+      del.textContent = '×';
+      del.addEventListener('click', ()=>{
+        measurementLog = measurementLog.filter(e=>e.id!==entry.id);
+        renderLog();
+      });
+      row.appendChild(labelInput);
+      row.appendChild(val);
+      row.appendChild(del);
+      logList.appendChild(row);
+    });
+  }
+
+  logToggleBtn.addEventListener('click', ()=> logPanel.classList.toggle('show'));
+  el('logClearBtn').addEventListener('click', ()=>{
+    if(measurementLog.length===0) return;
+    if(!confirm('確定要清空全部量測記錄嗎？')) return;
+    measurementLog = [];
+    renderLog();
+  });
+  el('logExportBtn').addEventListener('click', ()=>{
+    if(measurementLog.length===0){ alert('目前沒有量測記錄可以匯出。'); return; }
+    const lines = [
+      '疊圖比對 量測記錄',
+      '匯出時間：'+new Date().toLocaleString('zh-TW'),
+      '比例校正：'+(calibration ? calibration.pxPerMm.toFixed(3)+' px/mm' : '未校正（僅像素數值，非實際 mm）'),
+      '比對模式：'+(currentMode==='live' ? '即時相機' : '拍照比對'),
+      '', '項目\t數值'
+    ];
+    measurementLog.forEach(e=> lines.push(e.label+'\t'+e.valueText));
+    const blob = new Blob([lines.join('\n')], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = '量測記錄_'+new Date().toISOString().slice(0,10)+'.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 
   showScreen('upload');
 })();
