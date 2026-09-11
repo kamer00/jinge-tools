@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>材料重量計算機｜勁格科技</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-base:#15181c;
+    --bg-panel:#1c2025;
+    --bg-panel-raised:#22262c;
+    --border:#2b3038;
+    --border-active:#e0a23a;
+    --text-primary:#eae7e0;
+    --text-muted:#8b9199;
+    --amber:#e0a23a;
+    --steel:#5b8fa8;
+    --danger:#c15a4a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-base);
+    color:var(--text-primary);
+    font-family:'Noto Sans TC','Inter',system-ui,-apple-system,sans-serif;
+    min-height:100vh;
+    min-height:100dvh;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  }
+  header{
+    padding:calc(18px + env(safe-area-inset-top)) 20px 18px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(224,162,58,0.06), transparent);
+  }
+  header .brand{
+    font-family:'Rajdhani',sans-serif;
+    font-size:13px;
+    letter-spacing:0.04em;
+    color:var(--text-muted);
+    margin:0 0 4px;
+  }
+  header h1{
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:26px;
+    margin:0;
+    color:var(--text-primary);
+    letter-spacing:0.01em;
+  }
+  main{
+    max-width:480px;
+    margin:0 auto;
+    padding:18px 16px 0;
+  }
+  .section-label{
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    color:var(--text-muted);
+    margin:22px 0 10px;
+  }
+  .shape-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .shape-btn{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:14px 4px 12px;
+    min-height:76px;
+    color:var(--text-muted);
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    transition:border-color .1s, color .1s, background .1s;
+  }
+  .shape-btn:active{background:var(--bg-panel-raised);}
+  .shape-btn svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0;}
+  .shape-btn span{font-size:13.5px;font-weight:500;}
+  .shape-btn.active{
+    border-color:var(--border-active);
+    color:var(--amber);
+    background:var(--bg-panel-raised);
+  }
+  .material-row{
+    display:flex;
+    gap:8px;
+  }
+  select{
+    flex:1;
+    min-height:48px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    color:var(--text-primary);
+    border-radius:6px;
+    padding:12px 28px 12px 12px;
+    font-size:15px;
+    font-family:inherit;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%238b9199'%3E%3Cpath d='M5.5 7.5l4.5 4.5 4.5-4.5' stroke='%238b9199' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 10px center;
+  }
+  .density-box{
+    width:116px;
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:0 12px;
+  }
+  .density-box input{
+    width:100%;
+    background:transparent;
+    border:none;
+    color:var(--text-primary);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    padding:12px 0;
+    text-align:right;
+  }
+  .density-box input:focus{outline:none;}
+  .density-box .unit{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+  .dims{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .field{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:9px 12px 10px;
+    min-height:60px;
+  }
+  .field:focus-within{border-color:var(--steel);}
+  .field label{
+    display:block;
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-bottom:4px;
+  }
+  .field .input-row{display:flex;align-items:baseline;gap:5px;}
+  .field input{
+    width:100%;
+    background:transparent;
+    border:none;
+    color:var(--text-primary);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:21px;
+    font-weight:500;
+    padding:2px 0;
+  }
+  .field input:focus{outline:none;}
+  .field .mm{font-size:12px;color:var(--text-muted);}
+  .field.full{grid-column:1 / -1;}
+  .qty-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:14px;
+  }
+  .qty-row label{font-size:13px;color:var(--text-muted);white-space:nowrap;}
+  .qty-row .field{flex:1;padding:9px 12px 10px;}
+
+  .result{
+    margin-top:26px;
+    background:var(--bg-panel-raised);
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    border-radius:6px;
+    padding:18px 18px 16px;
+  }
+  .result .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:7px 0;
+  }
+  .result .row + .row{border-top:1px solid var(--border);}
+  .result .row .k{font-size:13px;color:var(--text-muted);}
+  .result .row .v{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--text-primary);}
+  .result .headline{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:6px;
+  }
+  .result .headline .k{
+    font-family:'Rajdhani',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-muted);
+  }
+  .result .headline .v{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:32px;
+    font-weight:600;
+    color:var(--amber);
+  }
+  .result .headline .v .unit{font-size:16px;color:var(--text-muted);margin-left:4px;}
+
+  .note{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--text-muted);
+    line-height:1.6;
+  }
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:var(--border);
+    padding:26px 0 0;
+  }
+
+  .sticky-bar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    background:var(--bg-panel-raised);
+    border-top:1px solid var(--border-active);
+    padding:10px 18px calc(12px + env(safe-area-inset-bottom));
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    z-index:10;
+  }
+  .sticky-bar .item{display:flex; flex-direction:column; gap:1px;}
+  .sticky-bar .item.total{align-items:flex-end;}
+  .sticky-bar .item .k{font-size:11px; color:var(--text-muted);}
+  .sticky-bar .item .v{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--amber); font-size:22px; line-height:1.1;}
+  .sticky-bar .item.total .v{color:var(--text-primary); font-size:20px;}
+  .sticky-bar .divider{width:1px; align-self:stretch; background:var(--border);}
+</style>
+</head>
+<body>
+
+<header>
+  <p class="brand">勁格科技 JINGER TECHNOLOGY</p>
+  <h1>材料重量計算機</h1>
+</header>
+
+<main>
+
+  <p class="section-label">形狀</p>
+  <div class="shape-grid" id="shapeGrid">
+    <button class="shape-btn active" data-shape="round">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/></svg>
+      <span>圓棒</span>
+    </button>
+    <button class="shape-btn" data-shape="square">
+      <svg viewBox="0 0 32 32"><rect x="6" y="6" width="20" height="20" rx="1"/></svg>
+      <span>方棒</span>
+    </button>
+    <button class="shape-btn" data-shape="hex">
+      <svg viewBox="0 0 32 32"><polygon points="16,5 25,10.5 25,21.5 16,27 7,21.5 7,10.5"/></svg>
+      <span>六角棒</span>
+    </button>
+    <button class="shape-btn" data-shape="plate">
+      <svg viewBox="0 0 32 32"><rect x="4" y="10" width="24" height="12" rx="1"/><line x1="4" y1="14" x2="28" y2="14"/></svg>
+      <span>板材</span>
+    </button>
+    <button class="shape-btn" data-shape="pipe">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6"/></svg>
+      <span>管材</span>
+    </button>
+  </div>
+
+  <p class="section-label">材質 / 密度</p>
+  <div class="material-row">
+    <select id="materialSelect">
+      <option value="7.85">碳鋼 / 中碳鋼 (S45C, S50C)</option>
+      <option value="7.85">合金鋼 (SCM440)</option>
+      <option value="7.93">不鏽鋼 (SUS304 / 316)</option>
+      <option value="7.75">不鏽鋼 (SUS420 / 440C)</option>
+      <option value="7.20">鑄鐵 (FC)</option>
+      <option value="2.70">鋁合金 (A6061 / A2017)</option>
+      <option value="8.50">黃銅</option>
+      <option value="8.90">磷青銅</option>
+      <option value="7.85" data-custom="1">自訂密度</option>
+    </select>
+    <div class="density-box">
+      <input type="number" id="densityInput" value="7.85" step="0.01" inputmode="decimal">
+      <span class="unit">g/cm&sup3;</span>
+    </div>
+  </div>
+
+  <p class="section-label">尺寸（mm）</p>
+  <div class="dims" id="dimsGrid"></div>
+
+  <div class="qty-row">
+    <label>數量</label>
+    <div class="field">
+      <input type="number" id="qtyInput" value="1" min="1" inputmode="numeric">
+    </div>
+  </div>
+
+  <div class="result">
+    <div class="headline">
+      <span class="k">單支重量</span>
+      <span class="v" id="unitWeight">0<span class="unit">kg</span></span>
+    </div>
+    <div class="row">
+      <span class="k">單支體積</span>
+      <span class="v" id="unitVolume">0 cm&sup3;</span>
+    </div>
+    <div class="row">
+      <span class="k">總重量（× 數量）</span>
+      <span class="v" id="totalWeight">0 kg</span>
+    </div>
+  </div>
+
+  <p class="note" id="formulaNote"></p>
+
+</main>
+
+<footer>勁格科技 內部工具</footer>
+
+<div class="sticky-bar">
+  <div class="item">
+    <span class="k">單支重量</span>
+    <span class="v" id="stickyUnit">0 kg</span>
+  </div>
+  <div class="divider"></div>
+  <div class="item total">
+    <span class="k">總重量</span>
+    <span class="v" id="stickyTotal">0 kg</span>
+  </div>
+</div>
+
+<script>
+const shapes = {
+  round: {
+    label: '圓棒',
+    fields: [
+      {id:'d', label:'直徑 D', placeholder:'0'},
+      {id:'l', label:'長度 L', placeholder:'0'}
+    ],
+    formula: (v) => Math.PI * Math.pow(v.d/2, 2) * v.l,
+    note: '體積 = π × (直徑/2)² × 長度'
+  },
+  square: {
+    label: '方棒',
+    fields: [
+      {id:'w', label:'邊長 A', placeholder:'0'},
+      {id:'l', label:'長度 L', placeholder:'0'}
+    ],
+    formula: (v) => v.w * v.w * v.l,
+    note: '體積 = 邊長² × 長度'
+  },
+  hex: {
+    label: '六角棒',
+    fields: [
+      {id:'w', label:'對邊寬 W', placeholder:'0'},
+      {id:'l', label:'長度 L', placeholder:'0'}
+    ],
+    formula: (v) => (Math.sqrt(3)/2) * v.w * v.w * v.l,
+    note: '體積 = (√3 / 2) × 對邊寬² × 長度（對邊寬為六角形對邊距離）'
+  },
+  plate: {
+    label: '板材',
+    fields: [
+      {id:'w', label:'寬 W', placeholder:'0'},
+      {id:'h', label:'長 L', placeholder:'0'},
+      {id:'t', label:'厚 T', placeholder:'0', full:true}
+    ],
+    formula: (v) => v.w * v.h * v.t,
+    note: '體積 = 寬 × 長 × 厚'
+  },
+  pipe: {
+    label: '管材',
+    fields: [
+      {id:'od', label:'外徑 OD', placeholder:'0'},
+      {id:'id', label:'內徑 ID', placeholder:'0'},
+      {id:'l', label:'長度 L', placeholder:'0', full:true}
+    ],
+    formula: (v) => Math.PI * (Math.pow(v.od/2,2) - Math.pow(v.id/2,2)) * v.l,
+    note: '體積 = π × [(外徑/2)² − (內徑/2)²] × 長度'
+  }
+};
+
+let currentShape = 'round';
+const dimsGrid = document.getElementById('dimsGrid');
+const formulaNote = document.getElementById('formulaNote');
+const densityInput = document.getElementById('densityInput');
+const materialSelect = document.getElementById('materialSelect');
+const qtyInput = document.getElementById('qtyInput');
+
+function renderFields(shapeKey){
+  const shape = shapes[shapeKey];
+  dimsGrid.innerHTML = '';
+  shape.fields.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'field' + (f.full ? ' full' : '');
+    div.innerHTML = `
+      <label>${f.label}</label>
+      <div class="input-row">
+        <input type="number" id="dim_${f.id}" placeholder="${f.placeholder}" inputmode="decimal" step="any">
+        <span class="mm">mm</span>
+      </div>`;
+    dimsGrid.appendChild(div);
+  });
+  formulaNote.textContent = shape.note;
+  shape.fields.forEach(f => {
+    document.getElementById(`dim_${f.id}`).addEventListener('input', calculate);
+  });
+}
+
+document.getElementById('shapeGrid').addEventListener('click', (e) => {
+  const btn = e.target.closest('.shape-btn');
+  if(!btn) return;
+  document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentShape = btn.dataset.shape;
+  renderFields(currentShape);
+  calculate();
+});
+
+materialSelect.addEventListener('change', () => {
+  const opt = materialSelect.options[materialSelect.selectedIndex];
+  densityInput.value = opt.value;
+  calculate();
+});
+densityInput.addEventListener('input', calculate);
+qtyInput.addEventListener('input', calculate);
+
+function calculate(){
+  const shape = shapes[currentShape];
+  const v = {};
+  let hasValue = false;
+  shape.fields.forEach(f => {
+    const raw = document.getElementById(`dim_${f.id}`).value;
+    const num = parseFloat(raw);
+    v[f.id] = isNaN(num) ? 0 : num;
+    if(!isNaN(num) && num > 0) hasValue = true;
+  });
+
+  const volumeMm3 = shape.formula(v); // mm^3
+  const volumeCm3 = volumeMm3 / 1000; // cm^3
+  const density = parseFloat(densityInput.value) || 0;
+  const weightG = volumeCm3 * density;
+  const weightKg = weightG / 1000;
+  const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+
+  document.getElementById('unitVolume').textContent =
+    (hasValue ? volumeCm3.toLocaleString('en-US', {maximumFractionDigits: 2}) : '0') + ' cm³';
+  document.getElementById('unitWeight').innerHTML =
+    (hasValue ? formatWeight(weightKg) : '0') + '<span class="unit">kg</span>';
+  document.getElementById('totalWeight').textContent =
+    (hasValue ? formatWeight(weightKg * qty) : '0') + ' kg';
+
+  document.getElementById('stickyUnit').textContent =
+    (hasValue ? formatWeight(weightKg) : '0') + ' kg';
+  document.getElementById('stickyTotal').textContent =
+    (hasValue ? formatWeight(weightKg * qty) : '0') + ' kg';
+}
+
+function formatWeight(kg){
+  if(kg >= 100) return kg.toFixed(1);
+  if(kg >= 1) return kg.toFixed(2);
+  return kg.toFixed(3);
+}
+
+renderFields(currentShape);
+calculate();
+</script>
+
+</body>
+</html>
