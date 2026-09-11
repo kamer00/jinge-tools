@@ -177,6 +177,33 @@
       gap: 14px;
     }
 
+    /* ── CATEGORY GROUPS ── */
+    .cat-group { margin-bottom: 30px; }
+    .cat-group:last-child { margin-bottom: 0; }
+    .cat-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: .04em;
+      margin-bottom: 12px;
+    }
+    .cat-heading .cat-count {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .cat-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
     /* ── CARD ── */
     .tool-card {
       background: #fff;
@@ -292,13 +319,48 @@
       .hero-eyebrow { display: none; }
       .hero-title { font-size: 14px; font-weight: 400; font-family: 'Noto Sans TC', sans-serif; color: rgba(255,255,255,.75); letter-spacing: .05em; margin-bottom: 0; }
       .hero-sub { display: none; }
-      .tools-section { padding: 10px 12px 20px; }
-      .section-row { margin-bottom: 10px; }
-      .tools-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .tool-card { padding: 14px 10px 12px; text-align: center; border-top: 2px solid var(--navy); animation: none; }
-      .card-icon { font-size: 28px; margin-bottom: 6px; }
-      .card-title { font-size: 14px; margin-bottom: 0; }
-      .card-desc, .card-tag, .card-arrow { display: none; }
+      .tools-section { padding: 4px 16px 20px; }
+      .section-row { margin-bottom: 4px; }
+
+      /* Flat, single-column list — no card chrome, just rows */
+      .cat-group { margin-bottom: 4px; }
+      .cat-heading {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: .06em;
+        margin: 18px 0 2px;
+      }
+      .cat-heading::after { display: none; }
+      .cat-heading .cat-count { display: none; }
+
+      .tools-grid { display: block; }
+      .tool-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 2px;
+        border-top: none;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        border-radius: 0;
+        text-align: left;
+        animation: none;
+        background: transparent;
+      }
+      .tool-card:active { background: var(--blue-light); }
+      .card-icon { font-size: 20px; margin-bottom: 0; flex-shrink: 0; width: 24px; text-align: center; }
+      .card-title { font-size: 14.5px; font-weight: 500; margin-bottom: 0; flex: 1; line-height: 1.3; }
+      .card-desc, .card-tag { display: none; }
+      .card-arrow {
+        position: static;
+        opacity: 1;
+        transform: none;
+        font-size: 15px;
+        color: var(--border);
+        flex-shrink: 0;
+      }
+
       footer { padding: 10px 16px; }
       .footer-copy { font-size: 8px; opacity: .4; }
       .footer-status { display: none; }
@@ -324,11 +386,11 @@
 
   <section class="tools-section">
     <div class="section-row">
-      <div class="section-label">工具總覽 — 15 items</div>
+      <div class="section-label" id="toolCount">工具總覽</div>
       <button id="sortBtn" onclick="toggleSort()">⇅ 調整順序</button>
     </div>
     <div id="sortHint" class="sort-hint">按 ▲ ▼ 移動卡片順序，完成後點「✓ 完成排序」儲存。</div>
-    <div class="tools-grid" id="toolsGrid"></div>
+    <div id="toolsGrid"></div>
   </section>
 
   <footer>
@@ -339,6 +401,7 @@
   <script>
     const TOOLS = [
       { no:'01', icon:'📦', title:'材料計算機・熱處理・銑床', shortTitle:'材料計算', href:'./材料計算機.html', cat:'材料費用', desc:'多材質單價管理，支援圓棒、管材、板材，自動計算重量與材料費。亦可查詢調質（S45C、42CrMo）及銑床用材規格參考。' },
+      { no:'17', icon:'⚖️', title:'材料重量計算機', shortTitle:'重量計算', href:'./材料重量計算機.html', cat:'材料費用', desc:'單純輸入圓棒、方棒、六角棒、板材、管材尺寸與材質密度，即時計算單支與總重量，不涉及單價與報價。' },
       { no:'02', icon:'✨', title:'研磨・拋光・電鍍試算', shortTitle:'表面加工', href:'./表面加工試算.html', cat:'表面處理', desc:'軸心／鋼管 表面加工費用試算，含研磨、拋光、電鍍工序。' },
       { no:'03', icon:'🔩', title:'銑床加工計算機', shortTitle:'銑床加工', href:'./銑床加工計算機.html', cat:'加工計算', desc:'銑削加工工時與費用估算，含法蘭面、鍵槽、側孔等多項工序。' },
       { no:'04', icon:'🕳️', title:'深孔加工計算機', shortTitle:'深孔加工', href:'./深孔加工計算機.html', cat:'加工計算', desc:'深孔鑽削加工工時與費用估算，依孔徑、深度及加工材質計算。' },
@@ -375,19 +438,11 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
     }
 
-    function render() {
-      const grid = document.getElementById('toolsGrid');
-      grid.innerHTML = '';
-      const map = Object.fromEntries(TOOLS.map(t => [t.href, t]));
-      order.forEach((href, idx) => {
-        const t = map[href];
-        if (!t) return;
-        const a = document.createElement('a');
-        a.className = 'tool-card';
-        a.href = sortMode ? '#' : t.href;
-        a.dataset.href = t.href;
-        a.style.animationDelay = (idx * 0.05 + 0.05) + 's';
-        a.innerHTML = `
+    const CAT_ORDER = ['材料費用', '表面處理', '加工計算', '規格查詢', '報價系統', '密封件', '品管檢驗'];
+
+    function cardHTML(t, idx) {
+      return `
+        <a class="tool-card" href="${sortMode ? '#' : t.href}" data-href="${t.href}" style="animation-delay:${idx * 0.05 + 0.05}s">
           <span class="card-icon">${t.icon}</span>
           <div class="card-title">${t.title}</div>
           <div class="card-desc">${t.desc}</div>
@@ -396,9 +451,42 @@
             <div class="sort-btns">
               <button class="sort-btn" onclick="moveCard(event,${idx},-1)" ${idx===0?'disabled':''}>▲</button>
               <button class="sort-btn" onclick="moveCard(event,${idx},+1)" ${idx===order.length-1?'disabled':''}>▼</button>
-            </div>` : '<span class="card-arrow">→</span>'}`;
-        grid.appendChild(a);
+            </div>` : '<span class="card-arrow">→</span>'}
+        </a>`;
+    }
+
+    function render() {
+      document.getElementById('toolCount').innerHTML =
+        `工具總覽 <span class="cat-count">— ${order.length} items</span>`;
+
+      const wrap = document.getElementById('toolsGrid');
+      const map = Object.fromEntries(TOOLS.map(t => [t.href, t]));
+
+      if (sortMode) {
+        // Sort mode: one flat, ordered grid so ▲▼ moves are simple to follow.
+        wrap.innerHTML = `<div class="tools-grid sort-mode">${
+          order.map((href, idx) => cardHTML(map[href], idx)).join('')
+        }</div>`;
+        return;
+      }
+
+      // Browse mode: grouped by category so the page reads as sections,
+      // not one long undifferentiated list.
+      const buckets = {};
+      order.forEach((href, idx) => {
+        const t = map[href];
+        if (!t) return;
+        (buckets[t.cat] = buckets[t.cat] || []).push({ t, idx });
       });
+      const cats = [...CAT_ORDER.filter(c => buckets[c]), ...Object.keys(buckets).filter(c => !CAT_ORDER.includes(c))];
+
+      wrap.innerHTML = cats.map(cat => `
+        <div class="cat-group">
+          <div class="cat-heading">${cat} <span class="cat-count">${buckets[cat].length}</span></div>
+          <div class="tools-grid">
+            ${buckets[cat].map(({t, idx}) => cardHTML(t, idx)).join('')}
+          </div>
+        </div>`).join('');
     }
 
     function moveCard(e, idx, dir) {
@@ -413,8 +501,6 @@
       sortMode = !sortMode;
       const btn  = document.getElementById('sortBtn');
       const hint = document.getElementById('sortHint');
-      const grid = document.getElementById('toolsGrid');
-      grid.classList.toggle('sort-mode', sortMode);
       btn.classList.toggle('active', sortMode);
       hint.classList.toggle('visible', sortMode);
       btn.textContent = sortMode ? '✓ 完成排序' : '⇅ 調整順序';
