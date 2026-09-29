@@ -322,44 +322,79 @@
       .tools-section { padding: 4px 16px 20px; }
       .section-row { margin-bottom: 4px; }
 
-      /* Flat, single-column list — no card chrome, just rows */
-      .cat-group { margin-bottom: 4px; }
+      /* Button-style cards — big tappable blocks, not thin list rows */
+      .cat-group { margin-bottom: 8px; }
       .cat-heading {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--navy);
         letter-spacing: .06em;
-        margin: 18px 0 2px;
+        margin: 20px 0 10px;
       }
       .cat-heading::after { display: none; }
       .cat-heading .cat-count { display: none; }
 
-      .tools-grid { display: block; }
+      .tools-grid { display: flex; flex-direction: column; gap: 10px; }
       .tool-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 13px 2px;
-        border-top: none;
-        border: none;
-        border-bottom: 1px solid var(--border);
-        border-radius: 0;
+        display: grid;
+        grid-template-columns: 40px 1fr auto;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "icon title arrow"
+          "icon desc  arrow";
+        column-gap: 14px;
+        row-gap: 2px;
+        padding: 14px;
+        border: 1.5px solid var(--border);
+        border-top: 3px solid var(--navy);
+        border-radius: 10px;
         text-align: left;
         animation: none;
-        background: transparent;
+        background: #fff;
+        box-shadow: 0 2px 6px rgba(26,45,107,0.07);
+        transition: background .12s, transform .08s, border-top-color .12s;
       }
-      .tool-card:active { background: var(--blue-light); }
-      .card-icon { font-size: 20px; margin-bottom: 0; flex-shrink: 0; width: 24px; text-align: center; }
-      .card-title { font-size: 14.5px; font-weight: 500; margin-bottom: 0; flex: 1; line-height: 1.3; }
-      .card-desc, .card-tag { display: none; }
+      .tool-card:active {
+        background: var(--blue-light);
+        transform: scale(0.98);
+        border-top-color: var(--amber);
+      }
+      .card-icon {
+        grid-area: icon;
+        align-self: center;
+        font-size: 22px;
+        margin-bottom: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--blue-light);
+        border-radius: 8px;
+      }
+      .card-title { grid-area: title; align-self: end; font-size: 15.5px; font-weight: 700; margin-bottom: 0; line-height: 1.3; }
+      .card-desc {
+        grid-area: desc;
+        align-self: start;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 11.5px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .card-tag { display: none; }
       .card-arrow {
+        grid-area: arrow;
         position: static;
         opacity: 1;
         transform: none;
-        font-size: 15px;
-        color: var(--border);
-        flex-shrink: 0;
+        align-self: center;
+        font-size: 18px;
+        color: var(--amber);
       }
+      .sort-btns { grid-area: arrow; position: static; }
 
       footer { padding: 10px 16px; }
       .footer-copy { font-size: 8px; opacity: .4; }
@@ -414,6 +449,7 @@
       { no:'12', icon:'⚙️', title:'螺紋加工計算機', shortTitle:'螺紋加工', href:'./螺紋加工計算機.html', cat:'加工計算', desc:'公制、UN、惠氏三系統螺紋車削參數計算，含三針測量與導螺桿相容性。' },
       { no:'14', icon:'🛢️', title:'柱型油缸報價系統（不含油封）', shortTitle:'柱型報價', href:'./柱型油缸報價系統.html', cat:'報價系統', desc:'柱型油缸前後蓋、套板、軸心、活塞、鋼管等各工序加工費計算，含CU/AIR、配件、固定柱、五金。注意：油封費用需另行計算。' },
       { no:'13', icon:'💎', title:'硬度換算工具', shortTitle:'硬度換算', href:'./硬度換算工具.html', cat:'規格查詢', desc:'HRC、HRB、HV、HB 各硬度系統互換查詢，附鋼材對照說明。' },
+      { no:'18', icon:'🔬', title:'材料型號比對工具', shortTitle:'材料比對', href:'./material-cross-ref.html', cat:'規格查詢', desc:'CNS／JIS／GB／ASTM-AISI／DIN／EN 各國材料牌號對照，含化學成分、機械性質、熱處理建議與表面處理相容性。' },
       { no:'15', icon:'🔵', title:'密封件選型工具', shortTitle:'密封件選型', href:'./seal-selector.html', cat:'密封件', desc:'整合 NOK、VALQUA、Hallite、SAKAGAMI、CNL 等品牌密封件選型，依缸徑與型式快速查詢對應規格。' },
       { no:'16', icon:'📷', title:'圖面疊圖比對工具', shortTitle:'疊圖比對', href:'./overlay-check.html', cat:'品管檢驗', desc:'上傳圖面轉線稿，用手機拍照或即時相機疊圖比對孔位、外型與方向，可校正比例尺並量測實際尺寸差異。' },
     ];
