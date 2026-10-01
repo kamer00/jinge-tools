@@ -1,359 +1,511 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>螺紋加工計算機</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>螺紋加工計算機 | 勁格科技</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap');
-
-:root {
-  --bg:    #0d1117;
-  --surf:  #161b22;
-  --card:  #1c2330;
-  --line:  #253047;
-  --acc:   #3b82f6;
-  --acc2:  #60a5fa;
-  --txt:   #c9d1d9;
-  --dim:   #586988;
-  --hi:    #f0f6ff;
-  --warn:  #f97316;
-  --red:   #ef4444;
-  --ok:    #22c55e;
-  --mono:  'JetBrains Mono', monospace;
-  --sans:  'Noto Sans TC', sans-serif;
+:root{
+  --bg:#14161a; --bg2:#1c1f25; --bg3:#22262e; --border:#2e333d;
+  --text:#e8e9eb; --dim:#9aa1ad; --accent:#ff8c1a; --accent-dim:#c96e12;
+  --blue:#4d9eff; --green:#4caf7d; --red:#ff6b6b; --yellow:#ffd166;
+  --mono:'SFMono-Regular',Consolas,'Courier New',monospace;
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { background:var(--bg); color:var(--txt); font-family:var(--sans); font-size:13px; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;font-size:15px;line-height:1.5;padding-bottom:50px;}
+header{background:linear-gradient(135deg,var(--bg2),var(--bg));border-bottom:2px solid var(--accent);padding:12px 16px;position:sticky;top:0;z-index:20;}
+.hd{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.hd img{width:36px;height:36px;border-radius:8px;}
+.hd h1{font-size:18px;flex:1;}
+.hd p{font-size:11px;color:var(--dim);letter-spacing:1px;}
+.back{font-size:12px;color:var(--dim);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;white-space:nowrap;}
+main{max-width:960px;margin:0 auto;padding:14px 16px;}
 
-/* ── 全頁容器 ── */
-.wrap { max-width:900px; margin:0 auto; }
+.step{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.step-t{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.step-t .n{background:var(--accent);color:#141414;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;cursor:pointer;font-family:inherit;}
+.chip small{display:block;font-size:11px;color:var(--dim);}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#141414;font-weight:700;}
+.chip.on small{color:#3a2a10;}
+.chip.sz{font-family:var(--mono);padding:8px 10px;font-size:13.5px;}
+.custom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.custom label{font-size:12.5px;color:var(--dim);display:block;margin-bottom:4px;}
+.custom input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:16px;padding:10px 12px;outline:none;}
+.custom input:focus{border-color:var(--accent);}
+.hint{font-size:12.5px;color:var(--dim);margin-top:8px;}
+.toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.toggle .chip{text-align:center;font-size:15px;padding:12px;}
 
-/* Header */
-header {
-  background:var(--surf); border-bottom:1px solid var(--line);
-  padding:10px 14px; display:flex; align-items:center; gap:10px;
-  position:sticky; top:0; z-index:10;
-}
-.header-inner { max-width:900px; margin:0 auto; width:100%; display:flex; align-items:center; gap:10px; }
-.logo { width:32px;height:32px; background:var(--acc); border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;flex-shrink:0; }
-header h1 { font-size:14px;font-weight:700;color:var(--hi);flex:1; }
-.back { font-size:11px;color:var(--dim);text-decoration:none;
-  padding:4px 8px;border:1px solid var(--line);border-radius:4px; }
-
-/* Input panel */
-.input-wrap { padding:10px 12px;background:var(--surf);border-bottom:1px solid var(--line); }
-.row2 { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px; }
-label { display:block;font-size:10px;color:var(--dim);text-transform:uppercase;
-  letter-spacing:.06em;margin-bottom:3px; }
-select,input {
-  width:100%;background:var(--card);border:1px solid var(--line);border-radius:4px;
-  color:var(--hi);font-family:var(--mono);font-size:12px;padding:6px 8px;
-  outline:none;-webkit-appearance:none;
-}
-select:focus,input:focus { border-color:var(--acc); }
-.mb8 { margin-bottom:8px; }
-.presets { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px; }
-.pb { background:var(--card);border:1px solid var(--line);color:var(--dim);
-  border-radius:3px;padding:3px 7px;font-family:var(--mono);font-size:10px;cursor:pointer; }
-.pb:hover { border-color:var(--acc);color:var(--acc2); }
-.btn-calc { width:100%;background:var(--acc);color:#fff;border:none;border-radius:4px;
-  padding:10px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer; }
-.btn-calc:active { opacity:.85; }
-
-/* Results */
-#results { display:none; }
-#results.show { display:block; }
-
-/* Pills summary */
-.pills { display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;
-  background:var(--surf);border-bottom:1px solid var(--line); }
-.pill { background:var(--card);border:1px solid var(--line);border-radius:3px;
-  padding:3px 8px;font-family:var(--mono);font-size:11px; }
-.pill b { color:var(--acc2); }
-
-/* Section */
-.sec { margin:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden; }
-.sec-h { background:var(--surf);border-bottom:1px solid var(--line);padding:7px 12px;
-  display:flex;align-items:center;gap:8px; }
-.sec-n { width:20px;height:20px;background:var(--acc);border-radius:3px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;flex-shrink:0; }
-.sec-h h2 { font-size:12px;font-weight:700;color:var(--hi); }
-
-/* PC: 雙欄排版 */
-@media (min-width:640px) {
-  .input-wrap { padding:14px 20px; }
-  .pills { padding:10px 20px; gap:8px; }
-  .results-grid {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:auto auto;
-    gap:0;
-    padding:0 8px;
-  }
-  /* ① 數據表格：左欄，跨兩行 */
-  .sec-data { grid-column:1; grid-row:1/3; margin:10px 6px 10px 10px; }
-  /* ② 機台設定：右欄上 */
-  .sec-setup { grid-column:2; grid-row:1; margin:10px 10px 5px 6px; }
-  /* ③ 操作防呆：右欄下 */
-  .sec-safety { grid-column:2; grid-row:2; margin:5px 10px 10px 6px; }
-  .sec { margin:0; }
-  td:first-child { width:46%; }
-}
-
-/* Table */
-table { width:100%;border-collapse:collapse; }
-tr { border-bottom:1px solid rgba(37,48,71,.6); }
-tr:last-child { border-bottom:none; }
-td { padding:7px 12px;vertical-align:middle;line-height:1.3; }
-td:first-child { color:var(--dim);font-size:11px;width:44%; }
-.v  { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--hi); }
-.va { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--acc2); }
-.vw { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--warn); }
-.vr { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--red); }
-.vo { font-family:var(--mono);font-weight:700;font-size:14px;color:var(--ok); }
-.sub td { background:rgba(37,48,71,.5);padding:4px 12px;
-  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--dim); }
+#out{display:none;}
+.title-bar{background:var(--bg3);border:1px solid var(--accent-dim);border-radius:10px;padding:12px 14px;margin-bottom:12px;}
+.title-bar .big{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);}
+.title-bar .sub{font-size:13px;color:var(--dim);margin-top:2px;}
+.grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr;}.span2{grid-column:1/3;}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.card h3{font-size:14.5px;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+.card h3 .n{color:#141414;background:var(--blue);border-radius:5px;padding:0 7px;font-size:12.5px;}
+.item{padding:10px 14px;border-bottom:1px solid var(--border);}
+.item:last-child{border-bottom:none;}
+.item .k{font-size:13px;color:var(--dim);}
+.item .v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--text);}
+.item .v.hl{color:var(--accent);}
+.item .v.ok{color:var(--green);}
+.item .why{font-size:12.5px;color:var(--dim);margin-top:2px;}
+.warn{background:rgba(255,107,107,.08);border-left:3px solid var(--red);padding:9px 12px;font-size:13.5px;margin:10px 14px;border-radius:4px;}
+.note{background:rgba(255,209,102,.07);border-left:3px solid var(--yellow);padding:9px 12px;font-size:13.5px;margin:10px 14px;border-radius:4px;}
+table.pass{width:100%;border-collapse:collapse;font-size:14px;}
+table.pass th,table.pass td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);}
+table.pass th{font-family:inherit;font-size:12px;color:var(--dim);font-weight:600;background:var(--bg3);}
+table.pass td:first-child,table.pass th:first-child{text-align:left;font-family:inherit;}
+table.pass tr.fin td{color:var(--green);}
+table.pass tr.spr td{color:var(--dim);}
+ul.list{padding:8px 14px 12px 32px;font-size:14px;}
+ul.list li{margin:4px 0;}
+.fig{padding:10px 8px 4px;}
+.fig svg{width:100%;height:auto;display:block;}
+footer{max-width:960px;margin:20px auto 0;padding:0 16px;font-size:12px;color:var(--dim);line-height:1.8;}
 </style>
 </head>
 <body>
+<header><div class="hd">
+  <img src="data:image/png;base64,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" alt="Jinger Technology">
+  <div style="flex:1"><h1>螺紋加工計算機</h1><p>JINGER TECHNOLOGY · THREAD TURNING</p></div>
+  <a href="/" class="back">← 首頁</a>
+</div></header>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">JG</div>
-    <h1>螺紋加工計算機</h1>
-    <a href="/" class="back">← 首頁</a>
+<main>
+  <div class="step">
+    <div class="step-t"><span class="n">1</span>選螺紋種類</div>
+    <div class="chips" id="sysChips"></div>
   </div>
-</header>
-
-<div class="wrap">
-<div class="input-wrap">
-  <div class="mb8">
-    <label>螺紋體系</label>
-    <select id="sys" onchange="onSys()">
-      <option value="metric">公制 Metric 60° — ISO 965</option>
-      <option value="un">英制 UN/UNC/UNF 60° — ANSI B1.1</option>
-      <option value="pt">PT 管用錐螺紋 55° — JIS B0203</option>
-      <option value="pf">PF 管用平行螺紋 55° — JIS B0202</option>
-      <option value="ps">PS 管用平行螺紋-配件 55° — JIS B0202</option>
-      <option value="nptf">NPTF 美規錐管螺紋 60° — ASME B1.20.3</option>
-    </select>
-  </div>
-  <div class="row2">
-    <div><label id="lD">公稱直徑 mm</label><input id="D" placeholder="如 40" /></div>
-    <div><label id="lP">螺距 P (mm)</label><input id="P" placeholder="如 3.0" /></div>
-  </div>
-  <div class="presets" id="presets"></div>
-  <button class="btn-calc" onclick="calc()">▶ 計算</button>
-</div>
-
-<div id="results">
-  <div class="pills" id="pills"></div>
-  <div class="results-grid">
-    <div class="sec sec-data">
-      <div class="sec-h"><div class="sec-n">①</div><h2>數據表格</h2></div>
-      <table id="t1"></table>
+  <div class="step">
+    <div class="step-t"><span class="n">2</span>選尺寸（或自行輸入）</div>
+    <div class="chips" id="sizeChips"></div>
+    <div class="custom" id="customBox">
+      <div><label id="lD">外徑 mm</label><input id="inD" inputmode="decimal" placeholder="例如 100"></div>
+      <div><label id="lP">牙距 mm</label><input id="inP" inputmode="decimal" placeholder="例如 3"></div>
     </div>
-    <div class="sec sec-setup">
-      <div class="sec-h"><div class="sec-n">②</div><h2>機台設定</h2></div>
-      <table id="t2"></table>
-    </div>
-    <div class="sec sec-safety">
-      <div class="sec-h"><div class="sec-n">③</div><h2>操作防呆</h2></div>
-      <table id="t3"></table>
+    <div class="hint" id="sizeHint"></div>
+  </div>
+  <div class="step">
+    <div class="step-t"><span class="n">3</span>車公牙還是母牙？</div>
+    <div class="toggle">
+      <button class="chip" data-g="ext" onclick="setGender('ext')">公牙（外牙）<small>螺桿、活塞桿端</small></button>
+      <button class="chip" data-g="int" onclick="setGender('int')">母牙（內牙）<small>螺帽、端蓋、油口</small></button>
     </div>
   </div>
-</div>
-</div><!-- /wrap -->
+
+  <div id="out">
+    <div class="title-bar"><div class="big" id="oTitle"></div><div class="sub" id="oSub"></div></div>
+    <div class="grid" id="oGrid"></div>
+  </div>
+</main>
+
+<footer>
+  計算依據：公制 ISO 965（公差 6g／6H）、英制 ASME B1.1（2A／2B）、管用平行螺紋 JIS B0202（ISO 228-1）、管用錐度螺紋 JIS B0203（ISO 7-1）、NPT／NPTF ASME B1.20.1／B1.20.3。<br>
+  公差為依標準公式估算之參考值；最終一律以螺紋量規（通規／止規）或圖面要求為準。
+</footer>
 
 <script>
-const PR = {
-  metric:[
-    {d:'M6',D:6,P:1.0},{d:'M8',D:8,P:1.25},{d:'M10',D:10,P:1.5},
-    {d:'M12',D:12,P:1.75},{d:'M16',D:16,P:2.0},{d:'M20',D:20,P:2.5},
-    {d:'M24',D:24,P:3.0},{d:'M30',D:30,P:3.5},{d:'M36',D:36,P:4.0},
-    {d:'M42',D:42,P:4.5},{d:'M48',D:48,P:5.0},{d:'M56',D:56,P:5.5},{d:'M64',D:64,P:6.0},
-  ],
-  un:[
-    {d:'1/4"',D:0.25,T:20},{d:'5/16"',D:0.3125,T:18},{d:'3/8"',D:0.375,T:16},
-    {d:'7/16"',D:0.4375,T:14},{d:'1/2"',D:0.5,T:13},{d:'5/8"',D:0.625,T:11},
-    {d:'3/4"',D:0.75,T:10},{d:'7/8"',D:0.875,T:9},{d:'1"',D:1.0,T:8},
-    {d:'1-1/4"',D:1.25,T:7},{d:'1-1/2"',D:1.5,T:6},
-  ],
-  pt:[
-    {d:'PT 1/8',M:9.728,T:28},{d:'PT 1/4',M:13.157,T:19},{d:'PT 3/8',M:16.662,T:19},
-    {d:'PT 1/2',M:20.955,T:14},{d:'PT 3/4',M:26.441,T:14},{d:'PT 1',M:33.249,T:11},
-    {d:'PT 1-1/4',M:41.910,T:11},{d:'PT 1-1/2',M:47.803,T:11},{d:'PT 2',M:59.614,T:11},
-  ],
-  pf:[
-    {d:'PF 1/8',M:9.728,T:28},{d:'PF 1/4',M:13.157,T:19},{d:'PF 3/8',M:16.662,T:19},
-    {d:'PF 1/2',M:20.955,T:14},{d:'PF 3/4',M:26.441,T:14},{d:'PF 1',M:33.249,T:11},
-    {d:'PF 1-1/4',M:41.910,T:11},{d:'PF 1-1/2',M:47.803,T:11},{d:'PF 2',M:59.614,T:11},
-  ],
-  ps:[
-    {d:'PS 1/8',M:9.728,T:28},{d:'PS 1/4',M:13.157,T:19},{d:'PS 3/8',M:16.662,T:19},
-    {d:'PS 1/2',M:20.955,T:14},{d:'PS 3/4',M:26.441,T:14},{d:'PS 1',M:33.249,T:11},
-    {d:'PS 1-1/4',M:41.910,T:11},{d:'PS 1-1/2',M:47.803,T:11},{d:'PS 2',M:59.614,T:11},
-  ],
-  nptf:[
-    {d:'1/8',M:10.287,T:27},{d:'1/4',M:13.716,T:18},{d:'3/8',M:17.145,T:18},
-    {d:'1/2',M:21.336,T:14},{d:'3/4',M:26.670,T:14},{d:'1"',M:33.401,T:11.5},
-    {d:'1-1/4',M:42.164,T:11.5},{d:'1-1/2',M:48.260,T:11.5},{d:'2"',M:60.325,T:11.5},
-  ]
-};
+/* ================== 資料 ================== */
+const SYS = [
+  {k:'mc', name:'公制粗牙', sub:'M20、M24…', ang:60},
+  {k:'mf', name:'公制細牙', sub:'M30×1.5、M42×2…', ang:60},
+  {k:'unc', name:'英制粗牙 UNC', sub:'1/2-13…', ang:60},
+  {k:'unf', name:'英制細牙 UNF', sub:'1/2-20…', ang:60},
+  {k:'g',  name:'管牙 G（舊稱 PF）', sub:'平行・55°', ang:55},
+  {k:'r',  name:'管牙 R／Rc（舊稱 PT）', sub:'錐度・55°', ang:55},
+  {k:'rp', name:'管牙 Rp（舊稱 PS）', sub:'平行母牙・配 R 公牙', ang:55},
+  {k:'npt',name:'美規 NPT／NPTF', sub:'錐度・60°', ang:60},
+];
+const MC = [[6,1],[8,1.25],[10,1.5],[12,1.75],[16,2],[20,2.5],[24,3],[30,3.5],[36,4],[42,4.5],[48,5],[56,5.5],[64,6]];
+const MF = [[8,1],[10,1.25],[12,1.25],[12,1.5],[14,1.5],[16,1.5],[18,1.5],[20,1.5],[22,1.5],[24,1.5],[24,2],[27,2],[30,1.5],[30,2],[33,2],[36,2],[36,3],[39,2],[42,2],[42,3],[45,2],[48,2],[48,3],[52,2],[56,2],[56,4],[60,2],[64,2],[64,4],[72,2],[80,2],[90,2],[100,2],[100,3],[110,3],[120,3],[140,4],[160,4]];
+const UNC = [['1/4',20],['5/16',18],['3/8',16],['7/16',14],['1/2',13],['9/16',12],['5/8',11],['3/4',10],['7/8',9],['1',8],['1-1/8',7],['1-1/4',7],['1-3/8',6],['1-1/2',6],['1-3/4',5],['2',4.5]];
+const UNF = [['1/4',28],['5/16',24],['3/8',24],['7/16',20],['1/2',20],['9/16',18],['5/8',18],['3/4',16],['7/8',14],['1',12],['1-1/8',12],['1-1/4',12],['1-3/8',12],['1-1/2',12]];
+// 管牙共用：基準大徑 D、牙數 T
+// R／Rc（JIS B0203）：a 基準距離、Le 公牙有效牙長（a+f）、b 公牙軸向容許差、c 母牙軸向容許差、l 母牙最小有效牙長
+//   rcN／rcR：Rc 下穴（不用鉸刀／使用錐度鉸刀）
+// G（JIS B0202／ISO 228-1）：Td 公牙外徑公差、Td2 有效徑公差（公牙 A 級＝母牙）、gMin～gMax 母牙底孔範圍
+const PIPE = [
+ {s:'1/8',  D:9.728, T:28, a:3.97,  Le:6.47,  b:0.91, c:1.13, l:6.2,  rcN:8.2,  rcR:8.1,  gMin:8.57, gMax:8.80, Td:0.214, Td2:0.107},
+ {s:'1/4',  D:13.157,T:19, a:6.01,  Le:9.71,  b:1.34, c:1.67, l:9.4,  rcN:11.0, rcR:10.7, gMin:11.44,gMax:11.87,Td:0.250, Td2:0.125},
+ {s:'3/8',  D:16.662,T:19, a:6.35,  Le:10.05, b:1.34, c:1.67, l:9.7,  rcN:14.5, rcR:14.2, gMin:14.95,gMax:15.38,Td:0.250, Td2:0.125},
+ {s:'1/2',  D:20.955,T:14, a:8.16,  Le:13.16, b:1.81, c:2.27, l:12.7, rcN:18.0, rcR:17.6, gMin:18.60,gMax:19.10,Td:0.284, Td2:0.142},
+ {s:'3/4',  D:26.441,T:14, a:9.53,  Le:14.53, b:1.81, c:2.27, l:14.1, rcN:23.5, rcR:23.0, gMin:24.10,gMax:24.60,Td:0.284, Td2:0.142},
+ {s:'1',    D:33.249,T:11, a:10.39, Le:16.79, b:2.31, c:2.89, l:16.2, rcN:29.5, rcR:29.0, gMin:30.30,gMax:30.90,Td:0.360, Td2:0.180},
+ {s:'1-1/4',D:41.910,T:11, a:12.70, Le:19.10, b:2.31, c:2.89, l:18.5, rcN:38.0, rcR:37.5, gMin:39.00,gMax:39.40,Td:0.360, Td2:0.180},
+ {s:'1-1/2',D:47.803,T:11, a:12.70, Le:19.10, b:2.31, c:2.89, l:18.5, rcN:44.0, rcR:43.4, gMin:44.80,gMax:45.40,Td:0.360, Td2:0.180},
+ {s:'2',    D:59.614,T:11, a:15.88, Le:23.38, b:2.31, c:2.89, l:22.8, rcN:55.5, rcR:54.9, gMin:56.60,gMax:57.20,Td:0.360, Td2:0.180},
+];
+// NPT（ASME B1.20.1，單位 inch）：OD 管外徑、E0 小端有效徑、L1 手旋入長、L2 有效牙長、鑽頭 mm
+const NPT = [
+ {s:'1/8',  OD:0.405,T:27,  E0:0.36351,L1:0.1615,L2:0.2639,drill:8.43,  dr:'Q'},
+ {s:'1/4',  OD:0.540,T:18,  E0:0.47739,L1:0.2278,L2:0.4018,drill:11.11, dr:'7/16"'},
+ {s:'3/8',  OD:0.675,T:18,  E0:0.61201,L1:0.240, L2:0.4078,drill:14.29, dr:'9/16"'},
+ {s:'1/2',  OD:0.840,T:14,  E0:0.75843,L1:0.320, L2:0.5337,drill:17.86, dr:'45/64"'},
+ {s:'3/4',  OD:1.050,T:14,  E0:0.96768,L1:0.339, L2:0.5457,drill:23.02, dr:'29/32"'},
+ {s:'1',    OD:1.315,T:11.5,E0:1.21363,L1:0.400, L2:0.6828,drill:29.37, dr:'1-5/32"'},
+ {s:'1-1/4',OD:1.660,T:11.5,E0:1.55713,L1:0.420, L2:0.7068,drill:38.10, dr:'1-1/2"', chk:false},
+ {s:'1-1/2',OD:1.900,T:11.5,E0:1.79609,L1:0.420, L2:0.7235,drill:44.05, dr:'1-47/64"', chk:false},
+ {s:'2',    OD:2.375,T:11.5,E0:2.26902,L1:0.436, L2:0.7565,drill:56.36, dr:'2-7/32"'},
+];
 
-const TL = {
-  pt:  {9.728:6.5,13.157:9.7,16.662:10.1,20.955:13.6,26.441:14.1,33.249:16.8,41.910:19.1,47.803:19.1,59.614:23.4},
-  nptf:{10.287:6.8,13.716:10.8,17.145:10.8,21.336:13.6,26.670:13.6,33.401:17.3,42.164:17.3,48.260:17.3,60.325:19.2}
-};
-
-function onSys(){
-  const s=document.getElementById('sys').value;
-  const pipe=['pt','pf','ps','nptf'].includes(s);
-  document.getElementById('lD').textContent = pipe?'大徑 mm（快選帶入）':s==='metric'?'公稱直徑 mm':'公稱直徑（英寸）';
-  document.getElementById('lP').textContent = s==='metric'?'螺距 P (mm)':'牙數 TPI';
-  document.getElementById('D').placeholder  = pipe?'快選自動帶入':s==='metric'?'如 40':'如 1/2';
-  document.getElementById('P').placeholder  = s==='metric'?'如 3.0':'如 14';
-  const el=document.getElementById('presets'); el.innerHTML='';
-  (PR[s]||[]).forEach(p=>{
-    const b=document.createElement('button'); b.className='pb'; b.textContent=p.d;
-    b.onclick=()=>{
-      const pipe2=['pt','pf','ps','nptf'].includes(s);
-      document.getElementById('D').value=pipe2?p.M:s==='metric'?p.D:p.d.replace(/"/g,'');
-      document.getElementById('P').value=pipe2?p.T:s==='metric'?p.P:p.T;
-    };
-    el.appendChild(b);
-  });
-}
+/* ================== 狀態 ================== */
+let sys='mc', gender='ext', sel=null;   // sel：所選尺寸索引；null 表示自行輸入
 
 function frac(s){
-  s=String(s).replace(/"/g,'').trim();
-  const dm=s.match(/^(\d+)-(\d+)\/(\d+)$/); if(dm) return +dm[1]+ +dm[2]/+dm[3];
-  const fm=s.match(/^(\d+)\/(\d+)$/);        if(fm) return +fm[1]/+fm[2];
+  s=String(s).replace(/["吋]/g,'').trim();
+  let m=s.match(/^(\d+)-(\d+)\/(\d+)$/); if(m) return +m[1] + m[2]/m[3];
+  m=s.match(/^(\d+)\/(\d+)$/); if(m) return m[1]/m[2];
   return parseFloat(s);
 }
+const f2=x=>x.toFixed(2), f3=x=>x.toFixed(3);
+const isPipe=k=>['g','r','rp','npt'].includes(k);
 
-function R(l,v,c='v'){ return `<tr><td>${l}</td><td class="${c}">${v}</td></tr>`; }
-function S(l){ return `<tr class="sub"><td colspan="2">${l}</td></tr>`; }
+/* ================== 介面 ================== */
+function drawSys(){
+  document.getElementById('sysChips').innerHTML = SYS.map(o=>
+    `<button class="chip${o.k===sys?' on':''}" onclick="setSys('${o.k}')">${o.name}<small>${o.sub}</small></button>`).join('');
+}
+function sizeList(){
+  if(sys==='mc') return MC.map(([d,p])=>`M${d}`);
+  if(sys==='mf') return MF.map(([d,p])=>`M${d}×${p}`);
+  if(sys==='unc') return UNC.map(([d,t])=>`${d}"-${t}`);
+  if(sys==='unf') return UNF.map(([d,t])=>`${d}"-${t}`);
+  const pre={g:'G',r:'R',rp:'Rp',npt:''}[sys];
+  if(sys==='npt') return NPT.map(o=>`${o.s}" NPT`);
+  return PIPE.map(o=>`${pre} ${o.s}`);
+}
+function drawSizes(){
+  document.getElementById('sizeChips').innerHTML = sizeList().map((t,i)=>
+    `<button class="chip sz${i===sel?' on':''}" onclick="setSize(${i})">${t}</button>`).join('');
+  const custom = !isPipe(sys);
+  document.getElementById('customBox').style.display = custom?'grid':'none';
+  const inch = sys==='unc'||sys==='unf';
+  document.getElementById('lD').textContent = inch?'外徑（吋，可打 1-1/4）':'外徑 mm';
+  document.getElementById('lP').textContent = inch?'每吋牙數 TPI':'牙距 mm';
+  document.getElementById('inD').placeholder = inch?'例如 1-1/4':'例如 100';
+  document.getElementById('inP').placeholder = inch?'例如 7':'例如 3';
+  document.getElementById('sizeHint').textContent = custom
+    ? '表上沒有的尺寸（例如 M100×3、M125×4）請直接在下方輸入，會自動計算。'
+    : (sys==='rp' ? 'Rp 只有母牙，用來配 R 錐度公牙。' : '管牙請直接點選尺寸。');
+}
+function drawGender(){
+  document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('on', b.dataset.g===gender));
+}
+function setSys(k){
+  sys=k; sel=null;
+  document.getElementById('inD').value=''; document.getElementById('inP').value='';
+  if(k==='rp') gender='int';
+  drawSys(); drawSizes(); drawGender(); calc();
+}
+function setSize(i){
+  sel=i;
+  if(sys==='mc'){ inD.value=MC[i][0]; inP.value=MC[i][1]; }
+  else if(sys==='mf'){ inD.value=MF[i][0]; inP.value=MF[i][1]; }
+  else if(sys==='unc'){ inD.value=UNC[i][0]; inP.value=UNC[i][1]; }
+  else if(sys==='unf'){ inD.value=UNF[i][0]; inP.value=UNF[i][1]; }
+  drawSizes(); calc();
+}
+function setGender(g){
+  if(sys==='rp' && g==='ext'){ gender='int'; drawGender(); alertBox('Rp 只有母牙；公牙請改選「管牙 R／Rc」。'); return; }
+  gender=g; drawGender(); calc();
+}
+function alertBox(msg){
+  const out=document.getElementById('out'); out.style.display='block';
+  document.getElementById('oTitle').textContent='請注意';
+  document.getElementById('oSub').textContent='';
+  document.getElementById('oGrid').innerHTML=`<div class="card span2"><div class="warn">${msg}</div></div>`;
+}
+['inD','inP'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{ sel=null; drawSizes(); calc(); });
+  el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ el.blur(); calc(); } });
+});
 
-function calc(){
-  const s=document.getElementById('sys').value;
-  const dR=document.getElementById('D').value.trim();
-  const pR=document.getElementById('P').value.trim();
-  if(!dR||!pR){alert('請輸入直徑與螺距/牙數');return;}
+/* ================== 共用輸出元件 ================== */
+const IT=(k,v,why='',cls='')=>`<div class="item"><div class="k">${k}</div><div class="v ${cls}">${v}</div>${why?`<div class="why">${why}</div>`:''}</div>`;
+const CARD=(n,t,body,span='')=>`<div class="card ${span}"><h3><span class="n">${n}</span>${t}</h3>${body}</div>`;
 
-  const pipe=['pt','pf','ps','nptf'].includes(s);
-  const taper=(s==='pt'||s==='nptf');
-  const is55=['pt','pf','ps'].includes(s);
-
-  let D= pipe?parseFloat(dR):s==='metric'?parseFloat(dR):frac(dR)*25.4;
-  let P,TPI;
-  if(s==='metric'){P=parseFloat(pR);TPI=null;}
-  else{TPI=parseFloat(pR);P=25.4/TPI;}
-
-  if(isNaN(D)||isNaN(P)||D<=0||P<=0){alert('數值格式錯誤');return;}
-
-  const hd=is55?27.5:30, hr=hd*Math.PI/180;
-  const df=is55?0.6403:0.6495;
-  const h=df*P, d2=D-df*P;
-  const mE=is55?1.2806:1.2269;
-  const d1e=D-mE*P;
-  // 外牙外徑預留：D-(0.1~0.2*P)
-  const odLo=D-0.20*P, odHi=D-0.10*P;
-  // 內牙底孔：基準 D-P，實務公差 +0.1~+0.2mm
-  const drBase=D-P, drLo=drBase+0.10, drHi=drBase+0.20;
-  // 總切深（外牙，單邊）固定用 60° 公式
-  const cutDepth=0.6495*P;
-  const ca=is55?27.5:29, ps=Math.ceil(h/0.2);
-
-  let Le=null,Ds=null;
-  if(taper){
-    const mp=TL[s]||{}, ks=Object.keys(mp).map(Number);
-    const nr=ks.reduce((a,b)=>Math.abs(b-D)<Math.abs(a-D)?b:a,ks[0]);
-    if(Math.abs(nr-D)<1){Le=mp[nr];Ds=D-Le/16;}
-  }
-
-  // Pills
-  const sn={metric:'公制 60°',un:'UN 60°',pt:'PT 55°',pf:'PF 55°',ps:'PS 55°',nptf:'NPTF 60°'}[s];
-  const pd=s==='metric'?`P=${P} mm`:`${TPI} TPI / P=${P.toFixed(2)} mm`;
-  document.getElementById('pills').innerHTML=`
-    <div class="pill">${sn}</div>
-    <div class="pill">D <b>${D.toFixed(2)} mm</b></div>
-    <div class="pill">${pd}</div>
-    <div class="pill">h <b>${h.toFixed(2)} mm</b></div>
-    <div class="pill">d₂ <b>${d2.toFixed(2)} mm</b></div>`;
-
-  // ① 數據表格
-  let t1='';
-  if(taper&&Le){
-    t1+=S('錐管幾何');
-    t1+=R('規格點大徑',D.toFixed(2)+' mm','va');
-    t1+=R('小端大徑（入口）',Ds.toFixed(2)+' mm','va');
-    t1+=R('有效螺紋長度 L',Le.toFixed(2)+' mm','v');
-    t1+=R('大小端直徑差',(D-Ds).toFixed(2)+' mm','v');
-  }
-  t1+=S('外螺紋');
-  t1+=R('外徑預留範圍',`${odLo.toFixed(2)} ~ ${odHi.toFixed(2)} mm`,'va');
-  t1+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
-  t1+=R('有效徑 d₂',d2.toFixed(2)+' mm','v');
-  t1+=R('底徑 d₁',d1e.toFixed(2)+' mm','v');
-  t1+=S('內螺紋');
-  t1+=R('底孔基準 D−P',drBase.toFixed(2)+' mm','va');
-  t1+=R('底孔加工範圍',`${drLo.toFixed(2)} ~ ${drHi.toFixed(2)} mm`,'va');
-  document.getElementById('t1').innerHTML=t1;
-
-  // ② 機台設定
-  let t2='';
-  if(taper&&Le){
-    t2+=S('錐度設定');
-    t2+=R('錐度比','1 : 16','vw');
-    t2+=R('半錐角',"1° 47' 24\"",'v');
-    t2+=R('小端大徑',Ds.toFixed(2)+' mm','va');
-    t2+=R('有效螺紋長 L',Le.toFixed(2)+' mm','v');
-  }
-  t2+=S('外牙');
-  t2+=R('複式滑板角',ca+'°','va');
-  t2+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
-  t2+=R('退刀槽寬',`${(2*P).toFixed(2)} ~ ${(3*P).toFixed(2)} mm`,'v');
-  t2+=R('退刀槽深',(cutDepth+0.2).toFixed(2)+' mm 以上','v');
-  t2+=R('粗車刀數估算',`≈ ${ps} 刀（每刀 0.2mm）`,'v');
-  t2+=R('牙尖圓角','建議略修圓（高壓油缸需求）','vw');
-  t2+=S('內牙');
-  t2+=R('複式滑板角',ca+'°（反向）','vw');
-  t2+=R('進刀方向','由裡向外退刀','vw');
-  t2+=R('鏜刀伸出長','≤ 孔深 + 5 mm','v');
-  t2+=R('總切深（單邊）',cutDepth.toFixed(2)+' mm','va');
-  document.getElementById('t2').innerHTML=t2;
-
-  // ③ 操作防呆
-  let t3='';
-  t3+=S('量測');
-  t3+=R('外牙','螺紋環規（GO/NO GO）','vo');
-  t3+=R('內牙','螺紋塞規（GO/NO GO）','vo');
-  t3+=taper
-    ?R('錐管判斷','量規旋入量，非尺寸量測','vw')
-    :R('首刀試量','首刀 0.05mm，量後再調','v');
-  t3+=S('加工確認');
-  t3+=R('刀尖角',`螺紋角規對中 ${is55?55:60}°`,'v');
-  t3+=R('外牙退刀槽',`確認寬 ≥ ${(2*P).toFixed(2)} mm`,'v');
-  t3+=R('精車後光刀','空走 1~2 刀','v');
-  if(taper){
-    t3+=R('錐管退刀槽','通常省略，需確認','vw');
-    t3+=R('錐管進給','全程維持錐度　禁純橫向','vr');
-  }
-  t3+=S('內牙專項');
-  t3+=R('複式滑板方向','與外牙相反，確認偏轉方向','vw');
-  t3+=R('鏜刀剛性','刀桿盡量短，減少讓刀','v');
-  t3+=R('精修量測','每刀量後決定下一刀進量','v');
-  document.getElementById('t3').innerHTML=t3;
-
-  document.getElementById('results').classList.add('show');
+// 進刀表：遞減吃刀（等切削面積），最後 2 刀各 0.05 精車＋1 刀空走光刀
+function passTable(total, ang){
+  const comp = ang===60?29:27;          // 複式刀座角度（牙角一半再少約 1°）
+  const k = 1/Math.cos(comp*Math.PI/180);
+  const fin = Math.min(0.10, total*0.2);
+  const rough = total - fin;
+  // 粗車刀數依牙距（約 4 + 2×牙距），每刀吃深由大到小線性遞減，最後一刀粗車約 0.05
+  const P = total/0.62;                 // 由牙深回推牙距（僅用於決定刀數）
+  let n = Math.max(3, Math.round(4 + 2*P));
+  const amin = 0.05;
+  let a1 = 2*rough/n - amin;
+  while(a1 < amin*1.2 && n > 3){ n--; a1 = 2*rough/n - amin; }
+  const step = n>1 ? (a1-amin)/(n-1) : 0;
+  const cum=[]; let c=0;
+  for(let i=0;i<n;i++){ c += a1 - i*step; cum.push(c); }
+  cum[n-1]=rough;
+  cum.push(rough+fin/2, total);
+  let rows='', prev=0;
+  cum.forEach((c,i)=>{
+    const cls = i>=n ? 'fin':'';
+    rows+=`<tr class="${cls}"><td>${i+1}${i>=n?'（精車）':''}</td><td>${f2(c-prev)}</td><td>${f2(c)}</td><td>${f2(c*k)}</td></tr>`;
+    prev=c;
+  });
+  rows+=`<tr class="spr"><td>${cum.length+1}（光刀）</td><td>0</td><td>${f2(total)}</td><td>${f2(total*k)}</td></tr>`;
+  return {comp,k,html:`<table class="pass"><thead><tr><th>第幾刀</th><th>本刀吃深</th><th>累計（單邊）</th><th>複式刀座刻度累計</th></tr></thead><tbody>${rows}</tbody></table>`};
 }
 
-onSys();
+// 牙形示意圖（標示三個直徑）
+function fig(ang, major, pitchD, minor, ext){
+  const lab = ext ? ['外徑','有效徑','底徑'] : ['大徑','有效徑','內孔'];
+  return `<div class="fig"><svg viewBox="0 0 470 175" font-family="sans-serif">
+    <polyline points="15,40 35,40 63,120 83,120 111,40 131,40 159,120 179,120 207,40 222,40" fill="none" stroke="#ff8c1a" stroke-width="3"/>
+    <line x1="5" y1="40" x2="228" y2="40" stroke="#4d9eff" stroke-dasharray="4 4"/>
+    <line x1="5" y1="80" x2="228" y2="80" stroke="#4caf7d" stroke-dasharray="4 4"/>
+    <line x1="5" y1="120" x2="228" y2="120" stroke="#ff6b6b" stroke-dasharray="4 4"/>
+    <text x="236" y="45" fill="#4d9eff" font-size="17">${lab[0]} ${f2(major)}</text>
+    <text x="236" y="85" fill="#4caf7d" font-size="17">${lab[1]} ${f2(pitchD)}</text>
+    <text x="236" y="125" fill="#ff6b6b" font-size="17">${lab[2]} ${f2(minor)}</text>
+    <text x="10" y="165" fill="#9aa1ad" font-size="15" text-anchor="start">牙角 ${ang}°（${ext?'公牙':'母牙'}示意，單位 mm）</text>
+  </svg></div>`;
+}
+
+/* ================== 計算 ================== */
+function calc(){
+  const out=document.getElementById('out');
+  if(isPipe(sys)){
+    if(sel===null){ out.style.display='none'; return; }
+    if(sys==='npt') return showNPT(NPT[sel]);
+    return showPipe(PIPE[sel]);
+  }
+  const inch = sys==='unc'||sys==='unf';
+  const dRaw=inD.value.trim(), pRaw=inP.value.trim();
+  if(!dRaw||!pRaw){ out.style.display='none'; return; }
+  let D = inch ? frac(dRaw)*25.4 : parseFloat(dRaw);
+  let P = inch ? 25.4/parseFloat(pRaw) : parseFloat(pRaw);
+  if(!(D>0)||!(P>0)){ alertBox('外徑或牙距格式不對，請重新輸入。'); return; }
+  if(P > D/3){ alertBox('牙距相對外徑太大，請確認是否輸入顛倒（第一格是外徑、第二格是牙距）。'); return; }
+  inch ? showUN(D,P,frac(dRaw),parseFloat(pRaw)) : showMetric(D,P);
+}
+
+/* ---------- 公制 ISO（6g／6H） ---------- */
+function showMetric(D,P){
+  const d2=D-0.649519*P, d3=D-1.226869*P, D1=D-1.082532*P;
+  // ISO 965-1 公差公式（µm）
+  const Td2=90*Math.pow(P,0.4)*Math.pow(D,0.1);
+  const es=-(15+11*P);
+  const Td=180*Math.pow(P,2/3)-3.15/Math.sqrt(P);
+  const TD2=1.32*Td2, TD1=P>=1?230*Math.pow(P,0.7):(433*P-190*Math.pow(P,1.22));
+  const odMax=D+es/1000, odMin=odMax-Td/1000;
+  const d2Max=d2+es/1000, d2Min=d2Max-Td2/1000;
+  const D1Min=D1, D1Max=D1+TD1/1000;
+  const D2Min=d2, D2Max=d2+TD2/1000;
+  const name = Number.isInteger(P) || true ? `M${D}×${P}` : '';
+  common({title:name, sub:`公制 60°・牙距 ${P} mm・公差 ${gender==='ext'?'6g':'6H'}`, ang:60, D,P,d2,d3,D1,
+    odMin,odMax,d2Min,d2Max,D1Min,D1Max,D2Min,D2Max, hExt:0.613435*P});
+}
+
+/* ---------- 英制 UN（2A／2B，ASME B1.1） ---------- */
+function showUN(D,P,dIn,tpi){
+  const p=1/tpi, di=dIn;
+  const Td2A=0.0015*Math.cbrt(di)+0.0015*Math.sqrt(9*p)+0.015*Math.pow(p,2/3);
+  const allow=0.300*Td2A, TD2B=1.300*Td2A, TdMaj=0.060*Math.pow(p,2/3);
+  const TD1 = tpi>4 ? 0.25*p-0.40*p*p : 0.15*p;
+  const IN=25.4;
+  const d2=(di-0.649519*p)*IN, d3=(di-1.19078*p)*IN, D1=(di-1.082532*p)*IN;
+  const odMax=(di-allow)*IN, odMin=(di-allow-TdMaj)*IN;
+  const d2Max=(di-0.649519*p-allow)*IN, d2Min=d2Max-Td2A*IN;
+  const D2Min=d2, D2Max=d2+TD2B*IN;
+  const D1Min=D1, D1Max=D1+TD1*IN;
+  common({title:`${inD.value.trim()}"-${tpi} ${sys.toUpperCase()}`, sub:`英制 60°・每吋 ${tpi} 牙（牙距 ${f3(P)} mm）・公差 ${gender==='ext'?'2A':'2B'}`,
+    ang:60, D,P,d2,d3,D1, odMin,odMax,d2Min,d2Max,D1Min,D1Max,D2Min,D2Max, hExt:0.61343*P});
+}
+
+/* ---------- 公制／英制共用輸出 ---------- */
+function common(o){
+  const ext = gender==='ext';
+  let html='';
+  if(ext){
+    const total=o.hExt, pt=passTable(total,o.ang);
+    const grooveD=o.d3-0.2;
+    html+=CARD('A','先車外徑',
+      IT('外徑車到', `${f2(o.odMin)} ～ ${f2(o.odMax)} mm`, '比標稱略小，牙尖才不會太尖、容易鎖入', 'hl')+
+      IT('退刀槽', `寬 ${f2(2*o.P)} ～ ${f2(3*o.P)} mm，槽底直徑 ≤ ${f2(grooveD)} mm`, '槽底要比牙底再低一點，牙刀才退得出來'));
+    html+=CARD('B','刀具與刀座',
+      IT('牙刀角度', `${o.ang}°`, '用螺紋角規對正，刀尖要垂直工件、對準中心高')+
+      IT('複式刀座（小刀座）轉', `${pt.comp}°`, '只用一邊刀刃切削，切屑順、不易震刀')+
+      IT('總吃刀深度（單邊、橫向）', `${f2(total)} mm`, '理論值；最後以環規試鎖為準','hl')+
+      IT('換算成複式刀座刻度', `${f2(total*pt.k)} mm`, `沿 ${pt.comp}° 方向進刀時，刻度要多走（× ${f3(pt.k)}）`,'hl'));
+    html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+
+      `<div class="note">刻度盤若是「直徑讀數」，橫向數字請 ×2。最後一刀不進刀空走一次（光刀）。</div>`, 'span2');
+    html+=CARD('D','量測與檢驗',
+      IT('有效徑（牙腰直徑）', `${f3(o.d2Min)} ～ ${f3(o.d2Max)} mm`, '用螺紋分厘卡或三針量這個尺寸','ok')+
+      IT('牙底直徑（參考）', `約 ${f2(o.d3)} mm`)+
+      IT('檢驗', '螺紋環規：通規要鎖得進、止規鎖不進','','ok'));
+    html+=CARD('E','示意圖', fig(o.ang, (o.odMin+o.odMax)/2, (o.d2Min+o.d2Max)/2, o.d3, true));
+  }else{
+    const bore=(o.D1Min+o.D1Max)/2;
+    const total=(o.D - bore)/2 + 0.02;   // 由內孔車到大徑（多 0.02 讓牙底清乾淨）
+    const pt=passTable(total,o.ang);
+    html+=CARD('A','先搪內孔（底孔）',
+      IT('內孔車到', `${f2(o.D1Min)} ～ ${f2(o.D1Max)} mm（建議 ${f2(bore)}）`, '孔太大牙會不完整；太小牙尖會被擠爛','hl')+
+      IT('用鑽頭時', `約 ${f2(o.D-o.P)} mm`, '小尺寸用絲攻時的底孔鑽頭（約等於外徑 − 牙距）')+
+      IT('內退刀槽', `槽徑 ≥ ${f2(o.D+0.3)} mm，寬 ${f2(2*o.P)} ～ ${f2(3*o.P)} mm`, '盲孔一定要有，牙刀才有地方退'));
+    html+=CARD('B','刀具與刀座',
+      IT('牙刀角度', `${o.ang}°`, '內牙刀桿越短越好，伸出長度 ≈ 牙深 + 5 mm 即可')+
+      IT('複式刀座（小刀座）轉', `${pt.comp}°（方向與車公牙相反）`, '車母牙時刀座要往反方向偏')+
+      IT('總吃刀深度（單邊、橫向）', `${f2(total)} mm`, `從內孔 ${f2(bore)} 起算，車到大徑 ${f2(o.D)}；最後以塞規為準`,'hl')+
+      IT('換算成複式刀座刻度', `${f2(total*pt.k)} mm`, `沿 ${pt.comp}° 方向進刀時，刻度要多走（× ${f3(pt.k)}）`,'hl'));
+    html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+
+      `<div class="note">內牙刀會「讓刀」（刀桿彈開），最後精車可多空走 1～2 次再量。刻度盤若是直徑讀數，橫向數字請 ×2。</div>`, 'span2');
+    html+=CARD('D','量測與檢驗',
+      IT('有效徑（牙腰直徑）', `${f3(o.D2Min)} ～ ${f3(o.D2Max)} mm`, '母牙一般直接用塞規判斷','ok')+
+      IT('大徑（牙底）', `≥ ${f2(o.D)} mm`)+
+      IT('檢驗', '螺紋塞規：通規要鎖得進、止規鎖不進','','ok'));
+    html+=CARD('E','示意圖', fig(o.ang, o.D, (o.D2Min+o.D2Max)/2, bore, false));
+  }
+  render(o.title, o.sub, html);
+}
+
+/* ---------- 管牙 G／R／Rc／Rp（55°） ---------- */
+function showPipe(t){
+  const P=25.4/t.T, D=t.D, h=0.640327*P, d2=D-h, D1=D-1.280654*P;
+  const ext=gender==='ext';
+  let html='', title='', sub='';
+  if(sys==='g'){
+    title=`G ${t.s}`; sub=`管用平行螺紋 55°・每吋 ${t.T} 牙（牙距 ${f3(P)} mm）・舊稱 PF`;
+    if(ext){
+      const pt=passTable(h,55);
+      html+=CARD('A','先車外徑',
+        IT('外徑車到', `${f2(D-t.Td)} ～ ${f2(D)} mm`,'','hl')+
+        IT('退刀槽', `寬 ${f2(2*P)} ～ ${f2(3*P)} mm，槽底直徑 ≤ ${f2(D1-0.2)} mm`));
+      html+=toolCard(55,h,pt,true);
+      html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="note">刻度盤若是直徑讀數，橫向數字請 ×2。</div>`,'span2');
+      html+=CARD('D','量測與檢驗',
+        IT('有效徑（A 級）', `${f3(d2-t.Td2)} ～ ${f3(d2)} mm`,'B 級公差加倍','ok')+
+        IT('檢驗','G 螺紋環規（通／止）','','ok'));
+      html+=CARD('E','示意圖', fig(55,D,d2,D1,true));
+    }else{
+      html+=pipeIntCard(D,t,P);
+      const bore=(t.gMin+t.gMax)/2, total=(D-bore)/2+0.02, pt=passTable(total,55);
+      html+=toolCard(55,total,pt,false,bore,D);
+      html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="note">刻度盤若是直徑讀數，橫向數字請 ×2。</div>`,'span2');
+      html+=CARD('D','量測與檢驗',
+        IT('有效徑', `${f3(d2)} ～ ${f3(d2+t.Td2)} mm`,'','ok')+
+        IT('檢驗','G 螺紋塞規（通／止）','','ok'));
+      html+=CARD('E','示意圖', fig(55,D,d2,bore,false));
+    }
+  }else if(sys==='rp'){
+    title=`Rp ${t.s}`; sub=`管用平行母牙 55°（配 R 錐度公牙）・每吋 ${t.T} 牙（牙距 ${f3(P)} mm）・舊稱 PS`;
+    html+=pipeIntCard(D,t,P);
+    const bore=(t.gMin+t.gMax)/2, total=(D-bore)/2+0.02, pt=passTable(total,55);
+    html+=toolCard(55,total,pt,false,bore,D);
+    html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html,'span2');
+    html+=CARD('D','量測與檢驗',
+      IT('有效徑（基準）', `${f3(d2)} mm`,'','ok')+
+      IT('檢驗', `用 R 錐度塞規：塞規端面要落在缺口範圍內（約 ±${f2(t.c)} mm）`,'','ok'));
+  }else{ // R／Rc 錐度
+    const small=D-t.a/16, large=D+(t.Le-t.a)/16;
+    if(ext){
+      title=`R ${t.s}`; sub=`管用錐度公牙 55°・錐度 1:16・每吋 ${t.T} 牙（牙距 ${f3(P)} mm）・舊稱 PT`;
+      const pt=passTable(h,55);
+      html+=CARD('A','先車錐度外徑',
+        IT('小端（入口）外徑', `${f2(small)} mm`,`從端面量起 ${f2(t.a)} mm 處外徑 = ${f2(D)} mm（基準位置）`,'hl')+
+        IT(`有效牙長 ${f2(t.Le)} mm 處外徑`, `${f2(large)} mm`,'','hl')+
+        IT('錐度','1 : 16（直徑每 16 mm 長差 1 mm）',`小刀座／錐度靠模轉半角 1°47′24″`)+
+        IT('牙要車多長', `至少 ${f2(t.Le)} mm（不含不完全牙）`));
+      html+=toolCard(55,h,pt,true);
+      html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="warn">每一刀都必須沿錐度走，不能只橫向進刀，否則牙深前後不一。</div>`,'span2');
+      html+=CARD('D','量測與檢驗',
+        IT('檢驗', `R 錐度環規：工件小端要落在環規缺口範圍內（約 ±${f2(t.b)} mm，約 ±1 牙）`,'錐度牙不量尺寸，看量規旋入的位置','ok'));
+      html+=CARD('E','示意圖', fig(55,D,d2,D-1.280654*P,true));
+    }else{
+      title=`Rc ${t.s}`; sub=`管用錐度母牙 55°・錐度 1:16・每吋 ${t.T} 牙（牙距 ${f3(P)} mm）・舊稱 PT`;
+      const deep=D1-t.l/16;
+      html+=CARD('A','先鑽孔、再車錐孔',
+        IT('車錐孔前先鑽', `≤ ${f2(deep)} mm（例如 ${(Math.floor(deep*2)/2).toFixed(1)} mm）`,'鑽頭不可大於最深處內徑，再用車刀車成 1:16 錐孔','hl')+
+        IT('直接用錐度絲攻時', `不鉸孔：${t.rcN} mm／先用錐度鉸刀：${t.rcR} mm`,'絲攻會自己切出錐度，最裡面幾牙不完整屬正常')+
+        IT('孔口內徑（端面處）', `${f2(D1)} mm`,'孔口就是基準位置','hl')+
+        IT(`深 ${f2(t.l)} mm 處內徑（最少要有效牙長 ${f2(t.l)} mm）`, `${f2(deep)} mm`,'越裡面越小（1:16）','hl')+
+        IT('錐度','1 : 16',`小刀座轉半角 1°47′24″（方向與公牙相反）`));
+      const total=h+0.02, pt=passTable(total,55);
+      html+=toolCard(55,total,pt,false,D1,D);
+      html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="warn">每一刀都必須沿錐度走，不能只橫向進刀。</div>`,'span2');
+      html+=CARD('D','量測與檢驗',
+        IT('檢驗', `R 錐度塞規：孔口端面要落在塞規缺口範圍內（約 ±${f2(t.c)} mm）`,'錐度牙不量尺寸，看量規旋入的位置','ok'));
+    }
+  }
+  render(title, sub, html);
+}
+function pipeIntCard(D,t,P){
+  return CARD('A','先鑽孔／搪內孔',
+    IT('內孔車到', `${f2(t.gMin)} ～ ${f2(t.gMax)} mm（建議 ${f2((t.gMin+t.gMax)/2)}）`,'孔太大牙會不完整','hl')+
+    IT('用鑽頭時', `選 ${f2(t.gMin)} ～ ${f2(t.gMax)} mm 之間的鑽頭`)+
+    IT('內退刀槽', `槽徑 ≥ ${f2(D+0.3)} mm，寬 ${f2(2*P)} ～ ${f2(3*P)} mm`));
+}
+function toolCard(ang,total,pt,ext,bore,D){
+  return CARD('B','刀具與刀座',
+    IT('牙刀角度', `${ang}°（注意：不是 60°）`, '管牙是 55° 英制牙形，用錯刀會漏油')+
+    IT('複式刀座（小刀座）轉', `${pt.comp}°${ext?'':'（方向與車公牙相反）'}`)+
+    IT('總吃刀深度（單邊、橫向）', `${f2(total)} mm`, ext?'理論值；最後以量規為準':`從內孔 ${f2(bore)} 起算，車到大徑 ${f2(D)}`,'hl')+
+    IT('換算成複式刀座刻度', `${f2(total*pt.k)} mm`, `沿 ${pt.comp}° 方向進刀時刻度要多走（× ${f3(pt.k)}）`,'hl'));
+}
+
+/* ---------- NPT／NPTF（60°，錐度 1:16，截頂牙 0.8P） ---------- */
+function showNPT(t){
+  const IN=25.4, P=IN/t.T, h=0.8*P;
+  const E0=t.E0*IN, L1=t.L1*IN, L2=t.L2*IN, E1=E0+L1/16;
+  const ext=gender==='ext';
+  let html='';
+  const title=`${t.s}" NPT／NPTF`, sub=`美規錐度管牙 60°・錐度 1:16・每吋 ${t.T} 牙（牙距 ${f3(P)} mm）`;
+  if(ext){
+    const small=E0+h, OD=t.OD*IN, large=Math.min(E0+L2/16+h, OD), pt=passTable(h,60);
+    html+=CARD('A','先車錐度外徑',
+      IT('小端（入口）外徑', `約 ${f2(small)} mm`,'','hl')+
+      IT(`往內車到管外徑為止`, `${f2(large)} mm（= 管外徑）`,'錐度往大端車，碰到管外徑後牙頂自然變不完整，屬正常','hl')+
+      IT('錐度','1 : 16','小刀座／錐度靠模轉半角 1°47′24″')+
+      IT('牙要車多長', `至少 ${f2(L2)} mm（有效牙長）`));
+    html+=CARD('B','刀具與刀座',
+      IT('牙刀角度','60°（牙頂、牙底是平的，NPTF 要求更嚴）','NPT 牙比一般 60° 牙淺，不可照公制牙深車')+
+      IT('複式刀座（小刀座）轉', `${pt.comp}°`)+
+      IT('總吃刀深度（單邊、橫向）', `${f2(h)} mm（= 0.8 × 牙距）`,'','hl')+
+      IT('換算成複式刀座刻度', `${f2(h*pt.k)} mm`,'','hl'));
+    html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="warn">每一刀都必須沿錐度走，不能只橫向進刀。</div>`,'span2');
+    html+=CARD('D','量測與檢驗',
+      IT('小端有效徑（參考）', `${f3(E0)} mm`)+
+      IT('檢驗', `L1 環規：手鎖到底時工件端面與環規面齊平，容許 ±1 牙（手旋入長 ${f2(L1)} mm）`,'','ok'));
+  }else{
+    const pt=passTable(h+0.02,60);
+    html+=CARD('A','先鑽孔、再車錐孔',
+      IT('車錐孔前先鑽', `≤ ${f2(E1-h-L2/16)} mm（例如 ${(Math.floor((E1-h-L2/16)*2)/2).toFixed(1)} mm）`,'鑽頭不可大於最深處內徑，再用車刀車成 1:16 錐孔','hl')+
+      IT('直接用 NPT 絲攻時', `${t.drill} mm（${t.dr}）鑽頭`, t.chk===false?'此尺寸常見值未經第二來源核對，請以絲攻廠建議為準':'各家表格略有差異，以絲攻廠建議為準')+
+      IT('孔口小徑（端面處）', `約 ${f2(E1-h)} mm`,'','hl')+
+      IT(`深 ${f2(L2)} mm 處小徑`, `約 ${f2(E1-h-L2/16)} mm`,'越裡面越小','hl'));
+    html+=CARD('B','刀具與刀座',
+      IT('牙刀角度','60°（截頂牙）')+
+      IT('複式刀座（小刀座）轉', `${pt.comp}°（方向與車公牙相反）`)+
+      IT('總吃刀深度（單邊、橫向）', `${f2(h+0.02)} mm`,'','hl')+
+      IT('換算成複式刀座刻度', `${f2((h+0.02)*pt.k)} mm`,'','hl'));
+    html+=CARD('C','每刀進刀表（越後面吃越少）', pt.html+`<div class="warn">每一刀都必須沿錐度走，不能只橫向進刀。</div>`,'span2');
+    html+=CARD('D','量測與檢驗',
+      IT('孔口有效徑（參考）', `${f3(E1)} mm`)+
+      IT('檢驗','L1 塞規：手鎖到底時塞規缺口與工件端面齊平，容許 ±1 牙','','ok'));
+  }
+  render(title, sub, html);
+}
+
+function render(title, sub, html){
+  document.getElementById('out').style.display='block';
+  document.getElementById('oTitle').textContent=title+'　'+(gender==='ext'?'公牙':'母牙');
+  document.getElementById('oSub').textContent=sub;
+  document.getElementById('oGrid').innerHTML=html;
+}
+
+const inD=document.getElementById('inD'), inP=document.getElementById('inP');
+drawSys(); drawSizes(); drawGender();
 </script>
 </body>
 </html>
