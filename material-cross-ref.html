@@ -48,7 +48,7 @@
     content:"⌕"; position:absolute; left:13px; top:50%; transform:translateY(-50%);
     color:var(--text-dim); font-size:17px; pointer-events:none;
   }
-  .cat-filters{display:flex; flex-wrap:wrap; gap:7px;}
+  .cat-filters{display:flex; flex-wrap:wrap; gap:7px; margin-top:10px;}
   .cat-btn{
     background:var(--bg3); border:1px solid var(--border); color:var(--text-dim);
     padding:8px 13px; border-radius:20px; font-size:12.5px; cursor:pointer;
@@ -105,6 +105,17 @@
   .std-row{display:flex; font-size:12.5px; padding:3px 0; gap:8px;}
   .std-label{color:var(--text-dim); width:76px; flex-shrink:0; font-size:11px; padding-top:1px;}
   .std-val{font-family:var(--mono); color:var(--text); word-break:break-word;}
+  .card-alias{margin-top:7px; font-size:11.5px; color:var(--text-dim); line-height:1.5; font-family:var(--mono); word-break:break-word;}
+  .card-alias span{font-family:inherit; color:var(--blue); font-size:10.5px; margin-right:6px; font-weight:600;}
+  .ht-badge{font-family:inherit; font-size:10px; font-weight:600; color:var(--purple); border:1px solid var(--purple); border-radius:4px; padding:1px 5px; margin-left:8px; vertical-align:middle;}
+  .ht-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:4px;}
+  .ht-table th, .ht-table td{border:1px solid var(--border); padding:6px 8px; text-align:left; white-space:nowrap;}
+  .ht-table th{background:var(--bg3); color:var(--accent); font-size:11px;}
+  .ht-table td{font-family:var(--mono);}
+  .ht-table td:first-child{font-family:inherit; color:var(--text);}
+  .ht-table td.c{text-align:center;}
+  .ht-warn{margin:10px 0 0 18px; font-size:12.5px; line-height:1.7; color:var(--red);}
+  .ht-note{margin-top:8px; font-size:11.5px !important; color:var(--text-dim) !important; line-height:1.6 !important;}
   .card-app{
     margin-top:10px; padding-top:9px; border-top:1px dashed var(--border);
     font-size:11.5px; color:var(--text-dim); line-height:1.5;
@@ -155,7 +166,8 @@
     .brand-text p{font-size:10px;}
     .toolbar{gap:8px;}
     .search-box input{padding:10px 12px 10px 34px; font-size:16px;} /* 16px 避免 iOS 自動縮放 */
-    .cat-filters{gap:6px;}
+    .cat-filters{gap:6px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; scrollbar-width:none;}
+    .cat-filters::-webkit-scrollbar{display:none;}
     .cat-btn{padding:7px 11px; font-size:12px;}
     main{padding:12px 12px;}
     .grid{grid-template-columns:1fr; gap:10px;}
@@ -193,7 +205,7 @@
   </div>
   <div class="toolbar">
     <div class="search-box">
-      <input id="searchInput" type="text" placeholder="搜尋型號、牌號或關鍵字 (例如 S45C、42CrMo、304、C3604、鑄鐵、氮化)…">
+      <input id="searchInput" type="text" placeholder="搜尋型號、牌號或俗稱 (例如 S45C、35CD4、EN19、ST52、AlBC3、PBC2、鋁青銅)…">
     </div>
   </div>
   <div class="cat-filters" id="catFilters"></div>
@@ -214,7 +226,8 @@
 <main id="mainContent"></main>
 
 <footer>
-  資料庫涵蓋常見結構用鋼、不鏽鋼、鑄鐵、銅合金、工具鋼、軸承鋼、氮化鋼與彈簧鋼等 CNS／JIS／GB／ASTM-AISI／UNS／DIN／EN 對照。<br>
+  資料庫涵蓋碳鋼、鋼管、活塞桿用鋼、合金結構鋼、不鏽鋼、鑄鐵、鑄鋼、鍋爐鋼板、銅合金（黃銅／錫青銅／磷青銅／鋁青銅）、鋁合金、工具鋼、軸承鋼、氮化鋼與彈簧鋼之 CNS／JIS／GB／ASTM-AISI／UNS／DIN／EN／NF／BS／UNI／ISO 對照，並可用俗稱、舊名或材料號搜尋。<br>
+  銅合金牌號字尾「C」（如 CAC406C）表示連續鑄造品（原 JIS H5121）。標示「熱處理規範」之材料附客戶規範 W611 熱處理條件。<br>
   對照關係多為「近似對應」而非完全等同，實際採購與驗收仍應以各標準原文化學成分及機械性質規範為準。
 </footer>
 
@@ -228,102 +241,475 @@
 
 <script>
 const DB = [
-{id:'S20C', category:'碳鋼', names:{cns:'S20C', jis:'S20C', gb:'20', astm:'1020', uns:'G10200', din:'C22 / 1.0402', en:'C22E / 1.1151'},
+/* ===== 碳鋼 ===== */
+{id:'S10C', category:'碳鋼', alias:['C10','10#'], names:{cns:'S10C', jis:'S10C', gb:'10', astm:'1010', uns:'G10100', din:'C10 / 1.0301', en:'C10E / 1.1121', nf:'XC10', bs:'040A10'},
+ comp:'C 0.08–0.13, Mn 0.30–0.60, Si 0.15–0.35', prop:'極低碳鋼，延展性與焊接性佳，強度低，可滲碳。',
+ app:'沖壓件、墊片、滲碳小零件、焊接結構件'},
+{id:'S15C', category:'碳鋼', alias:['C15','15#'], names:{cns:'S15C', jis:'S15C', gb:'15', astm:'1015', uns:'G10150', din:'C15 / 1.0401', en:'C15E / 1.1141', nf:'XC12 / XC15（近似）', bs:'080M15'},
+ comp:'C 0.13–0.18, Mn 0.30–0.60, Si 0.15–0.35', prop:'低碳鋼，焊接性良好，常作滲碳淬火用。',
+ app:'滲碳銷、襯套、焊接接頭座'},
+{id:'S20C', category:'碳鋼', alias:['C22','20#','CK22'], names:{cns:'S20C', jis:'S20C', gb:'20', astm:'1020', uns:'G10200', din:'C22 / 1.0402', en:'C22E / 1.1151', nf:'XC18（近似）', bs:'070M20'},
  comp:'C 0.18–0.23, Mn 0.30–0.60, Si 0.15–0.35', prop:'低碳鋼，可滲碳硬化，韌性佳、強度較低，冷加工性良好。',
  app:'銷軸、小型齒輪、螺絲、需滲碳處理之零件'},
-{id:'S45C', category:'碳鋼', names:{cns:'S45C / SC450', jis:'S45C', gb:'45', astm:'1045', uns:'G10450', din:'C45 / 1.0503', en:'C45E / 1.1191'},
+{id:'S25C', category:'碳鋼', alias:['C25','25#'], names:{cns:'S25C', jis:'S25C', gb:'25', astm:'1025', uns:'G10250', din:'C25 / 1.0406', en:'C25E / 1.1158', nf:'XC25', bs:'070M26'},
+ comp:'C 0.22–0.28, Mn 0.30–0.60, Si 0.15–0.35', prop:'低～中碳鋼，焊接性尚可，強度高於 S20C。',
+ app:'焊接法蘭、耳座、一般結構零件'},
+{id:'S35C', category:'碳鋼', alias:['C35','35#','CK35'], names:{cns:'S35C', jis:'S35C', gb:'35', astm:'1035', uns:'G10350', din:'C35 / 1.0501', en:'C35E / 1.1181', nf:'XC38', bs:'080M36'},
+ comp:'C 0.32–0.38, Mn 0.60–0.90, Si 0.15–0.35', prop:'中碳鋼，可調質，強度與韌性均衡，焊接性較 S45C 佳。',
+ app:'軸、連桿、螺栓、焊接後需加工之結構件'},
+{id:'S45C', category:'碳鋼', alias:['C45','CK45','45#','XC45','XC48','EN8（近似）','1045'], names:{cns:'S45C', jis:'S45C', gb:'45', astm:'1045', uns:'G10450', din:'C45 / 1.0503', en:'C45E / 1.1191', nf:'XC48 / XC45', bs:'080M46（EN8 為 080M40，近似）', uni:'C45', iso:'C45E4（ISO 683-1 舊制）'},
  comp:'C 0.42–0.48, Mn 0.60–0.90, Si 0.15–0.35', prop:'中碳鋼，調質後硬度約 HB 200–230，機械性質均衡，最常見之通用結構鋼。',
- app:'油缸活塞桿（多需再鍍硬鉻）、銷軸、齒輪、螺栓、一般機械零件'},
-{id:'S50C', category:'碳鋼', names:{cns:'S50C', jis:'S50C', gb:'50', astm:'1050', uns:'G10500', din:'C50 / 1.0540', en:'C50E / 1.1206'},
+ app:'油缸活塞桿（多需再鍍硬鉻，市售 CK45 鍍鉻棒）、銷軸、齒輪、螺栓、一般機械零件'},
+{id:'S50C', category:'碳鋼', alias:['C50','50#','CK50'], names:{cns:'S50C', jis:'S50C', gb:'50', astm:'1050 / 1049', uns:'G10500', din:'C50 / 1.0540', en:'C50E / 1.1206', nf:'XC50（近似）', bs:'080M50（EN43）', uni:'C50', iso:'C50E4（ISO 683-1 舊制）'},
  comp:'C 0.47–0.53, Mn 0.60–0.90, Si 0.15–0.35', prop:'較 S45C 稍高碳含量，強度、硬度略高，韌性略降。',
  app:'需較高強度之軸類、齒輪、凸輪'},
-{id:'S55C', category:'碳鋼', names:{cns:'S55C', jis:'S55C', gb:'55', astm:'1055', uns:'G10550', din:'C55 / 1.0535', en:'C55E / 1.1203'},
- comp:'C 0.52–0.58, Mn 0.60–0.90', prop:'高碳結構鋼，可調質至較高硬度，耐磨性佳但焊接性差。',
+{id:'S55C', category:'碳鋼', alias:['C55','55#','CK55'], names:{cns:'S55C', jis:'S55C', gb:'55', astm:'1055', uns:'G10550', din:'C55 / 1.0535', en:'C55E / 1.1203', nf:'XC55', bs:'070M55（EN9）'},
+ comp:'C 0.52–0.58, Mn 0.60–0.90, Si 0.15–0.35', prop:'高碳結構鋼，可調質至較高硬度，耐磨性佳但焊接性差。',
  app:'高強度軸類、鏈輪、彈簧夾頭'},
+{id:'SS400', category:'碳鋼', alias:['Q235','A36','St37','S235'], names:{cns:'SS400', jis:'SS400', gb:'Q235B', astm:'A36（近似）', uns:'K02600（A36）', din:'St37-2 / 1.0037', en:'S235JR / 1.0038', nf:'E24-2', bs:'4360 Gr.40B'},
+ comp:'P ≤0.050, S ≤0.050（JIS 不規定 C、Si、Mn）；抗拉 400–510 MPa', prop:'一般結構用軋延鋼，以強度保證交貨，成分管制寬鬆，不宜調質。',
+ app:'鋼板、底座、支架、耳座、焊接結構'},
+{id:'SM490A', category:'碳鋼', alias:['Q345','Q355','St52-3','S355','A572'], names:{cns:'SM490A', jis:'SM490A', gb:'Q355B（舊 Q345B / 16Mn）', astm:'A572 Gr.50（近似）', uns:'—', din:'St52-3 / 1.0570', en:'S355J2 / 1.0577', nf:'E36-3', bs:'4360 Gr.50D'},
+ comp:'C ≤0.20, Si ≤0.55, Mn ≤1.65；抗拉 490–610 MPa', prop:'焊接結構用高張力鋼，強度高於 SS400 且焊接性佳。',
+ app:'承載較大之焊接結構、法蘭板、耳座'},
+{id:'SUM24L', category:'碳鋼', alias:['12L14','易削鋼','快削鋼','Y15Pb'], names:{cns:'SUM24L', jis:'SUM24L', gb:'Y15Pb', astm:'12L14', uns:'G12144', din:'9SMnPb28 / 1.0718', en:'11SMnPb30 / 1.0718', nf:'S250Pb', bs:'230M07Pb'},
+ comp:'C ≤0.15, Mn 0.85–1.15, P 0.04–0.09, S 0.26–0.35, Pb 0.10–0.35', prop:'含鉛硫快削鋼，切削性極佳、表面光潔，但強度低、不宜焊接與承受衝擊。',
+ app:'接頭、螺絲、小型車削件（非承力件）'},
 
-{id:'SCM440', category:'合金結構鋼', names:{cns:'SCM440', jis:'SCM440', gb:'42CrMo', astm:'4140', uns:'G41400', din:'42CrMo4 / 1.7225', en:'42CrMo4 / 1.7225'},
+/* ===== 鋼管 ===== */
+{id:'STKM13A', category:'鋼管', alias:['機械構造用鋼管','STKM'], names:{cns:'STKM13A', jis:'STKM13A（JIS G3445）', gb:'20（GB/T 8162，近似）', astm:'A519 1020（近似）', uns:'—', din:'St45 / 1.0408（DIN 2391，近似）', en:'E235 / E255（EN 10305-1，近似）', nf:'TU37b（近似）', bs:'CDS 1（近似）'},
+ comp:'C ≤0.25, Si ≤0.35, Mn 0.30–0.90；抗拉 ≥370 MPa, 降伏 ≥215 MPa', prop:'機械構造用碳鋼鋼管，強度中等，加工性與焊接性佳。',
+ app:'低壓油缸缸筒、套管、一般機械管件'},
+{id:'STKM13C', category:'鋼管', alias:['ST52（近似）','E355（近似）'], names:{cns:'STKM13C', jis:'STKM13C（JIS G3445）', gb:'20 / Q355（近似）', astm:'A519 1026（近似）', uns:'—', din:'St52 / 1.0580（近似）', en:'E355 / 1.0580（近似）', nf:'TU52b（近似）', bs:'CDS 3（近似）'},
+ comp:'C ≤0.25, Si ≤0.35, Mn 0.30–0.90；抗拉 ≥510 MPa, 降伏 ≥380 MPa', prop:'STKM13 之冷抽高強度狀態（C 級），強度接近 ST52，常作搪磨缸筒。',
+ app:'油缸缸筒（搪磨管／滾壓管）、高壓套管'},
+{id:'E355 (ST52)', category:'鋼管', alias:['ST52','St52','E355','1.0580','搪磨管','honed tube','BK+S'], names:{cns:'（無直接對應）', jis:'STKM13C / STKM19C（近似）', gb:'Q355（舊 16Mn）', astm:'A519 1026（近似）', uns:'—', din:'St52 / 1.0580（DIN 2391）', en:'E355 / 1.0580（EN 10305-1）', nf:'TU52b（近似）', bs:'CDS 3（近似）'},
+ comp:'C ≤0.22, Si ≤0.55, Mn ≤1.60；+SR 狀態抗拉 ≥580 MPa, 降伏 ≥450 MPa', prop:'歐規精密冷抽無縫鋼管，為歐系油缸缸筒最普遍材料，常以 BK+S（冷抽＋去應力）交貨後搪磨或刮削滾光。',
+ app:'油缸缸筒（Honed tube／Skived & roller burnished tube）'},
+{id:'STPG370', category:'鋼管', alias:['STPG38','A53','A53 Gr.A','API 5L Gr.A','配管','SCH40'], names:{cns:'STPG370', jis:'STPG370（JIS G3454）', gb:'20（GB/T 8163，近似）', astm:'A53 Gr.A / API 5L Gr.A', uns:'K02504', din:'St37.0 / 1.0254（近似）', en:'P235TR1 / 1.0254（近似）', nf:'TU37c（近似）', bs:'3601 Gr.360（近似）'},
+ comp:'C ≤0.25, Si ≤0.35, Mn 0.30–0.90；抗拉 ≥370 MPa', prop:'壓力配管用碳鋼鋼管，適用 350 °C 以下壓力配管。',
+ app:'液壓配管、油路管件'},
+{id:'STPT410', category:'鋼管', alias:['STPT42','A106','A106B','高溫配管'], names:{cns:'STPT410', jis:'STPT410（JIS G3456）', gb:'20G（近似）', astm:'A106 Gr.B', uns:'K03006', din:'St45.8 / 1.0405（近似）', en:'P265GH / 1.0425（近似）', nf:'TU42c（近似）', bs:'3602 Gr.410（近似）'},
+ comp:'C ≤0.30, Si 0.10–0.35, Mn 0.30–1.00；抗拉 ≥410 MPa', prop:'高溫配管用碳鋼鋼管，強度高於 STPG370。',
+ app:'高壓／高溫油路配管、鍋爐配管'},
+
+/* ===== 活塞桿用鋼 ===== */
+{id:'20MnV6', category:'活塞桿用鋼', alias:['1.5217','20MnV','鍍鉻棒','中空鍍鉻管'], names:{cns:'（無直接對應）', jis:'（無直接對應）', gb:'20MnV', astm:'（無直接對應）', uns:'—', din:'20MnV6 / 1.5217', en:'20MnV6 / 1.5217（EN 10297 / 10294）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.16–0.22, Si 0.10–0.50, Mn 1.30–1.70, V 0.08–0.15', prop:'微合金化錳釩鋼，常態化狀態即具高降伏強度，焊接性佳（可直接焊接耳座），為歐系鍍鉻活塞桿與中空桿常用材料。',
+ app:'鍍鉻活塞桿、中空活塞桿（需焊接端部時優於 S45C）'},
+{id:'38MnVS6', category:'活塞桿用鋼', alias:['1.1303','非調質鋼','38MnVS','微合金鋼'], names:{cns:'（無直接對應）', jis:'（非調質鋼，無直接對應）', gb:'38MnVS6（GB/T 15712，近似）', astm:'（無直接對應）', uns:'—', din:'38MnVS6 / 1.1303', en:'38MnVS6 / 1.1303（EN 10267）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.34–0.41, Si 0.15–0.80, Mn 1.20–1.60, S 0.020–0.060, V 0.08–0.20', prop:'非調質微合金鋼，控冷後即可達接近調質鋼之強度，省去調質工序，切削性佳（含硫）。',
+ app:'高強度鍍鉻活塞桿、鍛造曲軸、連桿'},
+
+/* ===== 合金結構鋼 ===== */
+{id:'SCM415', category:'合金結構鋼', alias:['15CrMo','15CrMo5','1.7262','18CrMo4','15CD4'], names:{cns:'SCM415', jis:'SCM415', gb:'15CrMo', astm:'4118（近似）', uns:'G41180（近似）', din:'15CrMo5 / 1.7262', en:'18CrMo4 / 1.7243（近似）', nf:'15CD4（近似）', bs:'708M20（近似）'},
+ comp:'C 0.13–0.18, Cr 0.90–1.20, Mo 0.15–0.25, Mn 0.60–0.90', prop:'低碳鉻鉬鋼，滲碳用，表面硬、心部韌。',
+ app:'滲碳齒輪、軸、銷'},
+{id:'SCM420', category:'合金結構鋼', alias:['20CrMo','4118'], names:{cns:'SCM420', jis:'SCM420', gb:'20CrMo', astm:'4118 / 4120（近似；4130 對應 SCM430）', uns:'G41200（近似）', din:'25CrMo4 / 1.7218（近似）', en:'25CrMo4 / 1.7218（近似）', nf:'18CD4 / 25CD4（近似）', bs:'708M20', uni:'25CrMo4（近似）', iso:'25CrMo4（近似）'},
+ comp:'C 0.18–0.23, Cr 0.90–1.20, Mo 0.15–0.25, Mn 0.60–0.90', prop:'滲碳用鉻鉬鋼，淬透性優於 SCr420，為最常用滲碳鋼之一。',
+ app:'滲碳齒輪、凸輪軸、高負荷銷'},
+{id:'SCM435', category:'合金結構鋼', alias:['35CrMo','35CD4','34CrMo4','4135','4137','708A37'], names:{cns:'SCM435', jis:'SCM435', gb:'35CrMo', astm:'4135 / 4137', uns:'G41350', din:'34CrMo4 / 1.7220', en:'34CrMo4 / 1.7220', nf:'35CD4', bs:'708A37'},
+ comp:'C 0.33–0.38, Cr 0.90–1.20, Mo 0.15–0.30, Mn 0.60–0.90', prop:'鉻鉬合金鋼，可調質亦可氣體氮化，綜合性質介於 S45C 與 SCM440 之間，焊接性略優於 SCM440。',
+ app:'中負荷軸類、高強度螺栓、高壓缸筒／氣瓶、可氮化之結構零件'},
+{id:'SCM440', category:'合金結構鋼', alias:['SCM440H','42CrMo','42CD4','42CrMo4','4140','EN19','709M40'], names:{cns:'SCM440', jis:'SCM440', gb:'42CrMo', astm:'4140', uns:'G41400', din:'42CrMo4 / 1.7225', en:'42CrMo4 / 1.7225', nf:'42CD4', bs:'708M40 / 709M40（EN19）', uni:'42CrMo4', iso:'42CrMo4'},
  comp:'C 0.38–0.43, Cr 0.90–1.20, Mo 0.15–0.30, Mn 0.60–0.90', prop:'鉻鉬合金結構鋼，淬透性佳，調質後綜合機械性質優異，為油缸活塞桿最常用高階材料之一。',
  app:'油缸活塞桿（高負載）、大型軸類、螺栓、齒輪、模具座'},
-{id:'SCr440', category:'合金結構鋼', names:{cns:'SCr440', jis:'SCr440', gb:'40Cr', astm:'5140', uns:'G51400', din:'41Cr4 / 1.7035', en:'41Cr4 / 1.7035'},
- comp:'C 0.38–0.43, Cr 0.90–1.20, Mn 0.60–0.85', prop:'鉻鋼，淬透性優於碳鋼，強度與耐磨性佳。',
+{id:'SCr420', category:'合金結構鋼', alias:['20Cr','5120'], names:{cns:'SCr420', jis:'SCr420', gb:'20Cr', astm:'5120', uns:'G51200', din:'20Cr4 / 1.7027（近似）', en:'20Cr4 / 1.7027（近似）', nf:'18C3 / 20C4（近似）', bs:'527A19（近似）'},
+ comp:'C 0.18–0.23, Cr 0.90–1.20, Mn 0.60–0.90', prop:'滲碳用鉻鋼，價格低於 SCM420。',
+ app:'滲碳齒輪、活塞銷、小軸'},
+{id:'SCr440', category:'合金結構鋼', alias:['40Cr','41Cr4','5140','EN18'], names:{cns:'SCr440', jis:'SCr440', gb:'40Cr', astm:'5140', uns:'G51400', din:'41Cr4 / 1.7035', en:'41Cr4 / 1.7035', nf:'42C4', bs:'530M40（EN18）'},
+ comp:'C 0.38–0.43, Cr 0.90–1.20, Mn 0.60–0.90', prop:'鉻鋼，淬透性優於碳鋼，強度與耐磨性佳。',
  app:'齒輪、軸類、螺栓、鏈條零件'},
-{id:'SNCM439', category:'合金結構鋼', names:{cns:'SNCM439', jis:'SNCM439', gb:'40CrNiMoA', astm:'4340', uns:'G43400', din:'34CrNiMo6 / 1.6582', en:'34CrNiMo6 / 1.6582'},
+{id:'SMn438', category:'合金結構鋼', alias:['40Mn2','1340','36Mn5','EN15'], names:{cns:'SMn438', jis:'SMn438', gb:'40Mn2', astm:'1340', uns:'G13400', din:'36Mn5 / 1.1167', en:'36Mn5 / 1.1167', nf:'40M5', bs:'150M36（EN15）'},
+ comp:'C 0.35–0.41, Mn 1.35–1.65, Si 0.15–0.35', prop:'錳鋼，淬透性高於碳鋼、成本低於鉻鉬鋼。',
+ app:'軸、螺栓、一般調質零件'},
+{id:'SNC236', category:'合金結構鋼', alias:['40CrNi','35NC6','3140'], names:{cns:'SNC236', jis:'SNC236', gb:'40CrNi', astm:'3140（近似）', uns:'G31400（近似）', din:'36NiCr6 / 1.5710（近似）', en:'36NiCr6 / 1.5710（近似）', nf:'35NC6', bs:'640M40（EN111，近似）'},
+ comp:'C 0.32–0.40, Ni 1.00–1.50, Cr 0.50–0.90, Mn 0.50–0.80', prop:'鎳鉻合金鋼，調質後強韌性佳、耐衝擊。',
+ app:'軸、連桿、承受衝擊負荷之調質零件'},
+{id:'SNCM220', category:'合金結構鋼', alias:['8620','20CrNiMo','21NiCrMo2','EN362'], names:{cns:'SNCM220', jis:'SNCM220', gb:'20CrNiMo', astm:'8620', uns:'G86200', din:'21NiCrMo2 / 1.6523', en:'20NiCrMo2-2 / 1.6523', nf:'20NCD2', bs:'805M20（EN362）', uni:'20NiCrMo2', iso:'20NiCrMo2'},
+ comp:'C 0.17–0.23, Ni 0.40–0.70, Cr 0.40–0.65, Mo 0.15–0.25', prop:'鎳鉻鉬滲碳鋼，滲碳後表面耐磨、心部韌性佳。',
+ app:'滲碳齒輪、軸、銷'},
+{id:'SNCM420', category:'合金結構鋼', alias:['4320','20CrNi2Mo'], names:{cns:'SNCM420', jis:'SNCM420', gb:'20CrNi2Mo', astm:'4320', uns:'G43200', din:'17NiCrMo6-4 / 1.6566（近似）', en:'17NiCrMo6-4 / 1.6566（近似）', nf:'20NCD7（近似）', bs:'（無直接對應）'},
+ comp:'C 0.17–0.23, Ni 1.60–2.00, Cr 0.40–0.65, Mo 0.15–0.30', prop:'高鎳滲碳鋼，心部韌性與耐衝擊性優於 SNCM220。',
+ app:'重負荷滲碳齒輪、軸承套圈'},
+{id:'SNCM439', category:'合金結構鋼', alias:['4340','40CrNiMoA','EN24','817M40','40NiCrMo6','1.6565','34CrNiMo6'], names:{cns:'SNCM439', jis:'SNCM439', gb:'40CrNiMoA', astm:'4340', uns:'G43400', din:'40NiCrMo6 / 1.6565（另 34CrNiMo6 / 1.6582 近似）', en:'34CrNiMo6 / 1.6582（近似）', nf:'35NCD6（近似）', bs:'817M40（EN24）', uni:'40NiCrMo7'},
  comp:'C 0.36–0.43, Ni 1.60–2.00, Cr 0.60–1.00, Mo 0.15–0.30', prop:'高強度鎳鉻鉬合金鋼，淬透性極佳，韌性與疲勞強度優異，成本較高。',
- app:'重負荷軸類、高強度螺栓、航太／工具機關鍵零件'},
-{id:'SNC236', category:'合金結構鋼', names:{cns:'SNC236', jis:'SNC236', gb:'12CrNi3A', astm:'3115', uns:'G31150', din:'14NiCr14 / 1.5752', en:'14NiCr14 / 1.5752'},
- comp:'C 0.32–0.40, Ni 1.00–1.50, Cr 0.50–0.90', prop:'鎳鉻合金鋼，韌性佳、耐衝擊。',
- app:'齒輪、活塞銷、承受衝擊負荷零件'},
+ app:'重負荷軸類、高強度螺栓、大徑活塞桿'},
 
-{id:'SUS304', category:'不鏽鋼', names:{cns:'SUS304', jis:'SUS304', gb:'06Cr19Ni10', astm:'304', uns:'S30400', din:'X5CrNi18-10 / 1.4301', en:'1.4301'},
+/* ===== 不鏽鋼 ===== */
+{id:'SUS303', category:'不鏽鋼', alias:['303','Y12Cr18Ni9','1.4305'], names:{cns:'SUS303', jis:'SUS303', gb:'Y12Cr18Ni9', astm:'303', uns:'S30300', din:'X8CrNiS18-9 / 1.4305', en:'1.4305', nf:'Z8CNF18-09', bs:'303S31'},
+ comp:'C ≤0.15, Cr 17.0–19.0, Ni 8.0–10.0, S ≥0.15', prop:'添加硫之快削不鏽鋼，切削性為沃斯田鐵系中最佳，耐蝕性略低於 304，不宜焊接。',
+ app:'接頭、螺絲、軸套等車削件'},
+{id:'SUS304', category:'不鏽鋼', alias:['304','18-8','1.4301','06Cr19Ni10'], names:{cns:'SUS304', jis:'SUS304', gb:'06Cr19Ni10', astm:'304', uns:'S30400', din:'X5CrNi18-10 / 1.4301', en:'1.4301', nf:'Z7CN18-09', bs:'304S31', uni:'X5CrNi18-10', iso:'X5CrNi18-10'},
  comp:'C ≤0.08, Cr 18.0–20.0, Ni 8.0–10.5', prop:'沃斯田鐵系不鏽鋼，耐蝕性、加工性佳，不可淬火硬化，磁性弱。',
  app:'油缸外殼、油箱、密封蓋、一般耐蝕結構件'},
-{id:'SUS316', category:'不鏽鋼', names:{cns:'SUS316', jis:'SUS316', gb:'022Cr17Ni12Mo2', astm:'316', uns:'S31600', din:'X5CrNiMo17-12-2 / 1.4401', en:'1.4401'},
+{id:'SUS304L', category:'不鏽鋼', alias:['304L','1.4307','1.4306','022Cr19Ni10'], names:{cns:'SUS304L', jis:'SUS304L', gb:'022Cr19Ni10', astm:'304L', uns:'S30403', din:'X2CrNi19-11 / 1.4306', en:'1.4306 / 1.4307', nf:'Z3CN18-10', bs:'304S11', uni:'X2CrNi18-11', iso:'X2CrNi19-11'},
+ comp:'C ≤0.030, Cr 18.0–20.0, Ni 9.0–13.0', prop:'低碳 304，焊後不易發生晶界腐蝕。',
+ app:'需焊接之耐蝕結構、管件'},
+{id:'SUS316', category:'不鏽鋼', alias:['316','1.4401','06Cr17Ni12Mo2'], names:{cns:'SUS316', jis:'SUS316', gb:'06Cr17Ni12Mo2', astm:'316', uns:'S31600', din:'X5CrNiMo17-12-2 / 1.4401', en:'1.4401', nf:'Z7CND17-12-02', bs:'316S31', uni:'X5CrNiMo17-12', iso:'X5CrNiMo17-12-2'},
  comp:'C ≤0.08, Cr 16.0–18.0, Ni 10.0–14.0, Mo 2.0–3.0', prop:'較 304 含鉬，耐孔蝕、耐化學腐蝕能力更佳，適用於嚴苛腐蝕環境。',
  app:'化工／海洋環境用油缸零件、耐蝕螺絲、管件'},
-{id:'SUS420J2', category:'不鏽鋼', names:{cns:'SUS420J2', jis:'SUS420J2', gb:'40Cr13', astm:'420', uns:'S42000', din:'X46Cr13 / 1.4034', en:'1.4034'},
+{id:'SUS316L', category:'不鏽鋼', alias:['316L','1.4404','022Cr17Ni12Mo2'], names:{cns:'SUS316L', jis:'SUS316L', gb:'022Cr17Ni12Mo2', astm:'316L', uns:'S31603', din:'X2CrNiMo17-12-2 / 1.4404', en:'1.4404', nf:'Z3CND17-12-02', bs:'316S11', uni:'X2CrNiMo17-12', iso:'X2CrNiMo17-12-2'},
+ comp:'C ≤0.030, Cr 16.0–18.0, Ni 12.0–15.0, Mo 2.0–3.0', prop:'低碳 316，焊接後耐蝕性佳。',
+ app:'海水、化工環境焊接件、配管'},
+{id:'SUS410', category:'不鏽鋼', alias:['410','12Cr13','1Cr13','1.4006'], names:{cns:'SUS410', jis:'SUS410', gb:'12Cr13（舊 1Cr13）', astm:'410', uns:'S41000', din:'X12Cr13 / 1.4006', en:'1.4006', nf:'Z10C13 / Z12C13', bs:'410S21', uni:'X12Cr13', iso:'X12Cr13'},
+ comp:'C ≤0.15, Cr 11.5–13.5', prop:'麻田散鐵系不鏽鋼，可淬火，強度中等，耐蝕性低於 304，有磁性。',
+ app:'閥件、泵軸、一般耐蝕機械零件'},
+{id:'SUS420J1', category:'不鏽鋼', alias:['420','20Cr13','2Cr13','1.4021'], names:{cns:'SUS420J1', jis:'SUS420J1', gb:'20Cr13（舊 2Cr13）', astm:'420', uns:'S42000', din:'X20Cr13 / 1.4021', en:'1.4021', nf:'Z20C13', bs:'420S29 / 420S37', uni:'X20Cr13', iso:'X20Cr13'},
+ comp:'C 0.16–0.25, Cr 12.0–14.0', prop:'麻田散鐵系不鏽鋼，可淬硬，韌性較 420J2 佳。',
+ app:'泵軸、閥桿、耐蝕軸類'},
+{id:'SUS420J2', category:'不鏽鋼', alias:['420','30Cr13','3Cr13','1.4028'], names:{cns:'SUS420J2', jis:'SUS420J2', gb:'30Cr13（舊 3Cr13）', astm:'420', uns:'S42000', din:'X30Cr13 / 1.4028', en:'1.4028', nf:'Z33C13', bs:'420S45', uni:'X30Cr13', iso:'X30Cr13'},
  comp:'C 0.26–0.40, Cr 12.0–14.0', prop:'麻田散鐵系不鏽鋼，可淬火硬化，硬度高、耐蝕性中等。',
- app:'刀具、閥件、需硬度與耐蝕兼顧之零件'},
-{id:'SUS440C', category:'不鏽鋼', names:{cns:'SUS440C', jis:'SUS440C', gb:'108Cr17', astm:'440C', uns:'S44004', din:'X105CrMo17 / 1.4125', en:'1.4125'},
+ app:'刀具、閥件、耐蝕活塞桿（可高週波）、需硬度與耐蝕兼顧之零件'},
+{id:'SUS430', category:'不鏽鋼', alias:['430','10Cr17','1Cr17','1.4016'], names:{cns:'SUS430', jis:'SUS430', gb:'10Cr17（舊 1Cr17）', astm:'430', uns:'S43000', din:'X6Cr17 / 1.4016', en:'1.4016', nf:'Z8C17', bs:'430S17'},
+ comp:'C ≤0.12, Cr 16.0–18.0', prop:'肥粒鐵系不鏽鋼，有磁性、不可淬火，價格低於 304。',
+ app:'外蓋、裝飾件、一般耐蝕板件'},
+{id:'SUS431', category:'不鏽鋼', alias:['431','14Cr17Ni2','1Cr17Ni2','1.4057'], names:{cns:'SUS431', jis:'SUS431', gb:'14Cr17Ni2（舊 1Cr17Ni2）', astm:'431', uns:'S43100', din:'X17CrNi16-2 / 1.4057', en:'1.4057', nf:'Z15CN16-02', bs:'431S29'},
+ comp:'C ≤0.20, Cr 15.0–17.0, Ni 1.25–2.50', prop:'含鎳麻田散鐵系不鏽鋼，調質後強度高，耐蝕性為麻田散鐵系中最佳。',
+ app:'不鏽鋼活塞桿、船用軸、泵軸、高強度耐蝕螺栓'},
+{id:'SUS440C', category:'不鏽鋼', alias:['440C','108Cr17','9Cr18Mo','1.4125'], names:{cns:'SUS440C', jis:'SUS440C', gb:'108Cr17（舊 11Cr17）', astm:'440C', uns:'S44004', din:'X105CrMo17 / 1.4125', en:'1.4125', nf:'Z100CD17', bs:'（無直接對應）', uni:'X105CrMo17', iso:'X105CrMo17'},
  comp:'C 0.95–1.20, Cr 16.0–18.0, Mo ≤0.75', prop:'高碳麻田散鐵不鏽鋼，可淬硬至高硬度（HRC 58–60），耐磨性佳。',
  app:'軸承、精密閥件、刀具、高耐磨不鏽零件'},
+{id:'SUS630', category:'不鏽鋼', alias:['17-4PH','630','1.4542','05Cr17Ni4Cu4Nb'], names:{cns:'SUS630', jis:'SUS630', gb:'05Cr17Ni4Cu4Nb', astm:'630（17-4PH）', uns:'S17400', din:'X5CrNiCuNb16-4 / 1.4542', en:'1.4542', nf:'Z6CNU17-04', bs:'（無直接對應）', uni:'X5CrNiCuNb17-4', iso:'X5CrNiCuNb16-4'},
+ comp:'C ≤0.07, Cr 15.0–17.5, Ni 3.0–5.0, Cu 3.0–5.0, Nb 0.15–0.45', prop:'析出硬化不鏽鋼，時效處理後強度高（H900 約 HRC 40+），耐蝕性接近 304，變形小。',
+ app:'高強度耐蝕軸、閥桿、不鏽鋼活塞桿'},
 
-{id:'FC200', category:'鑄鐵', names:{cns:'FC200', jis:'FC200', gb:'HT200', astm:'Class 30', uns:'F12401', din:'GG20 / EN-GJL-200', en:'EN-GJL-200 / 0.6020'},
+/* ===== 鑄鐵 ===== */
+{id:'FC200', category:'鑄鐵', alias:['FC20','HT200','GG20','GG-20','灰鑄鐵'], names:{cns:'FC200', jis:'FC200', gb:'HT200', astm:'A48 Class 30（A126 則為 Class B）', uns:'F12101', din:'GG-20 / 0.6020', en:'EN-GJL-200 / EN-JL1030', nf:'Ft 20 D', bs:'1452 Gr.200'},
  comp:'灰鑄鐵，片狀石墨組織，抗拉強度 ≥200 MPa', prop:'減震性、切削性佳，抗壓強度高但韌性差，不耐衝擊。',
  app:'泵浦殼體、機台基座、一般鑄件外殼'},
-{id:'FC250', category:'鑄鐵', names:{cns:'FC250', jis:'FC250', gb:'HT250', astm:'Class 35', uns:'F12501', din:'GG25 / EN-GJL-250', en:'EN-GJL-250 / 0.6025'},
+{id:'FC250', category:'鑄鐵', alias:['FC25','HT250','GG25','GG-25'], names:{cns:'FC250', jis:'FC250', gb:'HT250', astm:'A48 Class 35（A126 則為 Class C）', uns:'F12401', din:'GG-25 / 0.6025', en:'EN-GJL-250 / EN-JL1040', nf:'Ft 25 D', bs:'1452 Gr.250'},
  comp:'灰鑄鐵，抗拉強度 ≥250 MPa', prop:'較 FC200 強度略高，仍屬脆性材料。',
  app:'油缸端蓋、閥體、承壓較高之鑄件'},
-{id:'FCD450', category:'鑄鐵', names:{cns:'FCD450', jis:'FCD450', gb:'QT450-10', astm:'65-45-12', uns:'F32800', din:'GGG50 / EN-GJS-450-10', en:'EN-GJS-450-10 / 0.7043'},
- comp:'球狀石墨鑄鐵，抗拉強度 ≥450 MPa，延伸率 ≥10%', prop:'韌性遠優於灰鑄鐵，兼具鑄造性與機械強度，俗稱延性鑄鐵／球墨鑄鐵。',
+{id:'FC300', category:'鑄鐵', alias:['HT300','GG30','GG-30'], names:{cns:'FC300', jis:'FC300', gb:'HT300', astm:'A48 Class 40 / 45', uns:'F12801', din:'GG-30 / 0.6030', en:'EN-GJL-300 / EN-JL1050', nf:'Ft 30 D', bs:'1452 Gr.300'},
+ comp:'灰鑄鐵，抗拉強度 ≥300 MPa', prop:'高強度灰鑄鐵，耐磨性佳，鑄造性與切削性較 FC250 略差。',
+ app:'機床床身、液壓閥體、汽缸套'},
+{id:'FCD400', category:'鑄鐵', alias:['FCD40','QT400-15','GGG40','GGG-40','球墨鑄鐵','延性鑄鐵'], names:{cns:'FCD400', jis:'FCD400-15', gb:'QT400-15', astm:'A536 60-40-18', uns:'F32800', din:'GGG-40 / 0.7040', en:'EN-GJS-400-15 / EN-JS1030', nf:'FGS 400-15', bs:'2789 Gr.420/12'},
+ comp:'球狀石墨鑄鐵，抗拉 ≥400 MPa，延伸率 ≥15%', prop:'肥粒鐵基地球墨鑄鐵，延展性與韌性最佳，切削性良好。',
+ app:'閥體、管件、承受衝擊之鑄件'},
+{id:'FCD450', category:'鑄鐵', alias:['QT450-10','GGG40.3（近似）','球墨鑄鐵','延性鑄鐵'], names:{cns:'FCD450', jis:'FCD450-10', gb:'QT450-10', astm:'A536 65-45-12', uns:'F33100', din:'GGG-40 系（近似）', en:'EN-GJS-450-10 / EN-JS1040', nf:'FGS 450-10（近似）', bs:'2789 Gr.450/10（近似）'},
+ comp:'球狀石墨鑄鐵，抗拉 ≥450 MPa，延伸率 ≥10%', prop:'韌性遠優於灰鑄鐵，兼具鑄造性與機械強度。',
  app:'油缸端蓋、法蘭、承受動態負荷之鑄件'},
-{id:'FCD600', category:'鑄鐵', names:{cns:'FCD600', jis:'FCD600', gb:'QT600-3', astm:'80-55-06', uns:'F33800', din:'GGG60 / EN-GJS-600-3', en:'EN-GJS-600-3 / 0.7060'},
- comp:'球狀石墨鑄鐵，抗拉強度 ≥600 MPa，延伸率 ≥3%', prop:'高強度球墨鑄鐵，硬度與強度較高，延展性相對降低。',
+{id:'FCD500', category:'鑄鐵', alias:['QT500-7','GGG50','GGG-50'], names:{cns:'FCD500', jis:'FCD500-7', gb:'QT500-7', astm:'A536 65-45-12～80-55-06 之間（近似）', uns:'—', din:'GGG-50 / 0.7050', en:'EN-GJS-500-7 / EN-JS1050', nf:'FGS 500-7', bs:'2789 Gr.500/7（舊 SNG 500/7）', uni:'GS 500-7'},
+ comp:'球狀石墨鑄鐵，抗拉 ≥500 MPa，延伸率 ≥7%', prop:'肥粒鐵＋波來鐵混合基地，強度與韌性均衡，為最常用之球墨鑄鐵牌號。',
+ app:'油缸端蓋、耳座、齒輪箱、液壓閥體'},
+{id:'FCD600', category:'鑄鐵', alias:['QT600-3','GGG60','GGG-60'], names:{cns:'FCD600', jis:'FCD600-3', gb:'QT600-3', astm:'A536 80-55-06 / 100-70-03（600 MPa 介於兩者）', uns:'F33800（80-55-06）', din:'GGG-60 / 0.7060', en:'EN-GJS-600-3 / EN-JS1060', nf:'FGS 600-3', bs:'2789 Gr.600/3'},
+ comp:'球狀石墨鑄鐵，抗拉 ≥600 MPa，延伸率 ≥3%', prop:'高強度球墨鑄鐵，硬度與強度較高，延展性相對降低。',
  app:'高負荷齒輪箱殼、重機械結構件'},
 
-{id:'C3604', category:'銅合金', names:{cns:'C3604', jis:'C3604', gb:'H62Pb（近似）', astm:'C36000', uns:'C36000', din:'CuZn36Pb3 / 2.0375', en:'CuZn36Pb3 / CW603N'},
- comp:'Cu 60–63, Pb 2.5–3.7, Zn 餘量', prop:'快削黃銅，切削性極佳（易車削），但強度、耐蝕性低於磷青銅或鑄造青銅，長期於潤滑不足或高負荷下易磨損。',
- app:'一般套筒、螺絲、接頭；注意：常見廠內誤用替代 BC6 需留意強度與耐磨差異'},
-{id:'BC6', category:'銅合金', names:{cns:'BC6（舊 JIS 鑄造青銅）', jis:'BC6（新制對應 CAC406）', gb:'ZCuSn5Pb5Zn5（近似）', astm:'C83600（近似）', uns:'C83600', din:'CuSn5ZnPb / 2.1096（近似）', en:'CC491K（近似）'},
- comp:'Cu 約85, Sn 約5, Zn 約5, Pb 約5', prop:'鑄造錫青銅，耐磨性、耐蝕性與抗疲勞強度均優於快削黃銅，為油缸／軸襯套之正規指定材料。',
- app:'活塞桿導套、軸襯（bushing）、耐磨滑動零件'},
-{id:'C5191', category:'銅合金', names:{cns:'C5191', jis:'C5191', gb:'QSn6.5-0.1（近似）', astm:'C51900', uns:'C51900', din:'CuSn6 / 2.1020', en:'CuSn6 / CW452K'},
- comp:'Cu 餘量, Sn 5.5–7.0, P 0.03–0.35', prop:'磷青銅，彈性、耐疲勞性與耐蝕性優異，強度高於黃銅。',
- app:'彈片、軸襯、耐磨耐蝕之精密零件'},
-{id:'C93700', category:'銅合金', names:{cns:'（無直接對應，參考 JIS 相近牌號）', jis:'CAC604（近似）', gb:'ZCuPb15Sn8（近似）', astm:'C93700', uns:'C93700', din:'CuPb15Sn8 / 2.1175（近似）', en:'CB495K（近似）'},
- comp:'Cu 約80, Pb 約15, Sn 約8', prop:'高鉛錫青銅（高鉛雙金屬），自潤滑性極佳，適合重負荷、低速滑動、潤滑不足工況。',
- app:'重負荷軸襯、滑動軸承'},
+/* ===== 鑄鋼 ===== */
+{id:'SC450', category:'鑄鋼', alias:['SC46','ZG230-450','GS-45','A27'], names:{cns:'SC450', jis:'SC450', gb:'ZG230-450', astm:'A27 Gr.65-35', uns:'J03001', din:'GS-45 / 1.0446', en:'GE240（近似）', nf:'GE230（近似）', bs:'3100 A2（近似）'},
+ comp:'C ≤0.35；抗拉 ≥450 MPa, 降伏 ≥225 MPa', prop:'碳鋼鑄鋼，強度、韌性與焊接性優於鑄鐵。',
+ app:'耳座、支架、承受衝擊之鑄件'},
+{id:'SCS13', category:'鑄鋼', alias:['CF8','304 鑄件','1.4308','A744 CF-8'], names:{cns:'SCS13', jis:'SCS13', gb:'ZG07Cr19Ni9（舊 ZG08Cr18Ni9）', astm:'A351 CF8', uns:'J92600', din:'G-X6CrNi18-9 / 1.4308', en:'GX5CrNi19-10 / 1.4308', nf:'Z6CN18-10M', bs:'3100 304C15'},
+ comp:'C ≤0.08, Cr 18.0–21.0, Ni 8.0–11.0', prop:'304 等級不鏽鋼鑄件。',
+ app:'耐蝕閥體、泵殼'},
+{id:'SCS14', category:'鑄鋼', alias:['CF8M','316 鑄件','1.4408'], names:{cns:'SCS14', jis:'SCS14', gb:'ZG07Cr19Ni11Mo2（舊 ZG08Cr18Ni12Mo2）', astm:'A351 CF8M', uns:'J92900', din:'G-X6CrNiMo18-10 / 1.4408', en:'GX5CrNiMo19-11-2 / 1.4408', nf:'Z6CND18-12M', bs:'3100 316C16'},
+ comp:'C ≤0.08, Cr 17.0–20.0, Ni 10.0–14.0, Mo 2.0–3.0', prop:'316 等級不鏽鋼鑄件，耐孔蝕優於 SCS13。',
+ app:'海水／化工用閥體、泵殼'},
 
-{id:'SKD11', category:'工具鋼', names:{cns:'SKD11', jis:'SKD11', gb:'Cr12Mo1V1', astm:'D2', uns:'T30402', din:'X153CrMoV12 / 1.2379', en:'X153CrMoV12 / 1.2379'},
+/* ===== 純銅／黃銅 ===== */
+{id:'C1100', category:'純銅／黃銅', alias:['紅銅','T2','Cu-ETP','C11000','電解銅'], names:{cns:'C1100', jis:'C1100', gb:'T2', astm:'C11000', uns:'C11000', din:'E-Cu58 / 2.0065', en:'Cu-ETP / CW004A', nf:'Cu-a1', bs:'C101'},
+ comp:'Cu ≥99.90', prop:'韌煉銅（電解銅），導電導熱極佳，軟、延展性高。',
+ app:'導電排、墊片、熱交換零件'},
+{id:'C2801', category:'純銅／黃銅', alias:['H62','6/4 黃銅','CuZn40','C28000'], names:{cns:'C2801', jis:'C2801', gb:'H62', astm:'C28000', uns:'C28000', din:'CuZn40 / 2.0360', en:'CuZn40 / CW509L', nf:'CuZn40', bs:'CZ109'},
+ comp:'Cu 59.0–62.0, Zn 餘量', prop:'六四黃銅，強度高於七三黃銅，熱加工性佳。',
+ app:'板金件、接頭、墊片'},
+{id:'C3604', category:'純銅／黃銅', alias:['快削黃銅','HPb59-3','CuZn39Pb3','C38500','CW614N'], names:{cns:'C3604', jis:'C3604', gb:'HPb59-3（近似）', astm:'C38500 / C36000（近似）', uns:'C38500（近似）', din:'CuZn39Pb3 / 2.0401', en:'CuZn39Pb3 / CW614N', nf:'CuZn39Pb3', bs:'CZ121'},
+ comp:'Cu 57.0–61.0, Pb 1.8–3.7, Fe ≤0.50, Zn 餘量', prop:'快削黃銅，切削性極佳，但強度、耐磨性與耐蝕性低於青銅，長期於潤滑不足或高負荷下易磨損。',
+ app:'一般套筒、螺絲、接頭；注意：常見廠內誤用替代 BC6 需留意強度與耐磨差異'},
+{id:'CAC304 (HBsC4)', category:'純銅／黃銅', alias:['HBsC4','CAC304C','高力黃銅','C86300','CDA863','SAE430B','CC762S','ZCuZn25Al6Fe3Mn3','錳青銅'], names:{cns:'HBsC4', jis:'CAC304（舊 HBsC4）', gb:'ZCuZn25Al6Fe3Mn3', astm:'C86300', uns:'C86300', din:'G-CuZn25Al5 / 2.0598', en:'CuZn25Al5Mn4Fe3-C / CC762S', nf:'CuZn25Al5Mn4Fe3（近似）', bs:'HTB3'},
+ comp:'Cu 60–65, Al 5–7.5, Fe 2–4, Mn 2.5–5, Zn 餘量；抗拉 ≥755 MPa', prop:'高力黃銅（俗稱錳青銅），強度與硬度極高，適合高負荷低速滑動，常作嵌入石墨之無油軸承基材。',
+ app:'重負荷軸襯、滑板、嵌石墨無油軸承'},
+
+/* ===== 錫青銅 ===== */
+{id:'CAC406 (BC6)', category:'錫青銅', alias:['BC6','CAC406C','砲金','85-5-5-5','C83600','CC491K','ZCuSn5Pb5Zn5','Rg5'], names:{cns:'BC6', jis:'CAC406（舊 BC6）', gb:'ZCuSn5Pb5Zn5', astm:'C83600', uns:'C83600', din:'G-CuSn5ZnPb（Rg5）/ 2.1096', en:'CuSn5Zn5Pb5-C / CC491K', nf:'CuPb5Sn5Zn5', bs:'LG2'},
+ comp:'Cu 83–87, Sn 4–6, Zn 4–6, Pb 4–6；抗拉 ≥195 MPa', prop:'鑄造錫青銅（砲金），耐磨性、耐蝕性與抗疲勞強度均優於快削黃銅，為油缸／軸襯套之正規指定材料。',
+ app:'活塞桿導套、軸襯（bushing）、耐磨滑動零件'},
+{id:'CAC403 (BC3)', category:'錫青銅', alias:['BC3','CAC403C','C90500','CC480K','ZCuSn10Zn2','Rg10'], names:{cns:'BC3', jis:'CAC403（舊 BC3）', gb:'ZCuSn10Zn2', astm:'C90500', uns:'C90500', din:'G-CuSn10Zn / 2.1086（近似）', en:'CuSn10-C / CC480K（近似）', nf:'CuSn10（近似）', bs:'LG4 / G1（近似）'},
+ comp:'Cu 86.5–89.5, Sn 9–11, Zn 1–3；抗拉 ≥245 MPa', prop:'高錫青銅，強度、耐磨性與耐蝕性優於 BC6。',
+ app:'高負荷導套、軸襯、泵葉輪、閥座'},
+{id:'CAC603 (LBC3)', category:'錫青銅', alias:['LBC3','CAC603C','C93700','SAE64','CDA937','CC495K','ZCuPb10Sn10','鉛青銅','CuPb10Sn10'], names:{cns:'LBC3', jis:'CAC603（舊 LBC3）', gb:'ZCuPb10Sn10', astm:'C93700', uns:'C93700', din:'G-CuPb10Sn / 2.1176', en:'CuSn10Pb10-C / CC495K', nf:'CuPb10Sn10', bs:'LB2'},
+ comp:'Cu 77–81, Sn 9–11, Pb 9–11；抗拉 ≥195 MPa', prop:'鉛錫青銅，自潤滑性佳，抗咬合，適合潤滑不足、重負荷、低速滑動工況。',
+ app:'重負荷軸襯、滑動軸承、嵌石墨軸承基材'},
+
+/* ===== 磷青銅 ===== */
+{id:'C5101', category:'磷青銅', alias:['C51000','CuSn5','CW451K','QSn4-0.3'], names:{cns:'C5101', jis:'C5101', gb:'QSn4-0.3（近似）', astm:'C51000', uns:'C51000', din:'CuSn4 / 2.1016（近似）', en:'CuSn5 / CW451K', nf:'CuSn5', bs:'PB102'},
+ comp:'Sn 4.2–5.8, P 0.03–0.35, Cu 餘量', prop:'低錫展延用磷青銅，彈性與導電性兼具。',
+ app:'彈片、接點、端子'},
+{id:'C5191', category:'磷青銅', alias:['C51900','CuSn6','CW452K','QSn6.5-0.1'], names:{cns:'C5191', jis:'C5191', gb:'QSn6.5-0.1', astm:'C51900', uns:'C51900', din:'CuSn6 / 2.1020', en:'CuSn6 / CW452K', nf:'CuSn6', bs:'PB103'},
+ comp:'Sn 5.5–7.0, P 0.03–0.35, Cu 餘量', prop:'展延用磷青銅，彈性、耐疲勞性與耐蝕性優異，強度高於黃銅。',
+ app:'彈片、薄壁軸襯、耐磨耐蝕之精密零件'},
+{id:'C5212', category:'磷青銅', alias:['C52100','CuSn8','CW453K','QSn8-0.3','PB104'], names:{cns:'C5212', jis:'C5212', gb:'QSn8-0.3', astm:'C52100', uns:'C52100', din:'CuSn8 / 2.1030', en:'CuSn8 / CW453K', nf:'CuSn8', bs:'PB104'},
+ comp:'Sn 7.0–9.0, P 0.03–0.35, Cu 餘量', prop:'高錫展延用磷青銅，強度、耐磨性為展延磷青銅中最高。',
+ app:'捲製軸襯、耐磨墊片、高強度彈片'},
+{id:'C5441', category:'磷青銅', alias:['C54400','快削磷青銅','QSn4-4-4','CuSn4Pb4Zn4'], names:{cns:'C5441', jis:'C5441', gb:'QSn4-4-4', astm:'C54400', uns:'C54400', din:'CuSn4Zn4Pb4 / 2.1061（近似）', en:'CuSn4Pb4Zn4（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'Sn 3.0–4.5, Pb 3.5–4.5, Zn 1.5–4.5, P 0.01–0.50, Cu 餘量', prop:'含鉛快削磷青銅，切削性佳且保有磷青銅之耐磨性。',
+ app:'車削軸襯、齒輪、精密滑動零件'},
+{id:'CAC502A (PBC2A)', category:'磷青銅', alias:['PBC2','PBC2A','CAC502','CAC502C','C90700','CC481K','ZCuSn10P1','CuSn11P','PB1'], names:{cns:'PBC2', jis:'CAC502A（舊 PBC2A，砂模鑄造）', gb:'ZCuSn10P1', astm:'C90700', uns:'C90700', din:'G-CuSn10P / 2.1050（近似）', en:'CuSn11P-C / CC481K', nf:'CuSn10P（近似）', bs:'PB1'},
+ comp:'Cu 87–91, Sn 9–12, P 0.05–0.20；抗拉 ≥195 MPa, HB ≥60', prop:'鑄造磷青銅，耐磨性與耐蝕性佳，抗咬合性優於砲金，適合中高速、中高負荷滑動。',
+ app:'活塞桿導套、蝸輪、軸襯、高負荷滑動件'},
+{id:'CAC502B (PBC2B)', category:'磷青銅', alias:['PBC2B','CAC502','連續鑄造磷青銅','離心鑄造'], names:{cns:'PBC2B', jis:'CAC502B（舊 PBC2B，連續／離心鑄造）', gb:'ZCuSn10P1', astm:'C90700', uns:'C90700', din:'G-CuSn10P / 2.1050（近似）', en:'CuSn11P-C / CC481K', nf:'CuSn10P（近似）', bs:'PB1'},
+ comp:'Cu 87–91, Sn 9–12, P 0.15–0.50；抗拉 ≥295 MPa, HB ≥80', prop:'同 CAC502A 成分但磷含量較高，以連續／離心鑄造製成，組織緻密、強度與硬度較砂模件高。',
+ app:'導套、軸襯管材、蝸輪輪緣'},
+{id:'CAC503 (PBC3)', category:'磷青銅', alias:['PBC3','PBC3A','PBC3B','CAC503A','CAC503B','CAC503C','C91000','CuSn12','CC483K'], names:{cns:'PBC3', jis:'CAC503A / B（舊 PBC3）', gb:'（無直接對應）', astm:'C91700 / C91000（近似）', uns:'C91700 / C91000（近似）', din:'G-CuSn12 / 2.1052（近似）', en:'CuSn12-C / CC483K（近似）', nf:'CuSn12（近似）', bs:'PB2（近似）'},
+ comp:'Cu 84–88, Sn 12–15, P 0.15–0.50', prop:'高錫鑄造磷青銅，硬度與耐磨性高於 CAC502，韌性稍低。',
+ app:'重負荷低速軸承、蝸輪、滑板'},
+
+/* ===== 鋁青銅 ===== */
+{id:'CAC701 (AlBC1)', category:'鋁青銅', alias:['AlBC1','CAC701C','C95200','CC331G','CuAl10Fe2'], names:{cns:'AlBC1', jis:'CAC701（舊 AlBC1）', gb:'ZCuAl10Fe3（近似）', astm:'C95200（近似）', uns:'C95200（近似）', din:'G-CuAl10Fe / 2.0940（近似）', en:'CuAl10Fe2-C / CC331G（近似）', nf:'CuAl10Fe3（近似）', bs:'AB1（近似）'},
+ comp:'Cu 85–90, Al 8.0–10.0, Fe 1.0–3.0；抗拉 ≥440 MPa', prop:'鑄造鋁青銅，強度高、耐蝕耐磨，較 AlBC2/3 延展性佳。',
+ app:'耐蝕軸襯、齒輪、閥座'},
+{id:'CAC702 (AlBC2)', category:'鋁青銅', alias:['AlBC2','CAC702C','C95400','CC332G','ZCuAl10Fe3Mn2'], names:{cns:'AlBC2', jis:'CAC702（舊 AlBC2）', gb:'ZCuAl10Fe3Mn2（近似）', astm:'C95400（近似）', uns:'C95400（近似）', din:'G-CuAl10Ni / 2.0975（近似）', en:'CuAl10Ni3Fe2-C / CC332G（近似）', nf:'CuAl10Fe3Ni2（近似）', bs:'AB1（近似）'},
+ comp:'Cu 80–88, Al 8.0–10.5, Fe 2.5–5.0, Ni 1.0–3.0, Mn ≤1.5；抗拉 ≥490 MPa', prop:'含鎳鑄造鋁青銅，強度、硬度與耐磨性高於 AlBC1，為一般鋁青銅軸襯最常用牌號。',
+ app:'重負荷軸襯、導套、蝸輪、耐海水零件'},
+{id:'CAC703 (AlBC3)', category:'鋁青銅', alias:['AlBC3','CAC703C','NAB','鎳鋁青銅','CDA624 代用','C95500','C95800','CC333G','CuAl10Fe5Ni5'], names:{cns:'AlBC3', jis:'CAC703（舊 AlBC3）', gb:'ZCuAl9Fe4Ni4Mn2', astm:'C95500 / C95800（近似）', uns:'C95800（近似）', din:'G-CuAl10Ni / 2.0975（近似）', en:'CuAl10Fe5Ni5-C / CC333G', nf:'CuAl10Fe5Ni5', bs:'AB2'},
+ comp:'Cu 78–85, Al 8.5–10.5, Fe 3.0–6.0, Ni 3.0–6.0, Mn ≤1.5；抗拉 ≥590 MPa, HB ≥150', prop:'鎳鋁青銅（NAB），鑄造鋁青銅中強度最高，耐海水腐蝕、耐空蝕與耐磨性極佳。',
+ app:'船用螺槳、重負荷軸襯、耐磨滑板、泵葉輪'},
+{id:'CAC704 (AlBC4)', category:'鋁青銅', alias:['AlBC4','高錳鋁青銅','C95700','CC212E','ZCuAl8Mn13Fe3Ni2'], names:{cns:'AlBC4', jis:'CAC704（舊 AlBC4）', gb:'ZCuAl8Mn13Fe3Ni2', astm:'C95700', uns:'C95700', din:'G-CuMn11Al8Fe3Ni3（近似）', en:'CuMn11Al8Fe3Ni3-C / CC212E', nf:'（無直接對應）', bs:'CMA1（近似）'},
+ comp:'Cu 71–84, Al 6.0–9.0, Mn 7.0–15.0, Fe 2.0–5.0, Ni 1.0–5.0；抗拉 ≥590 MPa', prop:'高錳鋁青銅，強度高、鑄造性佳，耐海水沖蝕。',
+ app:'船用螺槳、高強度耐蝕鑄件'},
+{id:'C6161', category:'鋁青銅', alias:['C61400','CuAl8Fe3','CW303G','QAl9-4'], names:{cns:'C6161', jis:'C6161', gb:'QAl9-4（近似）', astm:'C61400（近似）', uns:'C61400（近似）', din:'CuAl8Fe3 / 2.0932', en:'CuAl8Fe3 / CW303G', nf:'CuAl8Fe3', bs:'CA106（近似）'},
+ comp:'Cu 83–90, Al 7.0–10.0, Fe 2.0–4.0, Ni 0.5–2.0, Mn 0.5–2.0', prop:'展延用鋁青銅棒／板，強度高、耐蝕耐磨，延展性為三種展延鋁青銅中最佳。',
+ app:'軸襯、齒輪、耐蝕螺栓'},
+{id:'C6191', category:'鋁青銅', alias:['C62300','CuAl10Fe3Mn2','CW306G','QAl10-3-1.5'], names:{cns:'C6191', jis:'C6191', gb:'QAl10-3-1.5', astm:'C62300（近似）', uns:'C62300（近似）', din:'CuAl10Fe3Mn2 / 2.0936', en:'CuAl10Fe3Mn2 / CW306G', nf:'CuAl10Fe3（近似）', bs:'CA103（近似）'},
+ comp:'Cu 81–88, Al 8.5–11.0, Fe 3.0–5.0, Ni 0.5–2.0, Mn 0.5–2.0', prop:'展延用鋁青銅，強度與耐磨性高於 C6161，為市售鋁青銅棒最常見牌號。',
+ app:'活塞桿導套、軸襯、滑板、耐磨齒輪'},
+{id:'C6301', category:'鋁青銅', alias:['C63000','CuAl10Ni5Fe4','CW307G','QAl10-4-4','CA104','鎳鋁青銅棒'], names:{cns:'C6301', jis:'C6301', gb:'QAl10-4-4', astm:'C63000', uns:'C63000', din:'CuAl10Ni5Fe4 / 2.0966', en:'CuAl10Ni5Fe4 / CW307G', nf:'CuAl10Ni5Fe4', bs:'CA104'},
+ comp:'Cu 77–84, Al 8.5–10.5, Fe 3.0–6.0, Ni 4.0–6.0, Mn 0.5–2.0', prop:'展延用鎳鋁青銅，展延鋁青銅中強度最高，耐海水、耐磨、抗疲勞性佳。',
+ app:'重負荷軸襯、泵軸、閥桿、船用零件'},
+
+/* ===== 鋁合金 ===== */
+{id:'A2017', category:'鋁合金', alias:['2017','2A11','LY11','硬鋁','杜拉鋁'], names:{cns:'2017', jis:'A2017', gb:'2A11（舊 LY11，近似）', astm:'2017', uns:'A92017', din:'AlCuMg1 / 3.1325', en:'EN AW-2017A', nf:'A-U4G', bs:'（無直接對應）'},
+ comp:'Cu 3.5–4.5, Mg 0.40–0.8, Mn 0.40–1.0, Si 0.20–0.8', prop:'硬鋁，T4 狀態強度高、切削性佳，耐蝕性差（需陽極處理）。',
+ app:'治具、機械零件、螺絲'},
+{id:'A5052', category:'鋁合金', alias:['5052','LF2','AlMg2.5'], names:{cns:'5052', jis:'A5052', gb:'5052（舊 LF2）', astm:'5052', uns:'A95052', din:'AlMg2.5 / 3.3523', en:'EN AW-5052', nf:'A-G2.5C', bs:'NS4（近似）'},
+ comp:'Mg 2.2–2.8, Cr 0.15–0.35', prop:'中強度鋁鎂合金，耐蝕性與焊接性佳，不可熱處理強化。',
+ app:'板金件、油箱、外蓋'},
+{id:'A6061', category:'鋁合金', alias:['6061','6061-T6','LD30','AlMg1SiCu'], names:{cns:'6061', jis:'A6061', gb:'6061（舊 LD30）', astm:'6061', uns:'A96061', din:'AlMg1SiCu / 3.3211', en:'EN AW-6061', nf:'A-GSUC', bs:'H20'},
+ comp:'Mg 0.8–1.2, Si 0.40–0.8, Cu 0.15–0.40, Cr 0.04–0.35', prop:'可熱處理強化鋁合金，T6 抗拉約 310 MPa，綜合性能佳、可陽極處理。',
+ app:'治具、機械結構件、氣缸端蓋'},
+{id:'A6063', category:'鋁合金', alias:['6063','LD31','擠型鋁'], names:{cns:'6063', jis:'A6063', gb:'6063（舊 LD31）', astm:'6063', uns:'A96063', din:'AlMgSi0.5 / 3.3206', en:'EN AW-6063', nf:'A-GS', bs:'H9'},
+ comp:'Mg 0.45–0.9, Si 0.20–0.6', prop:'擠型用鋁合金，表面品質佳，強度低於 6061。',
+ app:'氣缸管、鋁擠型、框架'},
+{id:'A7075', category:'鋁合金', alias:['7075','7075-T6','超硬鋁','7A09'], names:{cns:'7075', jis:'A7075', gb:'7075 / 7A09（近似）', astm:'7075', uns:'A97075', din:'AlZnMgCu1.5 / 3.4365', en:'EN AW-7075', nf:'A-Z5GU', bs:'2L95（近似）'},
+ comp:'Zn 5.1–6.1, Mg 2.1–2.9, Cu 1.2–2.0, Cr 0.18–0.28', prop:'超硬鋁，T6 抗拉約 570 MPa，強度接近中碳鋼，耐蝕性與焊接性差。',
+ app:'高強度治具、模具、航太零件'},
+
+/* ===== 工具鋼 ===== */
+{id:'SKD11', category:'工具鋼', alias:['D2','Cr12Mo1V1','Cr12MoV','1.2379'], names:{cns:'SKD11', jis:'SKD11', gb:'Cr12Mo1V1（舊 Cr12MoV 近似）', astm:'D2', uns:'T30402', din:'X153CrMoV12 / 1.2379', en:'X153CrMoV12 / 1.2379', nf:'Z160CDV12', bs:'BD2', iso:'X153CrMoV12'},
  comp:'C 1.40–1.60, Cr 11.0–13.0, Mo 0.80–1.20, V 0.20–0.50', prop:'高碳高鉻冷作模具鋼，耐磨性極佳，淬火變形小。',
  app:'沖壓模具、剪切刀具、耐磨零件'},
-{id:'SKD61', category:'工具鋼', names:{cns:'SKD61', jis:'SKD61', gb:'4Cr5MoSiV1', astm:'H13', uns:'T20813', din:'X40CrMoV5-1 / 1.2344', en:'X40CrMoV5-1 / 1.2344'},
- comp:'C 0.35–0.42, Cr 4.80–5.50, Mo 1.10–1.50, V 0.80–1.20', prop:'熱作模具鋼，耐熱疲勞、高溫強度佳。',
+{id:'SKD61', category:'工具鋼', alias:['H13','4Cr5MoSiV1','1.2344'], names:{cns:'SKD61', jis:'SKD61', gb:'4Cr5MoSiV1', astm:'H13', uns:'T20813', din:'X40CrMoV5-1 / 1.2344', en:'X40CrMoV5-1 / 1.2344', nf:'Z40CDV5', bs:'BH13', iso:'40CrMoV5'},
+ comp:'C 0.35–0.42, Cr 4.80–5.50, Mo 1.00–1.50, V 0.80–1.15', prop:'熱作模具鋼，耐熱疲勞、高溫強度佳。',
  app:'壓鑄模具、熱鍛模、需耐熱衝擊之工具'},
-{id:'SKS3', category:'工具鋼', names:{cns:'SKS3', jis:'SKS3', gb:'9CrWMn', astm:'O1', uns:'T31501', din:'100MnCrW4 / 1.2510', en:'100MnCrW4 / 1.2510'},
- comp:'C 0.90–1.00, Cr 0.50–1.00, W 0.80–1.20, Mn 1.00–1.20', prop:'油淬冷作工具鋼，尺寸安定性佳，加工性良好。',
+{id:'SKS3', category:'工具鋼', alias:['O1','9CrWMn','1.2510'], names:{cns:'SKS3', jis:'SKS3', gb:'9CrWMn', astm:'O1', uns:'T31501', din:'100MnCrW4 / 1.2510', en:'100MnCrW4 / 1.2510', nf:'90MWCV5', bs:'BO1'},
+ comp:'C 0.90–1.00, Cr 0.50–1.00, W 0.50–1.00, Mn 0.90–1.20', prop:'油淬冷作工具鋼，尺寸安定性佳，加工性良好。',
  app:'刃具、沖模、量規'},
+{id:'SKH51', category:'工具鋼', alias:['M2','高速鋼','HSS','W6Mo5Cr4V2','1.3343'], names:{cns:'SKH51', jis:'SKH51', gb:'W6Mo5Cr4V2', astm:'M2', uns:'T11302', din:'HS6-5-2 / 1.3343', en:'HS6-5-2 / 1.3343', nf:'Z85WDCV06-05-04-02', bs:'BM2', iso:'HS6-5-2'},
+ comp:'C 0.80–0.88, W 5.70–6.70, Mo 4.70–5.20, Cr 3.80–4.50, V 1.70–2.10', prop:'鎢鉬系高速工具鋼，紅硬性佳，淬回火後 HRC 63–65。',
+ app:'鑽頭、銑刀、車刀、沖頭'},
+{id:'SK105', category:'工具鋼', alias:['SK3','T10','W1','C105W1'], names:{cns:'SK105', jis:'SK105（舊 SK3）', gb:'T10', astm:'W1-10（近似）', uns:'T72301（近似）', din:'C105W1 / 1.1545', en:'C105U / 1.1545', nf:'C105E2U（Y1 105）', bs:'BW1B', iso:'TC105'},
+ comp:'C 1.00–1.10, Si 0.10–0.35, Mn 0.10–0.50', prop:'碳素工具鋼，水淬硬度高，淬透性低、價格便宜。',
+ app:'手工具、簡易刃具、沖頭'},
+{id:'SKT4', category:'工具鋼', alias:['L6','5CrNiMo','1.2714','55NiCrMoV7'], names:{cns:'SKT4', jis:'SKT4', gb:'5CrNiMo', astm:'L6（近似）', uns:'T61206（近似）', din:'55NiCrMoV7 / 1.2714（另 56NiCrMoV7 / 1.2713 近似）', en:'55NiCrMoV7 / 1.2714', nf:'55NCDV7', bs:'BH224/5（近似）'},
+ comp:'C 0.50–0.60, Ni 1.30–2.00, Cr 0.70–1.00, Mo 0.20–0.50, V ≤0.20', prop:'熱鍛模具鋼，韌性佳、耐衝擊。',
+ app:'熱鍛模、模座'},
 
-{id:'SUJ2', category:'軸承鋼', names:{cns:'SUJ2', jis:'SUJ2', gb:'GCr15', astm:'52100', uns:'G52986', din:'100Cr6 / 1.3505', en:'100Cr6 / 1.3505'},
- comp:'C 0.95–1.10, Cr 1.30–1.60, Mn 0.25–0.45', prop:'高碳鉻軸承鋼，淬火後硬度高（HRC 60+）、疲勞壽命長，為滾動軸承標準用鋼。',
+/* ===== 軸承鋼 ===== */
+{id:'SUJ2', category:'軸承鋼', alias:['52100','GCr15','100Cr6','EN31','1.3505'], names:{cns:'SUJ2', jis:'SUJ2', gb:'GCr15', astm:'52100', uns:'G52986', din:'100Cr6 / 1.3505', en:'100Cr6 / 1.3505', nf:'100C6', bs:'535A99（EN31）', iso:'100Cr6（B1）'},
+ comp:'C 0.95–1.10, Cr 1.30–1.60, Mn ≤0.50, Si 0.15–0.35', prop:'高碳鉻軸承鋼，淬火後硬度高（HRC 60+）、疲勞壽命長，為滾動軸承標準用鋼。',
  app:'滾珠／滾柱軸承、精密滑動元件、需高硬度耐磨之銷軸'},
 
-{id:'SACM645', category:'氮化鋼', names:{cns:'SACM645', jis:'SACM645', gb:'38CrMoAlA', astm:'（無直接對應，參考 Nitralloy 135）', uns:'K24065（近似）', din:'41CrAlMo7-10 / 1.8509', en:'41CrAlMo7-10 / 1.8509'},
- comp:'C 0.40–0.45, Cr 1.30–1.70, Al 0.70–1.20, Mo 0.15–0.30', prop:'專為氮化處理設計之鋁鉻鉬鋼，氮化後表面硬度極高（HV 900+）且心部保有韌性，變形量小。',
+/* ===== 氮化鋼 ===== */
+{id:'SACM645', category:'氮化鋼', alias:['38CrMoAl','38CrMoAlA','41CrAlMo7','EN41B','1.8509'], names:{cns:'SACM645', jis:'SACM645', gb:'38CrMoAlA', astm:'7140（Nitralloy 135M，近似）', uns:'K24065（近似）', din:'41CrAlMo7-10 / 1.8509', en:'41CrAlMo7-10 / 1.8509', nf:'40CAD6-12', bs:'905M39（EN41B）', iso:'41CrAlMo74'},
+ comp:'C 0.40–0.50, Cr 1.30–1.70, Al 0.70–1.20, Mo 0.15–0.30', prop:'專為氮化處理設計之鋁鉻鉬鋼，氮化後表面硬度極高（HV 900+）且心部保有韌性，變形量小。',
  app:'高精度油缸活塞桿（表面氮化取代鍍鉻）、滑動導軌、齒輪軸'},
-{id:'SCM435', category:'氮化鋼', names:{cns:'SCM435', jis:'SCM435', gb:'35CrMo', astm:'4135', uns:'G41350', din:'34CrMo4 / 1.7220', en:'34CrMo4 / 1.7220'},
- comp:'C 0.33–0.38, Cr 0.90–1.20, Mo 0.15–0.30', prop:'鉻鉬合金鋼，可調質亦可氣體氮化，綜合性質介於 S45C 與 SCM440 之間。',
- app:'中負荷軸類、螺栓、可氮化之結構零件'},
 
-{id:'SUP9', category:'彈簧鋼', names:{cns:'SUP9', jis:'SUP9', gb:'60Si2Mn', astm:'9260', uns:'G92600', din:'60SiMn5 / 1.5028（近似）', en:'60SiMn5 / 1.5028（近似）'},
- comp:'C 0.56–0.64, Si 1.50–1.80, Mn 0.70–1.00', prop:'矽錳彈簧鋼，彈性極限高、疲勞性能佳，為常見板彈簧、螺旋彈簧用鋼。',
- app:'螺旋彈簧、板彈簧、彈性元件'},
-{id:'SUP10', category:'彈簧鋼', names:{cns:'SUP10', jis:'SUP10', gb:'50CrVA', astm:'6150', uns:'G61500', din:'50CrV4 / 1.8159', en:'50CrV4 / 1.8159'},
- comp:'C 0.47–0.55, Cr 0.80–1.10, V 0.10–0.20', prop:'鉻釩彈簧鋼，較矽錳鋼耐高溫、耐疲勞性更佳。',
+/* ===== 彈簧鋼 ===== */
+{id:'SUP7', category:'彈簧鋼', alias:['60Si2Mn','9260','矽錳彈簧鋼'], names:{cns:'SUP7', jis:'SUP7', gb:'60Si2Mn（A）', astm:'9260', uns:'G92600', din:'60Si7 / 1.5027（近似）', en:'61SiCr7 / 1.7108（近似）', nf:'60S7（近似）', bs:'250A61（近似）'},
+ comp:'C 0.56–0.64, Si 1.80–2.20, Mn 0.70–1.00', prop:'矽錳彈簧鋼，彈性極限高、價格低，淬透性有限。',
+ app:'板彈簧、螺旋彈簧'},
+{id:'SUP9', category:'彈簧鋼', alias:['55CrMnA','5155','55Cr3','1.7176'], names:{cns:'SUP9', jis:'SUP9', gb:'55CrMnA', astm:'5155', uns:'G51550', din:'55Cr3 / 1.7176', en:'55Cr3 / 1.7176', nf:'55C3', bs:'527A60 / 525A58'},
+ comp:'C 0.52–0.60, Si 0.15–0.35, Mn 0.65–0.95, Cr 0.65–0.95', prop:'錳鉻彈簧鋼，淬透性優於矽錳鋼，適合較大線徑／板厚。',
+ app:'板彈簧、螺旋彈簧、扭力桿'},
+{id:'SUP10', category:'彈簧鋼', alias:['50CrVA','6150','51CrV4','EN47','1.8159'], names:{cns:'SUP10', jis:'SUP10', gb:'50CrVA', astm:'6150', uns:'G61500', din:'51CrV4 / 1.8159', en:'51CrV4 / 1.8159', nf:'50CV4 / 51CV4', bs:'735A51（EN47）'},
+ comp:'C 0.47–0.55, Si 0.15–0.35, Mn 0.65–0.95, Cr 0.80–1.10, V 0.15–0.25', prop:'鉻釩彈簧鋼，較矽錳鋼耐高溫、耐疲勞性更佳。',
  app:'高負荷螺旋彈簧、閥彈簧、扭力桿'},
+{id:'SUP12', category:'彈簧鋼', alias:['55SiCrA','9254','54SiCr6','1.7102'], names:{cns:'SUP12', jis:'SUP12', gb:'55SiCrA', astm:'9254', uns:'G92540', din:'54SiCr6 / 1.7102', en:'54SiCr6 / 1.7102', nf:'54SC6', bs:'685A55'},
+ comp:'C 0.51–0.59, Si 1.20–1.60, Mn 0.60–0.90, Cr 0.60–0.90', prop:'矽鉻彈簧鋼，抗鬆弛（耐永久變形）性能佳。',
+ app:'閥彈簧、高應力螺旋彈簧'},
+{id:'SWP-A', category:'彈簧鋼', alias:['琴鋼線','鋼琴線','Music wire','A228','SWPA'], names:{cns:'SWP-A', jis:'SWP-A（JIS G3522）', gb:'GB/T 4357 碳素彈簧鋼絲（近似）', astm:'A228', uns:'K08500', din:'DIN 17223 Gr.DH（近似）', en:'EN 10270-1 DH（近似）', nf:'（無直接對應）', bs:'5216 M4（近似）'},
+ comp:'C 0.60–0.95（依線徑）, Mn 0.30–0.60', prop:'冷抽琴鋼線，抗拉強度極高（依線徑約 1,600–2,800 MPa），適用小型彈簧。',
+ app:'小型壓縮／拉伸彈簧、閥彈簧'},
+
+/* ===== 依客戶對照表（Ver.06）補充 ===== */
+{id:'SMn443', category:'合金結構鋼', alias:['SAE1345','1345','45Mn2'], names:{cns:'SMn443', jis:'SMn443', gb:'45Mn2', astm:'1345', uns:'G13450', din:'（無直接對應）', en:'（無直接對應）', nf:'45M5（近似）', bs:'（無直接對應）'},
+ comp:'C 0.40–0.46, Si 0.15–0.35, Mn 1.35–1.65', prop:'高錳結構鋼，淬透性高於碳鋼，調質後強度高。',
+ app:'軸、齒輪、高強度螺栓'},
+{id:'16MnCr5', category:'合金結構鋼', alias:['1.7131','16MC5','5115','SMnC420','527M17'], names:{cns:'（無直接對應）', jis:'SMnC420（近似）', gb:'15CrMn / 16MnCr5（近似）', astm:'5115', uns:'G51150', din:'16MnCr5 / 1.7131', en:'16MnCr5 / 1.7131', nf:'16MC5', bs:'527M17', uni:'16MnCr5', iso:'16MnCr5'},
+ comp:'C 0.14–0.19, Si ≤0.40, Mn 1.00–1.30, Cr 0.80–1.10', prop:'錳鉻滲碳鋼（不含鉬），歐系最常用滲碳鋼。注意：不等於 SCM415。',
+ app:'滲碳齒輪、凸輪、活塞銷'},
+
+{id:'SK85', category:'工具鋼', alias:['SK5','C80W1','W1-8','TC80','T8'], names:{cns:'SK85', jis:'SK85（舊 SK5）', gb:'T8 / T9（近似）', astm:'W1-8（近似）', uns:'—', din:'C80W1 / 1.1525', en:'C80U / 1.1525', nf:'C80E2U（Y1 80）', bs:'BW1A（近似）', iso:'TC80'},
+ comp:'C 0.80–0.90, Si 0.10–0.35, Mn 0.10–0.50', prop:'碳素工具鋼，韌性略優於 SK105，價格低。',
+ app:'刃具、沖頭、彈簧片、手工具'},
+
+{id:'SUS302', category:'不鏽鋼', alias:['302','12Cr18Ni9','1.4310'], names:{cns:'SUS302', jis:'SUS302', gb:'12Cr18Ni9', astm:'302', uns:'S30200', din:'X10CrNi18-8 / 1.4310', en:'1.4310', nf:'Z12CN18-09（近似）', bs:'302S25', uni:'X10CrNi18-8', iso:'X10CrNi18-8'},
+ comp:'C ≤0.15, Cr 17.0–19.0, Ni 8.0–10.0', prop:'較 304 含碳高之沃斯田鐵不鏽鋼，冷加工後強度高，常作彈簧材。',
+ app:'不鏽鋼彈簧、彈片、扣件'},
+{id:'SUS310S', category:'不鏽鋼', alias:['310S','06Cr25Ni20','1.4845','耐熱不鏽鋼'], names:{cns:'SUS310S', jis:'SUS310S', gb:'06Cr25Ni20（舊 0Cr25Ni20）', astm:'310S', uns:'S31008', din:'X8CrNi25-21 / 1.4845（舊 X12CrNi25-21）', en:'1.4845', nf:'Z8CN25-20', bs:'310S31', uni:'X6CrNi25-20（近似）', iso:'X8CrNi25-21'},
+ comp:'C ≤0.08, Cr 24.0–26.0, Ni 19.0–22.0', prop:'高鉻鎳耐熱不鏽鋼，抗氧化溫度可達約 1,000 °C。',
+ app:'爐內構件、耐熱治具、熱處理籃'},
+{id:'SUS321', category:'不鏽鋼', alias:['321','06Cr18Ni11Ti','1Cr18Ni9Ti','1.4541'], names:{cns:'SUS321', jis:'SUS321', gb:'06Cr18Ni11Ti（舊 0Cr18Ni10Ti）', astm:'321', uns:'S32100', din:'X6CrNiTi18-10 / 1.4541', en:'1.4541', nf:'Z6CNT18-10', bs:'321S31', uni:'X6CrNiTi18-11', iso:'X6CrNiTi18-10'},
+ comp:'C ≤0.08, Cr 17.0–19.0, Ni 9.0–13.0, Ti ≥5×C', prop:'添加鈦之穩定化不鏽鋼，焊後及高溫下不易晶界腐蝕。',
+ app:'高溫配管、排氣管、焊接耐蝕件'},
+{id:'SUS329J4L', category:'不鏽鋼', alias:['329J4L','S31260','雙相不鏽鋼','duplex','1.4507'], names:{cns:'SUS329J4L', jis:'SUS329J4L', gb:'022Cr25Ni6Mo2N（近似）', astm:'S31260', uns:'S31260', din:'X2CrNiMoCuN25-6-3 / 1.4507（近似）', en:'1.4507（近似）', nf:'Z3CNDU25-07Az（近似）', bs:'（無直接對應）'},
+ comp:'C ≤0.030, Cr 24.0–26.0, Ni 5.5–7.5, Mo 2.5–3.5, N 0.08–0.30', prop:'沃斯田鐵＋肥粒鐵雙相不鏽鋼，強度約為 304 的兩倍，耐孔蝕與應力腐蝕。注意：S32205（2205）對應的是 SUS329J3L。',
+ app:'海水設備、化工泵閥、高強度耐蝕軸'},
+
+{id:'SC410', category:'鑄鋼', alias:['SC42','ZG200-400','GS-38','A27 60-30'], names:{cns:'SC410', jis:'SC410', gb:'ZG200-400', astm:'A27 Gr.60-30', uns:'J03000', din:'GS-38 / 1.0420', en:'GE200（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C ≤0.30；抗拉 ≥410 MPa, 降伏 ≥205 MPa', prop:'低強度碳鋼鑄鋼，焊接性佳。',
+ app:'一般鑄鋼件、支架'},
+{id:'SC480', category:'鑄鋼', alias:['SC49','ZG270-500','GS-52','A27 70-36'], names:{cns:'SC480', jis:'SC480', gb:'ZG270-500（近似）', astm:'A27 Gr.70-36', uns:'J03501', din:'GS-52 / 1.0552', en:'GE300（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C ≤0.40；抗拉 ≥480 MPa, 降伏 ≥245 MPa', prop:'中強度碳鋼鑄鋼。',
+ app:'耳座、輪轂、承載鑄件'},
+{id:'SCMn3', category:'鑄鋼', alias:['SCMn3A','SCMn3B','GS-36Mn5','ZG35Mn'], names:{cns:'SCMn3', jis:'SCMn3A / SCMn3B（JIS G5111）', gb:'ZG35Mn（近似）', astm:'（無直接對應）', uns:'—', din:'GS-36Mn5（客戶表，近似）', en:'（無直接對應）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.30–0.38, Si 0.30–0.60, Mn 1.20–1.60；A（正常化回火）抗拉 ≥640 MPa、B（淬火回火）≥690 MPa', prop:'構造用高張力錳鋼鑄鋼，A 為正常化、B 為調質狀態。',
+ app:'高強度鑄件、耳座、齒輪坯'},
+{id:'SCMnCr3', category:'鑄鋼', alias:['SCMnCr3A','SCMnCr3B','ZG35CrMn'], names:{cns:'SCMnCr3', jis:'SCMnCr3A / SCMnCr3B（JIS G5111）', gb:'ZG35CrMn（近似）', astm:'（無直接對應）', uns:'—', din:'（無直接對應）', en:'（無直接對應）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.30–0.38, Si 0.30–0.60, Mn 1.20–1.60, Cr 0.40–0.80；B 抗拉 ≥690 MPa', prop:'錳鉻鑄鋼，淬透性優於 SCMn3。',
+ app:'高強度鑄件、齒輪'},
+{id:'SCMnCrM3', category:'鑄鋼', alias:['SCMnCrM3A','SCMnCrM3B'], names:{cns:'SCMnCrM3', jis:'SCMnCrM3A / SCMnCrM3B（JIS G5111）', gb:'（無直接對應）', astm:'（無直接對應）', uns:'—', din:'（無直接對應）', en:'（無直接對應）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.30–0.38, Si 0.30–0.60, Mn 1.20–1.60, Cr 0.30–0.70, Mo 0.15–0.35；B 抗拉 ≥830 MPa', prop:'錳鉻鉬鑄鋼，調質後強度為 G5111 系列中最高。',
+ app:'重負荷鑄件、高強度齒輪'},
+{id:'SCMnH1', category:'鑄鋼', alias:['高錳鋼','ZGMn13','A128 B1','Hadfield'], names:{cns:'SCMnH1', jis:'SCMnH1（JIS G5131）', gb:'ZGMn13-1（近似）', astm:'A128 Gr.B1（近似）', uns:'J91119（近似）', din:'GX120Mn13 / 1.3802（近似）', en:'GX120Mn13 / 1.3802（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.90–1.30, Mn 11.0–14.0', prop:'高錳沃斯田鐵鑄鋼（Hadfield 鋼），受衝擊後表面加工硬化，耐衝擊磨耗。一般用。',
+ app:'破碎機襯板、履帶板、耐衝擊磨耗件'},
+{id:'SCMnH2', category:'鑄鋼', alias:['高錳鋼','ZGMn13','A128 B2'], names:{cns:'SCMnH2', jis:'SCMnH2（JIS G5131）', gb:'ZGMn13-2（近似）', astm:'A128 Gr.B2（近似）', uns:'J91129（近似）', din:'GX120Mn13 / 1.3802（近似）', en:'GX120Mn13 / 1.3802（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.90–1.20, Mn 11.0–14.0, P ≤0.070；抗拉 ≥740 MPa', prop:'高錳鑄鋼，P 管制較 H1 嚴、韌性較佳，適合高衝擊。',
+ app:'破碎機錘頭、顎板、軌道轍叉'},
+{id:'SCMnH11', category:'鑄鋼', alias:['高錳鉻鋼','ZGMn13Cr2','A128 C'], names:{cns:'SCMnH11', jis:'SCMnH11（JIS G5131）', gb:'ZGMn13Cr2（近似）', astm:'A128 Gr.C', uns:'J91309', din:'GX120MnCr13-2（近似）', en:'GX120MnCr13-2（近似）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.90–1.30, Mn 11.0–14.0, Cr 1.5–2.5；抗拉 ≥740 MPa', prop:'含鉻高錳鑄鋼，降伏強度與初期耐磨性高於 SCMnH1/H2。',
+ app:'破碎機襯板、耐磨鑄件'},
+{id:'SCS22', category:'鑄鋼', alias:['CF10MC','1.4581','316Nb 鑄件'], names:{cns:'SCS22', jis:'SCS22', gb:'（無直接對應）', astm:'A351 CF10MC（近似；CF8C 對應 SCS21）', uns:'J92971（近似）', din:'G-X5CrNiMoNb18-10 / 1.4581', en:'GX5CrNiMoNb19-11-2 / 1.4581', nf:'Z6CNDNb18-12M（近似）', bs:'（無直接對應）'},
+ comp:'C ≤0.08, Cr 18.0–21.0, Ni 10.0–14.0, Mo 2.0–3.0, Nb ≥8×C', prop:'含鈮穩定化之 316 等級不鏽鋼鑄件，焊後耐晶界腐蝕。',
+ app:'化工閥體、泵殼'},
+{id:'SCH19', category:'鑄鋼', alias:['HN','A297 HN','耐熱鑄鋼'], names:{cns:'SCH19', jis:'SCH19（JIS G5122）', gb:'ZG35Ni24Cr18Si2（近似）', astm:'A297 HN', uns:'J94213', din:'（無直接對應）', en:'（無直接對應）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.20–0.50, Cr 19.0–23.0, Ni 23.0–27.0, Si ≤2.0, Mn ≤2.0；抗拉 ≥390 MPa', prop:'高鎳耐熱鑄鋼，高溫強度與抗滲碳性佳。',
+ app:'爐用構件、熱處理治具'},
+{id:'SCH22', category:'鑄鋼', alias:['HK40','A297 HK40','1.4848','耐熱鑄鋼'], names:{cns:'SCH22', jis:'SCH22（JIS G5122）', gb:'ZG40Cr25Ni20', astm:'A297 / A351 HK40', uns:'J94204', din:'G-X40CrNiSi25-20 / 1.4848', en:'GX40CrNiSi25-20 / 1.4848', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'C 0.30–0.60, Cr 24.0–28.0, Ni 18.0–22.0；抗拉 ≥440 MPa', prop:'HK40 耐熱鑄鋼，高溫潛變強度佳。',
+ app:'爐管、輻射管、耐熱構件'},
+
+{id:'CAC402 (BC2)', category:'錫青銅', alias:['BC2','CAC402C','C90300','SAE620','CA903'], names:{cns:'BC2', jis:'CAC402（舊 BC2）', gb:'（無直接對應）', astm:'C90300', uns:'C90300', din:'（無直接對應）', en:'（無直接對應）', nf:'（無直接對應）', bs:'（無直接對應）'},
+ comp:'Cu 86–90, Sn 7–9, Zn 3–5, Pb ≤1.0；抗拉 ≥245 MPa', prop:'錫青銅，耐蝕耐磨，強度介於 BC6 與 BC3 之間。',
+ app:'軸襯、閥件、泵零件'},
+{id:'CAC604 (LBC4)', category:'錫青銅', alias:['LBC4','CAC604C','C93800','CDA938','CC496K','ZCuPb15Sn8','CuPb15Sn'], names:{cns:'LBC4', jis:'CAC604（舊 LBC4）', gb:'ZCuPb15Sn8', astm:'C93800', uns:'C93800', din:'G-CuPb15Sn / 2.1182', en:'CuSn7Pb15-C / CC496K', nf:'CuPb15Sn8', bs:'LB1'},
+ comp:'Cu 74–78, Sn 7–9, Pb 14–16；抗拉 ≥165 MPa, HB ≥55', prop:'高鉛錫青銅，自潤滑與抗咬合性優於 LBC3，強度較低。',
+ app:'潤滑不良之低速重負荷軸襯'},
+{id:'CAC301 (HBsC1)', category:'純銅／黃銅', alias:['HBsC1','CAC301C','C86500','高力黃銅','CuZn35Mn2Al1Fe1'], names:{cns:'HBsC1', jis:'CAC301（舊 HBsC1）', gb:'ZCuZn35Al2Mn2Fe1（近似）', astm:'C86500', uns:'C86500', din:'G-CuZn35Al1 / 2.0592（近似）', en:'CuZn35Mn2Al1Fe1-C / CC765S', nf:'（無直接對應）', bs:'HTB1'},
+ comp:'Cu 55–60, Al 0.5–1.5, Fe 0.5–1.5, Mn 0.1–1.5, Zn 餘量；抗拉 ≥430 MPa', prop:'高力黃銅第 1 種，延展性最佳、強度為系列最低。',
+ app:'船舶零件、軸承、一般耐蝕機械件'},
+{id:'CAC302 (HBsC2)', category:'純銅／黃銅', alias:['HBsC2','CAC302C','C86400','C86700','高力黃銅'], names:{cns:'HBsC2', jis:'CAC302（舊 HBsC2）', gb:'（無直接對應）', astm:'C86400 / C86700（近似）', uns:'C86700（近似）', din:'G-CuZn35Al1 / 2.0592（近似）', en:'CuZn35Mn2Al1Fe1-C / CC765S（近似）', nf:'（無直接對應）', bs:'HTB1（近似）'},
+ comp:'Cu 55–60, Al 0.5–2.0, Fe 0.5–2.0, Mn 0.1–3.5, Zn 餘量；抗拉 ≥490 MPa', prop:'高力黃銅第 2 種，強度與耐磨性優於 HBsC1。',
+ app:'船用螺槳、閥桿、一般機械零件'},
+{id:'CAC303 (HBsC3)', category:'純銅／黃銅', alias:['HBsC3','CAC303C','C86200','高力黃銅','ZCuZn26Al4Fe3Mn3'], names:{cns:'HBsC3', jis:'CAC303（舊 HBsC3）', gb:'ZCuZn26Al4Fe3Mn3', astm:'C86200', uns:'C86200', din:'G-CuZn25Al5 / 2.0598（近似）', en:'CuZn25Al5Mn4Fe3-C / CC762S（近似）', nf:'（無直接對應）', bs:'HTB2（近似）'},
+ comp:'Cu 60–65, Al 3.0–5.0, Fe 2.0–4.0, Mn 2.5–5.0, Zn 餘量；抗拉 ≥635 MPa（連續鑄造 CAC303C ≥655）', prop:'高力黃銅第 3 種，高強度、適合低速高負荷滑動。',
+ app:'低速重負荷滑動件、油缸零件、軸襯'},
+
+{id:'STPG410', category:'鋼管', alias:['STPG42','A53 Gr.B','API 5L Gr.B'], names:{cns:'STPG410', jis:'STPG410（JIS G3454）', gb:'20（GB/T 8163，近似）', astm:'A53 Gr.B / API 5L Gr.B', uns:'K03005', din:'St45.8 / 1.0405（近似）', en:'P265TR1（近似）', nf:'（無直接對應）', bs:'3601 Gr.410（近似）'},
+ comp:'C ≤0.30, Si ≤0.35, Mn 0.30–1.00；抗拉 ≥410 MPa', prop:'壓力配管用碳鋼鋼管，強度高於 STPG370。',
+ app:'液壓配管、壓力管路'},
+{id:'STPT370', category:'鋼管', alias:['STPT38','A106 Gr.A'], names:{cns:'STPT370', jis:'STPT370（JIS G3456）', gb:'10 / 20（近似）', astm:'A106 Gr.A', uns:'K02501', din:'St35.8 / 1.0305（近似）', en:'P235GH / 1.0345（近似）', nf:'（無直接對應）', bs:'3602 Gr.360（近似）'},
+ comp:'C ≤0.25, Si 0.10–0.35, Mn 0.30–0.90；抗拉 ≥370 MPa', prop:'高溫配管用碳鋼鋼管（低強度級）。',
+ app:'高溫配管'},
+{id:'SGP', category:'鋼管', alias:['白鐵管','黑鐵管','A53 Type F','A120','S195T'], names:{cns:'SGP', jis:'SGP（JIS G3452）', gb:'Q195 / Q215 焊管（GB/T 3091，近似）', astm:'A53 Type F（舊 A120 已廢止）', uns:'—', din:'St33 / 1.0035（DIN 2440，近似）', en:'S195T / 1.0026（EN 10255）', nf:'（無直接對應）', bs:'1387（近似）'},
+ comp:'P ≤0.040, S ≤0.040；抗拉 ≥290 MPa', prop:'一般配管用碳鋼管（俗稱黑鐵管／鍍鋅白鐵管），不適用高壓。',
+ app:'水、空氣、低壓油配管'},
+{id:'STB340', category:'鋼管', alias:['STB35','A178 Gr.A','A179','A192','鍋爐管'], names:{cns:'STB340', jis:'STB340（JIS G3461）', gb:'10 / 20（GB 3087，近似）', astm:'A178 Gr.A（電焊）／A179・A192（無縫，近似）', uns:'K01200（A178 A）', din:'St35.8 / 1.0305（近似）', en:'P235GH / 1.0345（近似）', nf:'（無直接對應）', bs:'3059（近似）'},
+ comp:'C ≤0.18, Si ≤0.35, Mn 0.30–0.60；抗拉 ≥340 MPa', prop:'鍋爐、熱交換器用碳鋼鋼管（低強度級）。',
+ app:'鍋爐管、熱交換器管'},
+{id:'STB410', category:'鋼管', alias:['STB42','A210 A-1','A178 Gr.C','鍋爐管'], names:{cns:'STB410', jis:'STB410（JIS G3461）', gb:'20G（近似）', astm:'A210 Gr.A-1（無縫）／A178 Gr.C（電焊）', uns:'K02707（A210 A-1）', din:'St45.8 / 1.0405（近似）', en:'P265GH / 1.0425（近似）', nf:'（無直接對應）', bs:'3059（近似）'},
+ comp:'C ≤0.32, Si ≤0.35, Mn 0.30–0.80；抗拉 ≥410 MPa', prop:'鍋爐、熱交換器用碳鋼鋼管（中強度級）。',
+ app:'鍋爐管、過熱器管'},
+{id:'SUS304TP', category:'鋼管', alias:['304 管','A312 TP304','TP304'], names:{cns:'SUS304TP', jis:'SUS304TP（JIS G3459）', gb:'06Cr19Ni10（GB/T 14976）', astm:'A312 TP304', uns:'S30400', din:'X5CrNi18-10 / 1.4301', en:'1.4301（EN 10216-5 / 10217-7）', nf:'Z7CN18-09', bs:'304S31'},
+ comp:'同 SUS304：C ≤0.08, Cr 18.0–20.0, Ni 8.0–11.0', prop:'配管用不鏽鋼管（304）。A358 為大口徑電熔焊管、A376 為高溫用無縫管，皆屬特定用途規格。',
+ app:'耐蝕配管、液壓回油管'},
+{id:'SUS316TP', category:'鋼管', alias:['316 管','A312 TP316','TP316'], names:{cns:'SUS316TP', jis:'SUS316TP（JIS G3459）', gb:'06Cr17Ni12Mo2（GB/T 14976）', astm:'A312 TP316', uns:'S31600', din:'X5CrNiMo17-12-2 / 1.4401', en:'1.4401（EN 10216-5 / 10217-7）', nf:'Z7CND17-12-02', bs:'316S31'},
+ comp:'同 SUS316：C ≤0.08, Cr 16.0–18.0, Ni 10.0–14.0, Mo 2.0–3.0', prop:'配管用不鏽鋼管（316），耐孔蝕優於 304TP。',
+ app:'海水、化工配管'},
+
+{id:'SB410', category:'鍋爐鋼板', alias:['SB42','A516 Gr.60','A285 Gr.C','P265GH','Q245R'], names:{cns:'SB410', jis:'SB410（JIS G3103）', gb:'Q245R', astm:'A516 Gr.60 / A285 Gr.C（近似）', uns:'K02100', din:'HII / 1.0425（近似）', en:'P265GH / 1.0425', nf:'A42CP（近似）', bs:'1501-161 Gr.430（近似）'},
+ comp:'C ≤0.24（t ≤25 mm）, Si 0.15–0.40, Mn ≤0.90；抗拉 410–550 MPa', prop:'鍋爐及壓力容器用碳鋼鋼板。',
+ app:'壓力容器、油箱、承壓板件'},
+{id:'SB450', category:'鍋爐鋼板', alias:['SB46','A516 Gr.65','P295GH'], names:{cns:'SB450', jis:'SB450（JIS G3103）', gb:'Q245R / Q345R（近似）', astm:'A516 Gr.65', uns:'K02403', din:'17Mn4 / 1.0481（近似）', en:'P295GH / 1.0481', nf:'A48CP（近似）', bs:'1501-161 Gr.460（近似）'},
+ comp:'C ≤0.28（t ≤25 mm）, Si 0.15–0.40, Mn ≤0.90；抗拉 450–590 MPa', prop:'鍋爐及壓力容器用碳鋼鋼板（中強度）。',
+ app:'壓力容器、承壓板件'},
+{id:'SB480', category:'鍋爐鋼板', alias:['SB49','A516 Gr.70','A537 Cl.1','P355GH','Q345R'], names:{cns:'SB480', jis:'SB480（JIS G3103）', gb:'Q345R', astm:'A516 Gr.70（A537 Cl.1 近似）', uns:'K02700', din:'19Mn6 / 1.0473（近似）', en:'P355GH / 1.0473', nf:'A52CP（近似）', bs:'1501-224 Gr.490（近似）'},
+ comp:'C ≤0.31（t ≤25 mm）, Si 0.15–0.40, Mn ≤1.20；抗拉 480–620 MPa', prop:'鍋爐及壓力容器用碳鋼鋼板（高強度級）。',
+ app:'高壓容器、蓄壓器殼體'},
 ];
 
-const CATEGORIES = ['全部','碳鋼','合金結構鋼','不鏽鋼','鑄鐵','銅合金','工具鋼','軸承鋼','氮化鋼','彈簧鋼'];
-const STD_LABELS = {cns:'CNS 台灣', jis:'JIS 日本', gb:'GB 中國', astm:'ASTM/AISI 美國', uns:'UNS 美國', din:'DIN 德國', en:'EN 歐盟'};
+// 客戶規範：常用鋼鐵材料熱處理條件對照表（W611，112.08.11 版）
+// 欄位：p 熱處理、hb、hrc、hs、d 深度、t 抗拉（鑄件以抗拉為主）；warn 為核對時發現的換算矛盾或疑點
+const HT_SRC = '客戶規範 W611（112.08.11 版）';
+const HT = {
+ 'S45C':{jis:'G4051', rows:[
+   {p:'正常化', hb:'167–229', hrc:'*', hs:'*', d:'全件'},
+   {p:'調質', hb:'237–269', hrc:'22–28', hs:'35–41', d:'全件'},
+   {p:'軟氮化（鹽浴）', hv:'Hv 500 以上', d:'0.01–0.02 mm'},
+   {p:'高週波', hb:'379–448', hrc:'40–48', hs:'53–64', d:'1–2 mm'},
+   {p:'中週波', hb:'379–448', hrc:'40–48', hs:'53–64', d:'2–4 mm'}],
+  warn:['高週波 HRC 40–48 低於 S45C 一般可達之 HRC 50–58，屬寬鬆驗收規格。']},
+ 'SCM440':{rows:[
+   {p:'調質', hb:'285–352', hrc:'28–32', hs:'40–50', d:'全件'},
+   {p:'高週波', hb:'433–505', hrc:'45–55', hs:'62–72', d:'2–4 mm'},
+   {p:'中週波', hb:'433–505', hrc:'45–55', hs:'62–72', d:'4–6 mm'},
+   {p:'氮化', hv:'Hv 600 以上', d:'0.2–0.5 mm'}],
+  warn:['調質 HB 285–352 ≈ HRC 30–38，與 HRC 28–32 上限不一致，驗收前應確認以哪一欄為準。','HB 450 以上已超出鋼球 HB 量測可靠範圍，高週波件建議以 HRC 驗收。']},
+ 'SNCM439':{rows:[
+   {p:'調質', hb:'293–352', hrc:'32–36', hs:'40–50', d:'全件'},
+   {p:'高週波', hb:'433–505', hrc:'45–55', hs:'62–72', d:'2–4 mm'},
+   {p:'中週波', hb:'433–505', hrc:'45–55', hs:'62–72', d:'4–6 mm'}],
+  warn:['調質 HB 352 ≈ HRC 38，與 HRC 上限 36 有落差。']},
+ 'SACM645':{rows:[
+   {p:'調質', hb:'229–285', hrc:'20–28', hs:'34–41', d:'全件'},
+   {p:'氮化', hv:'Hv 900 以上', d:'0.5 mm 以上'}],
+  warn:['氣體氮化深度 0.5 mm 以上需長週期處理，報價應計入工期與成本。']},
+ 'SCM420':{rows:[
+   {p:'滲碳', hb:'*', hrc:'57–62', hs:'77–85', d:'0.5–2 mm'}]},
+ 'SKD11':{jis:'G4404', rows:[
+   {p:'調質（真空或鹽浴）', hb:'*', hrc:'58–62', hs:'83 以上', d:'全件'}],
+  warn:['HS 83 以上 ≈ HRC 61.5 以上，與 HRC 下限 58 衝突。']},
+ 'SKD61':{jis:'G4404', rows:[
+   {p:'調質（真空或鹽浴）', hb:'456 以下', hrc:'45–55', hs:'62–72', d:'全件'}],
+  warn:['HB「456 以下」≈ HRC 48 以下，與 HRC 45–55 矛盾（HRC 55 已超出 HB 量測範圍）。']},
+ 'SUJ2':{rows:[
+   {p:'調質', hb:'*', hrc:'27–37', hs:'40–50', d:'全件'},
+   {p:'中週波', hb:'*', hrc:'62 以上', hs:'85 以上', d:'4 mm 以上'}],
+  warn:['SUJ2 一般為球化退火（約 HB 201 以下）或淬硬 HRC 60 以上，調質 HRC 27–37 不常見，建議向客戶確認用途。']},
+ 'SMn443':{rows:[
+   {p:'調質（表列 SAE1345）', hb:'284–379', hrc:'32–45', hs:'42–55', d:'全件'}],
+  warn:['HB 284–379 ≈ HRC 30–41，與 HRC 32–45 不一致（HRC 45 ≈ HB 421）。']},
+ 'SUS420J2':{rows:[
+   {p:'調質', hb:'237–269', hrc:'22–28', hs:'35–41', d:'全件'},
+   {p:'高週波', hb:'379–448', hrc:'40–50', hs:'53–64', d:'1–2 mm'}]},
+ 'SUS630':{rows:[
+   {p:'固溶化', hb:'363 以下', hrc:'40 以下', hs:'52 以下', d:'全件'},
+   {p:'固溶化＋析出硬化', hv:'硬度依圖面規範', d:'全件'}],
+  warn:['JIS G4303 固溶化狀態一般為 HRC 38 以下（HBW 363 以下），表上 HRC 40 與 HB 363 不一致，建議以原文確認。']},
+ 'SCMn3':{jis:'G5111', rows:[{p:'退火＋調質（SCMn3B）', t:'抗拉 690 N/mm² 以上'}]},
+ 'SCMnCr3':{jis:'G5111', rows:[{p:'退火＋調質（SCMnCr3B）', t:'抗拉 690 N/mm² 以上'}]},
+ 'SCMnCrM3':{jis:'G5111', rows:[{p:'退火＋調質（SCMnCrM3B）', t:'抗拉 830 N/mm² 以上'}]},
+ 'SCS13':{jis:'G5121', rows:[{p:'固溶化', t:'抗拉 440 N/mm² 以上'}]},
+ 'SCH19':{jis:'G5122', rows:[{p:'固溶化', t:'抗拉 390 N/mm² 以上'}]},
+};
+const HT_NOTES = ['鑄件檢驗以抗拉為主。','「*」表示該種硬度計無法準確量測，請選擇合適硬度計。','圖面有標示則以標示為主，圖面未標示則以本表作為製作及檢驗依據。','周波硬化處理圖面若未要求無軟點，依一般周波硬化設備條件檢驗。'];
+
+const CATEGORIES = ['全部','碳鋼','鋼管','鍋爐鋼板','活塞桿用鋼','合金結構鋼','不鏽鋼','鑄鐵','鑄鋼','純銅／黃銅','錫青銅','磷青銅','鋁青銅','鋁合金','工具鋼','軸承鋼','氮化鋼','彈簧鋼'];
+const STD_LABELS = {cns:'CNS 台灣', jis:'JIS 日本', gb:'GB 中國', astm:'ASTM/AISI 美國', uns:'UNS 美國', din:'DIN 德國', en:'EN 歐盟', nf:'NF 法國', bs:'BS 英國', uni:'UNI 義大利', iso:'ISO 國際'};
+const stdKeysOf = item => Object.keys(STD_LABELS).filter(k=>item.names[k]);
 
 let activeCategory = '全部';
 let searchTerm = '';
@@ -335,18 +721,42 @@ function initFilters(){
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (cat===activeCategory ? ' active':'');
     btn.textContent = cat;
-    btn.onclick = ()=>{ activeCategory = cat; render(); };
+    btn.onclick = ()=>{
+      // 點分類：清空搜尋欄，只依分類篩選
+      activeCategory = cat;
+      searchTerm = '';
+      document.getElementById('searchInput').value = '';
+      render();
+    };
     btn.dataset.cat = cat;
     wrap.appendChild(btn);
   });
 }
 
-function matchesSearch(item, term){
-  if(!term) return true;
-  const t = term.toLowerCase();
-  const hay = [item.id, item.category, item.comp, item.prop, item.app, ...Object.values(item.names)]
-    .join(' ').toLowerCase();
-  return hay.includes(t);
+// 正規化：忽略大小寫、空白、連字號、斜線、底線、句點（例如「SUS 304」「35-CD-4」「1.7220」皆可查到）
+function norm(str){ return String(str).toLowerCase().replace(/[\s\-_\/\.．、（）()]/g,''); }
+function hayOf(item){
+  return [item.id, item.category, item.comp, item.prop, item.app, ...(item.alias||[]), ...Object.values(item.names)]
+    .map(norm).join('|');
+}
+// 先以整串比對（「SUS 304」視為 SUS304）；整串無結果時，再改以空白分隔之多關鍵字全部符合
+function searchFilter(list, term){
+  if(!term) return list;
+  const whole = norm(term);
+  const exact = list.filter(i=>hayOf(i).includes(whole));
+  // 排序：牌號完全相符 > 牌號開頭相符 > 俗稱完全相符 > 其他
+  const score = i=>{
+    const id=norm(i.id), al=(i.alias||[]).map(norm), nm=Object.values(i.names).map(norm);
+    if(id===whole || i.id.split(/[()（）]/).map(norm).includes(whole)) return 0;
+    if(id.startsWith(whole)) return 1;
+    if(al.includes(whole) || nm.includes(whole)) return 2;
+    if(al.some(a=>a.startsWith(whole)) || nm.some(a=>a.startsWith(whole))) return 3;
+    return 4;
+  };
+  if(exact.length) return exact.map(i=>[score(i),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  if(!/\s/.test(term)) return exact;
+  const toks = term.split(/\s+/).filter(Boolean).map(norm);
+  return list.filter(i=>{ const h=hayOf(i); return toks.every(t=>h.includes(t)); });
 }
 
 function render(){
@@ -354,10 +764,10 @@ function render(){
     b.classList.toggle('active', b.dataset.cat===activeCategory);
   });
 
-  const filtered = DB.filter(item=>{
-    const catOk = activeCategory==='全部' || item.category===activeCategory;
-    return catOk && matchesSearch(item, searchTerm);
-  });
+  // 搜尋與分類互不影響：有搜尋字時一律搜尋全部材料
+  const filtered = searchTerm
+    ? searchFilter(DB, searchTerm)
+    : DB.filter(item=>activeCategory==='全部' || item.category===activeCategory);
 
   document.getElementById('resultCount').textContent = `共 ${filtered.length} 筆材料`;
 
@@ -375,6 +785,16 @@ function render(){
     groups[item.category].push(item);
   });
 
+  // 搜尋時依相符程度排列（單一群組）；未搜尋時依分類分組
+  if(searchTerm){
+    const title = document.createElement('div');
+    title.className = 'group-title'; title.textContent = '搜尋結果（依相符程度排序）';
+    main.appendChild(title);
+    const grid = document.createElement('div'); grid.className = 'grid';
+    filtered.forEach(item=>grid.appendChild(buildCard(item)));
+    main.appendChild(grid);
+    return;
+  }
   const orderedCats = CATEGORIES.filter(c=>c!=='全部' && groups[c]);
 
   orderedCats.forEach(cat=>{
@@ -403,16 +823,17 @@ function buildCard(item){
     }
   };
 
-  const stdRows = Object.entries(item.names).map(([k,v])=>
-    `<div class="std-row"><span class="std-label">${STD_LABELS[k]||k}</span><span class="std-val">${v}</span></div>`
+  const stdRows = stdKeysOf(item).map(k=>
+    `<div class="std-row"><span class="std-label">${STD_LABELS[k]}</span><span class="std-val">${item.names[k]}</span></div>`
   ).join('');
 
   card.innerHTML = `
     <div class="card-top">
-      <span class="card-id">${item.id}</span>
+      <span class="card-id">${item.id}${HT[item.id]?'<span class="ht-badge">熱處理規範</span>':''}</span>
       <span class="card-check" title="加入比對">${selectedIds.has(item.id)?'✓':''}</span>
     </div>
     ${stdRows}
+    ${item.alias&&item.alias.length?`<div class="card-alias"><span>俗稱／其他</span>${item.alias.join('、')}</div>`:''}
     <div class="card-app"><b>用途</b> ${item.app}</div>
   `;
   return card;
@@ -463,8 +884,8 @@ function clearCompare(){
 function openDetail(id){
   const item = DB.find(d=>d.id===id);
   if(!item) return;
-  const rows = Object.entries(item.names).map(([k,v])=>
-    `<tr><td>${STD_LABELS[k]||k}</td><td>${v}</td></tr>`
+  const rows = stdKeysOf(item).map(k=>
+    `<tr><td>${STD_LABELS[k]}</td><td>${item.names[k]}</td></tr>`
   ).join('');
   document.getElementById('detailContent').innerHTML = `
     <div class="modal-head">
@@ -473,11 +894,30 @@ function openDetail(id){
     </div>
     <div class="modal-cat">${item.category}</div>
     <table class="modal-table">${rows}</table>
+    ${item.alias&&item.alias.length?`<div class="modal-sec"><h4>俗稱／其他寫法</h4><p>${item.alias.join('、')}</p></div>`:''}
     <div class="modal-sec"><h4>化學成分（主要元素, wt%）</h4><p>${item.comp}</p></div>
     <div class="modal-sec"><h4>特性</h4><p>${item.prop}</p></div>
     <div class="modal-sec"><h4>常見用途</h4><p>${item.app}</p></div>
+    ${htBlock(item.id)}
   `;
   document.getElementById('detailModal').classList.add('show');
+}
+function htBlock(id){
+  const h = HT[id]; if(!h) return '';
+  const tr = h.rows.map(r=>{
+    if(r.t) return `<tr><td>${r.p}</td><td colspan="4" class="c">${r.t}</td></tr>`;
+    if(r.hv) return `<tr><td>${r.p}</td><td colspan="3" class="c">${r.hv}</td><td>${r.d||''}</td></tr>`;
+    return `<tr><td>${r.p}</td><td>${r.hb}</td><td>${r.hrc}</td><td>${r.hs}</td><td>${r.d}</td></tr>`;
+  }).join('');
+  const warn = (h.warn||[]).map(w=>`<li>${w}</li>`).join('');
+  return `<div class="modal-sec"><h4>熱處理條件（${HT_SRC}${h.jis?'，JIS '+h.jis:''}）</h4>
+    <div class="cmp-scroll"><table class="ht-table"><thead><tr><th>熱處理</th><th>HB</th><th>HRC</th><th>HS</th><th>深度</th></tr></thead><tbody>${tr}</tbody></table></div>
+    ${warn?`<ul class="ht-warn">${warn}</ul>`:''}
+    <p class="ht-note">${HT_NOTES.join('　')}</p></div>`;
+}
+function htSummary(id){
+  const h = HT[id]; if(!h) return '—';
+  return h.rows.map(r=> r.t ? `${r.p}：${r.t}` : r.hv ? `${r.p}：${r.hv}（${r.d}）` : `${r.p}：HRC ${r.hrc}／HB ${r.hb}（${r.d}）`).join('<br>');
 }
 function closeDetail(){ document.getElementById('detailModal').classList.remove('show'); }
 
@@ -492,8 +932,10 @@ function openCompare(){
   stdKeys.forEach(k=>{
     rows += `<tr><td>${STD_LABELS[k]}</td>` + items.map(i=>`<td>${i.names[k]||'—'}</td>`).join('') + `</tr>`;
   });
+  rows += `<tr><td>俗稱／其他</td>` + items.map(i=>`<td class="txt">${(i.alias||[]).join('、')||'—'}</td>`).join('') + `</tr>`;
   rows += `<tr><td>化學成分</td>` + items.map(i=>`<td class="txt">${i.comp}</td>`).join('') + `</tr>`;
   rows += `<tr><td>特性</td>` + items.map(i=>`<td class="txt">${i.prop}</td>`).join('') + `</tr>`;
+  rows += `<tr><td>熱處理（客戶規範）</td>` + items.map(i=>`<td class="txt">${htSummary(i.id)}</td>`).join('') + `</tr>`;
   rows += `<tr><td>用途</td>` + items.map(i=>`<td class="txt">${i.app}</td>`).join('') + `</tr>`;
 
   document.getElementById('compareContent').innerHTML = `
@@ -509,6 +951,8 @@ function closeCompareModal(){ document.getElementById('compareModal').classList.
 
 document.getElementById('searchInput').addEventListener('input', (e)=>{
   searchTerm = e.target.value.trim();
+  // 輸入搜尋：分類自動回到「全部」
+  if(searchTerm) activeCategory = '全部';
   render();
 });
 
