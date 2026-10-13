@@ -46,6 +46,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .note{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.35);border-left:3px solid var(--accent);border-radius:3px;padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text)}
 .note b{color:var(--accent);font-family:var(--mono)}
 .note .warn{color:var(--red);font-weight:700}
+.res-err{text-align:center;padding:22px 8px 18px;color:var(--red);font-weight:700;font-size:15px;line-height:1.6}
+.res-err small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:4px}
+.res-tag{display:inline-block;margin-top:6px;padding:2px 10px;border:1px solid var(--blue);border-radius:10px;color:var(--blue);font-size:11px}
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield}
@@ -60,7 +63,6 @@ input[type=number]{-moz-appearance:textfield}
   </div>
 </div>
 <div class="main">
-
   <div class="note">
     適用材質：<b>SS400</b>／<b>S45C</b>／<b>SCM440</b><br>
     <span class="warn">以上以外的材質，需另行報價</span>
@@ -70,14 +72,18 @@ input[type=number]{-moz-appearance:textfield}
     <div class="card-title">輸入參數</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="field">
-        <label>孔徑（mm）</label>
-        <select id="dia-sel" onchange="onDiaChange()">
-          <option value="">— 選擇孔徑 —</option>
-        </select>
+        <label>工件外徑 D（mm）</label>
+        <input type="number" id="od" placeholder="工件外徑" step="0.1" min="1">
       </div>
       <div class="field">
         <label>深度 L（mm）</label>
         <input type="number" id="depth" placeholder="加工深度" step="1" min="1">
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label>孔徑（mm）</label>
+        <select id="dia-sel" onchange="onDiaChange()">
+          <option value="">— 選擇孔徑 —</option>
+        </select>
       </div>
     </div>
   </div>
@@ -87,6 +93,16 @@ input[type=number]{-moz-appearance:textfield}
   <div class="result-card" id="result-card">
     <div class="res-header" id="res-header"></div>
     <div class="res-body" id="res-body"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">加工限制（廷翼鎗鑽圓心機）</div>
+    <div style="font-size:12px;line-height:1.9;color:var(--muted)">
+      ・孔徑範圍 <b style="color:var(--text)">φ3 ~ φ50</b><br>
+      ・外徑 ≤ φ55：φ3 ~ φ4 最深 <b style="color:var(--text)">600</b>　｜　φ5 ~ φ32 單邊 <b style="color:var(--text)">1500</b>、雙頭 <b style="color:var(--text)">3000</b>　｜　φ35 ~ φ50 最深 <b style="color:var(--text)">1200</b><br>
+      ・外徑 ≥ φ56：最深 <b style="color:var(--text)">1200</b><br>
+      ・超出範圍需另行報價
+    </div>
   </div>
 
 </div>
@@ -104,6 +120,19 @@ const RATES = [
   {d:45,p:8.00},{d:50,p:11.00},{d:55,p:14.00},
 ];
 
+// 加工限制（廷翼官網：CNC鎗鑽圓心專用機）
+// 回傳 {ok:false, msg} 或 {ok:true, maxSingle, maxDouble}
+function getLimit(od, dia) {
+  if(dia > 50) return {ok:false, msg:'孔徑超出加工範圍（最大 φ50）'};
+  if(dia >= od) return {ok:false, msg:'孔徑不可大於或等於工件外徑'};
+  if(od <= 55) {
+    if(dia <= 4)  return {ok:true, maxSingle:600,  maxDouble:600};
+    if(dia <= 32) return {ok:true, maxSingle:1500, maxDouble:3000};
+    return {ok:true, maxSingle:1200, maxDouble:1200};
+  }
+  return {ok:true, maxSingle:1200, maxDouble:1200};
+}
+
 let selDia = null, selPx = null;
 
 (function buildSelect() {
@@ -111,7 +140,7 @@ let selDia = null, selPx = null;
   RATES.forEach(r => {
     const o = document.createElement('option');
     o.value = r.d;
-    o.textContent = 'φ' + r.d + ' mm　—　' + r.p.toFixed(2) + ' 元/mm';
+    o.textContent = 'φ' + r.d + ' mm　—　' + r.p.toFixed(2) + ' 元/mm' + (r.d > 50 ? '（超出範圍）' : '');
     sel.appendChild(o);
   });
 })();
@@ -122,31 +151,53 @@ function onDiaChange() {
   selPx  = r ? r.p : null;
 }
 
+function showError(title, msg, sub) {
+  document.getElementById('res-header').textContent = title;
+  document.getElementById('res-body').innerHTML =
+    `<div class="res-err">${msg}<small>${sub}</small></div>`;
+  document.getElementById('result-card').classList.add('show');
+}
+
 function calculate() {
-  if(!selDia) { alert('請選擇孔徑'); return; }
+  const od    = parseFloat(document.getElementById('od').value);
   const depth = parseFloat(document.getElementById('depth').value);
+  if(!od || od <= 0)       { alert('請填入工件外徑'); return; }
+  if(!selDia)              { alert('請選擇孔徑'); return; }
   if(!depth || depth <= 0) { alert('請填入加工深度'); return; }
+
+  const title = `深孔加工費用　D${od} ／ φ${selDia} × ${depth}mm`;
+  const lim = getLimit(od, selDia);
+  if(!lim.ok) { showError(title, lim.msg, '需另行報價'); return; }
+  if(depth > lim.maxDouble) {
+    showError(title, `超出加工範圍（最大 ${lim.maxDouble} mm）`, '需另行報價');
+    return;
+  }
+  const isDouble = depth > lim.maxSingle;
 
   const cost  = selPx * depth;
   const fmt   = n => n.toLocaleString('zh-TW', {minimumFractionDigits:2, maximumFractionDigits:2});
   const fmtNT = n => Math.round(n).toLocaleString('zh-TW');
 
-  document.getElementById('res-header').textContent = `深孔加工費用　φ${selDia} × ${depth}mm`;
+  document.getElementById('res-header').textContent = title;
   document.getElementById('res-body').innerHTML = `
     <div class="res-big">
       <div class="label">TOTAL COST</div>
       <div class="amount">NT$ ${fmtNT(cost)}</div>
       <div class="sub">${selPx.toFixed(2)} 元/mm × ${depth} mm</div>
+      ${isDouble ? `<div class="res-tag">需雙頭鑽孔（單邊上限 ${lim.maxSingle} mm）</div>` : ''}
     </div>
+    <div class="res-row"><span class="res-label">工件外徑</span><span class="res-val">φ${od} mm</span></div>
     <div class="res-row"><span class="res-label">孔徑</span><span class="res-val">φ${selDia} mm</span></div>
     <div class="res-row"><span class="res-label">單價</span><span class="res-val">${selPx.toFixed(2)} 元/mm</span></div>
-    <div class="res-row"><span class="res-label">深度</span><span class="res-val">${depth} mm</span></div>
+    <div class="res-row"><span class="res-label">深度</span><span class="res-val">${depth} mm（上限 ${lim.maxDouble} mm）</span></div>
     <div class="res-row"><span class="res-label">加工費用</span><span class="res-val" style="color:var(--green)">NT$ ${fmt(cost)}</span></div>
   `;
   document.getElementById('result-card').classList.add('show');
 }
 
-document.getElementById('depth').addEventListener('keydown', e => { if(e.key==='Enter') e.target.blur(); });
+document.querySelectorAll('input').forEach(inp =>
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') inp.blur(); })
+);
 </script>
 </body>
 </html>
