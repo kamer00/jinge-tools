@@ -156,6 +156,9 @@
   .cmp-table td{font-family:var(--mono);}
   .cmp-table td.txt{font-family:inherit; font-size:12.5px; line-height:1.6;}
   .cmp-scroll{overflow-x:auto;}
+  .cmp-table td:first-child, .cmp-table th:first-child{position:sticky; left:0; z-index:1; min-width:84px;}
+  .cmp-table th:first-child{background:var(--bg3);}
+  .cmp-table td, .cmp-table th{min-width:112px;}
   .cmp-sub{font-size:14px; color:var(--accent); margin:18px 0 8px;}
   .use-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; font-size:13px;}
   .use-hint{font-size:11.5px; color:var(--text-dim);}
@@ -939,8 +942,8 @@ function closeDetail(){ document.getElementById('detailModal').classList.remove(
 
 // ===== 狀態別機械性質（供綜合評比用）=====
 // 數值格式：[下限] 或 [下限, 上限]；空物件 {} 代表尚未查證（顯示「待確認」，不估計）
-const ST_LABEL = {raw:'原材（軋延）', N:'正火', H:'調質', cast:'鑄造（連續鑄造）'};
-const PERF_SRC = '鋼材：JIS G4051／G4053／G3101／G3106 代表值（NBK 技術資料、日建連資料）。銅合金：ASTM B505 連續鑄造最低值（Concast 型錄），硬度為典型值，JIS 牌號以對應之 ASTM 牌號數值為準。實際以材料證明為準。';
+const ST_LABEL = {raw:'原材（交貨狀態）', N:'正火', H:'調質', cast:'鑄造態'};
+const PERF_SRC = '鋼材：JIS G4051／G4053／G3101／G3106 代表值（NBK 技術資料、日建連資料），STKM13A 取自日本製鐵型錄。鑄鐵：取自牌號所示最低值。銅合金：ASTM B505 連續鑄造最低值（Concast 型錄），硬度為典型值，JIS 牌號以對應之 ASTM 牌號數值為準。實際以材料證明為準。';
 const PERF = {
  'S35C':{N:{ts:[510],ys:[305],el:[23],hb:[149,207]}, H:{ts:[570],ys:[390],el:[22],hb:[167,235]}},
  'S45C':{N:{ts:[570],ys:[345],el:[20],hb:[167,229]},
@@ -957,7 +960,17 @@ const PERF = {
  'CAC406 (BC6)':{cast:{ts:[248],ys:[131],el:[15],hb:[60],typ:['hb'],mr:84,n:'C83600 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
  'CAC403 (BC3)':{cast:{ts:[303],ys:[172],el:[10],hb:[75],typ:['hb'],mr:30,n:'C90500 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
  'CAC603 (LBC3)':{cast:{ts:[241],ys:[138],el:[6],hb:[60],typ:['hb'],mr:80,n:'C93700 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
- 'CAC502A (PBC2A)':{cast:{ts:[276],ys:[172],el:[10],hb:[102],typ:['hb'],mr:20,n:'C90700 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}}
+ 'CAC502A (PBC2A)':{cast:{ts:[276],ys:[172],el:[10],hb:[102],typ:['hb'],mr:20,n:'C90700 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
+ 'STKM13A':{raw:{ts:[370],ys:[215],el:[30],n:'STKM13A 為製造狀態（JIS G3445，日本製鐵型錄）；伸長率為 11 號／12 號試驗片。'}},
+ 'STKM13C':{raw:{ts:[510],ys:[380],n:'STKM13C 數值沿用本工具既有資料，尚未對照 JIS G3445 全文；伸長率待確認。'}},
+ 'E355 (ST52)':{raw:{ts:[580],ys:[450],n:'E355 為 +SR 狀態，數值沿用本工具既有資料，尚未對照 EN 10305-1 全文。'}},
+ 'FC200':{cast:{ts:[200],n:'灰鑄鐵數值為牌號所示最低抗拉強度；降伏強度、硬度未查得可靠數值。'}},
+ 'FC250':{cast:{ts:[250],n:'灰鑄鐵數值為牌號所示最低抗拉強度；降伏強度、硬度未查得可靠數值。'}},
+ 'FC300':{cast:{ts:[300],n:'灰鑄鐵數值為牌號所示最低抗拉強度；降伏強度、硬度未查得可靠數值。'}},
+ 'FCD400':{cast:{ts:[400],el:[15],n:'球墨鑄鐵抗拉強度、伸長率取自牌號（FCD400-15）；降伏強度、硬度未查得可靠數值。'}},
+ 'FCD450':{cast:{ts:[450],el:[10],n:'球墨鑄鐵抗拉強度、伸長率取自牌號（FCD450-10）；降伏強度、硬度未查得可靠數值。'}},
+ 'FCD500':{cast:{ts:[500],el:[7],n:'球墨鑄鐵抗拉強度、伸長率取自牌號（FCD500-7）；降伏強度、硬度未查得可靠數值。'}},
+ 'FCD600':{cast:{ts:[600],el:[3],n:'球墨鑄鐵抗拉強度、伸長率取自牌號（FCD600-3）；降伏強度、硬度未查得可靠數值。'}}
 };
 // 靜態評等（1–5，工程經驗參考，非標準數值）：hdn 淬透性、weld 焊接性、mach 切削性、cost 成本(5=便宜)、risk 調質變形／裂紋風險(5=風險低)、tough 韌性（依狀態）
 const SCORE = {
@@ -968,7 +981,20 @@ const SCORE = {
  'SM490A':{hdn:1,weld:4,mach:3,cost:4,tough:{raw:3}},
  'SCM435':{hdn:4,weld:2,mach:3,cost:3,risk:4,tough:{N:3,H:4}},
  'SCM440':{hdn:5,weld:1,mach:3,cost:2,risk:4,tough:{N:3,H:4}},
- 'SNCM439':{hdn:5,weld:1,mach:2,cost:1,risk:4,tough:{N:3,H:5}}
+ 'SNCM439':{hdn:5,weld:1,mach:2,cost:1,risk:4,tough:{N:3,H:5}},
+ 'STKM13A':{hdn:1,weld:4,mach:4,cost:4,tough:{raw:4}},
+ 'STKM13C':{hdn:1,weld:3,mach:3,cost:3,tough:{raw:3}},
+ 'E355 (ST52)':{hdn:1,weld:4,mach:3,cost:2,tough:{raw:3}},
+ 'FC200':{weld:1,mach:4,cost:5,tough:{cast:1}},
+ 'FC250':{weld:1,mach:4,cost:5,tough:{cast:1}},
+ 'FC300':{weld:1,mach:3,cost:5,tough:{cast:1}},
+ 'FCD400':{weld:2,mach:4,cost:4},
+ 'FCD450':{weld:2,mach:4,cost:4},
+ 'FCD500':{weld:2,mach:3,cost:4},
+ 'FCD600':{weld:2,mach:3,cost:4},
+ 'CAC701 (AlBC1)':{cost:2},'CAC702 (AlBC2)':{cost:2},'CAC703 (AlBC3)':{cost:2},
+ 'CAC304 (HBsC4)':{cost:3},'CAC406 (BC6)':{cost:2},'CAC403 (BC3)':{cost:2},
+ 'CAC603 (LBC3)':{cost:2},'CAC502A (PBC2A)':{cost:2}
 };
 const DIMS = [
  {k:'str',n:'強度（依抗拉下限）'},{k:'tough',n:'韌性'},{k:'hard',n:'硬度／耐磨（依 HB 下限）'},
@@ -980,7 +1006,9 @@ const USES = {
  weld:{n:'需焊接', w:{weld:4,str:1,tough:1,cost:1}},
  cost:{n:'成本優先', w:{cost:4,mach:1,str:1}},
  heavy:{n:'高負荷軸類／耐磨', w:{str:3,hard:2,tough:2,hdn:2}},
- mach:{n:'重切削／加工容易', w:{mach:3,cost:1}}
+ mach:{n:'重切削／加工容易', w:{mach:3,cost:1}},
+ tube:{n:'缸筒（管材）', w:{str:3,tough:2,weld:2,mach:1,cost:1}},
+ piston:{n:'活塞／導向件（鑄件）', w:{str:2,tough:1,mach:2,cost:2}}
 };
 let cmpCols = [];
 let cmpUse = 'pressure';
@@ -1050,7 +1078,7 @@ function verdictHtml(){
     }
   }
   rows.filter(x=>x.na).forEach(x=>{
-    html += `<p class="v-warn">⚠ ${colLabel(x.c)}：${x.c.id} 無碳含量規範，不宜調質，已排除評比。若需調質後強度，可改選 S45C（調質）或 SCM 系列。</p>`;
+    html += `<p class="v-warn">⚠ ${colLabel(x.c)}：${x.c.id} 屬低碳或未規定碳含量鋼種，調質提升有限，已排除評比。若需調質後強度，可改選 S45C（調質）或 SCM 系列。</p>`;
   });
   html += `<p class="v-note">評等為工程經驗之相對參考（強度、硬度由標準下限值換算），最終選材請依圖面需求、尺寸與客戶規範確認。</p></div>`;
   return html;
