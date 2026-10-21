@@ -939,8 +939,8 @@ function closeDetail(){ document.getElementById('detailModal').classList.remove(
 
 // ===== 狀態別機械性質（供綜合評比用）=====
 // 數值格式：[下限] 或 [下限, 上限]；空物件 {} 代表尚未查證（顯示「待確認」，不估計）
-const ST_LABEL = {raw:'原材（軋延）', N:'正火', H:'調質'};
-const PERF_SRC = '機械性質：JIS G4051／G4053／G3101／G3106 代表值（NBK 技術資料、日建連資料），實際以材料證明為準。';
+const ST_LABEL = {raw:'原材（軋延）', N:'正火', H:'調質', cast:'鑄造（連續鑄造）'};
+const PERF_SRC = '鋼材：JIS G4051／G4053／G3101／G3106 代表值（NBK 技術資料、日建連資料）。銅合金：ASTM B505 連續鑄造最低值（Concast 型錄），硬度為典型值，JIS 牌號以對應之 ASTM 牌號數值為準。實際以材料證明為準。';
 const PERF = {
  'S35C':{N:{ts:[510],ys:[305],el:[23],hb:[149,207]}, H:{ts:[570],ys:[390],el:[22],hb:[167,235]}},
  'S45C':{N:{ts:[570],ys:[345],el:[20],hb:[167,229]},
@@ -949,7 +949,15 @@ const PERF = {
  'SM490A':{raw:{ts:[490,610],ys:[325], n:'SM490A 降伏強度 325 為 SM490 之規定值，伸長率待確認。'}},
  'SCM435':{H:{ts:[930],ys:[785],el:[15],hb:[269,331]}},
  'SCM440':{H:{ts:[980],ys:[835],el:[12],hb:[285,352]}},
- 'SNCM439':{H:{hb:[293,352], n:'SNCM439 僅硬度取自客戶規範 W611，其餘強度數值待確認。'}}
+ 'SNCM439':{H:{hb:[293,352], n:'SNCM439 僅硬度取自客戶規範 W611，其餘強度數值待確認。'}},
+ 'CAC701 (AlBC1)':{cast:{ts:[469],ys:[179],el:[20],hb:[125],typ:['hb'],n:'C95200 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。切削性評級各來源不一（聯東 50、Concast 20），未納入評等。'}},
+ 'CAC702 (AlBC2)':{cast:{ts:[586],ys:[221],el:[12],hb:[170],typ:['hb'],mr:60,n:'C95400 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
+ 'CAC703 (AlBC3)':{cast:{ts:[586],ys:[241],el:[18],hb:[159],typ:['hb'],n:'C95800 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。切削性評級各來源不一（聯東 50、Concast 20），未納入評等。'}},
+ 'CAC304 (HBsC4)':{cast:{ts:[758],ys:[427],el:[14],hb:[223],typ:['hb'],mr:8,n:'C86300 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。此牌號硬度為 3000 kg 負荷量測。'}},
+ 'CAC406 (BC6)':{cast:{ts:[248],ys:[131],el:[15],hb:[60],typ:['hb'],mr:84,n:'C83600 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
+ 'CAC403 (BC3)':{cast:{ts:[303],ys:[172],el:[10],hb:[75],typ:['hb'],mr:30,n:'C90500 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
+ 'CAC603 (LBC3)':{cast:{ts:[241],ys:[138],el:[6],hb:[60],typ:['hb'],mr:80,n:'C93700 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}},
+ 'CAC502A (PBC2A)':{cast:{ts:[276],ys:[172],el:[10],hb:[102],typ:['hb'],mr:20,n:'C90700 數值為 ASTM B505 連續鑄造最低值，硬度為典型值。'}}
 };
 // 靜態評等（1–5，工程經驗參考，非標準數值）：hdn 淬透性、weld 焊接性、mach 切削性、cost 成本(5=便宜)、risk 調質變形／裂紋風險(5=風險低)、tough 韌性（依狀態）
 const SCORE = {
@@ -977,8 +985,9 @@ const USES = {
 let cmpCols = [];
 let cmpUse = 'pressure';
 
-const stateKeys = id => !PERF[id] ? [] : (PERF[id].raw ? ['raw','H'] : ['N','H'].filter(k=>PERF[id][k] && Object.keys(PERF[id][k]).length));
-const defState = id => !PERF[id] ? null : (PERF[id].raw ? 'raw' : (stateKeys(id).includes('H') ? 'H' : stateKeys(id)[0]));
+const ST_ORDER = ['N','H','cast'];
+const stateKeys = id => !PERF[id] ? [] : (PERF[id].raw ? ['raw','H'] : ST_ORDER.filter(k=>PERF[id][k] && Object.keys(PERF[id][k]).length));
+const defState = id => { const k = stateKeys(id); return !k.length ? null : (PERF[id].raw ? 'raw' : (k.includes('H') ? 'H' : k[0])); };
 // 回傳 {none}（無性能資料）、{na}（此狀態不適用）或該狀態數值
 function getPerf(id, st){
   const p = PERF[id]; if(!p) return {none:true};
@@ -997,6 +1006,8 @@ function scoresOf(c){
   if(pf.hb) out.hard = lvl(pf.hb[0], [150,190,230,270]);
   if(sc.tough && sc.tough[c.state]!=null) out.tough = sc.tough[c.state];
   ['hdn','weld','mach','cost'].forEach(k=>{ if(sc[k]!=null) out[k] = sc[k]; });
+  if(out.mach==null && pf.mr!=null) out.mach = lvl(pf.mr,[20,30,50,70]);
+  if(out.tough==null && pf.el) out.tough = lvl(pf.el[0],[6,10,15,25]);
   if(c.state==='H' && sc.risk!=null) out.risk = sc.risk;
   return out;
 }
@@ -1087,7 +1098,7 @@ function renderCompare(){
     }).join('');
     const head = `<tr><th>項目</th>${th}</tr>`;
     const has = (c,k)=>{ const pf=getPerf(c.id,c.state); return !pf.na && pf[k]; };
-    const cell = (c,k,u)=>{ const pf=getPerf(c.id,c.state); if(pf.na) return '<span style="color:var(--red)">不適用</span>'; return fmtR(pf[k],u)||'—'; };
+    const cell = (c,k,u)=>{ const pf=getPerf(c.id,c.state); if(pf.na) return '<span style="color:var(--red)">不適用</span>'; const v = fmtR(pf[k],u); if(!v) return '—'; return (pf.typ && pf.typ.includes(k)) ? `${pf[k][0]}${u}<span style="color:var(--text-dim)">（典型）</span>` : v; };
     let rows = '';
     [['ts','抗拉強度','MPa'],['ys','降伏強度','MPa'],['el','伸長率','%'],['hb','硬度 HB','']].forEach(([k,n,u])=>{
       if(pcols.some(c=>has(c,k))) rows += `<tr><td>${n}</td>` + pcols.map(c=>`<td>${cell(c,k,u)}</td>`).join('') + `</tr>`;
