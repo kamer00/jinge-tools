@@ -945,12 +945,11 @@ const PERF = {
  'S35C':{N:{ts:[510],ys:[305],el:[23],hb:[149,207]}, H:{ts:[570],ys:[390],el:[22],hb:[167,235]}},
  'S45C':{N:{ts:[570],ys:[345],el:[20],hb:[167,229]},
          H:{ts:[690],ys:[490],el:[17],hb:[201,269], n:'S45C 調質：JIS 為 HB 201–269；客戶規範 W611 驗收為 HB 237–269（較嚴）。'}},
- 'S50C':{N:{}, H:{}},
  'SS400':{raw:{ts:[400,510],ys:[235],el:[21]}},
  'SM490A':{raw:{ts:[490,610],ys:[325], n:'SM490A 降伏強度 325 為 SM490 之規定值，伸長率待確認。'}},
- 'SCM435':{N:{}, H:{ts:[930],ys:[785],el:[15],hb:[269,331]}},
- 'SCM440':{N:{}, H:{ts:[980],ys:[835],el:[12],hb:[285,352]}},
- 'SNCM439':{N:{}, H:{hb:[293,352], n:'SNCM439 僅硬度取自客戶規範 W611，其餘強度數值待確認。'}}
+ 'SCM435':{H:{ts:[930],ys:[785],el:[15],hb:[269,331]}},
+ 'SCM440':{H:{ts:[980],ys:[835],el:[12],hb:[285,352]}},
+ 'SNCM439':{H:{hb:[293,352], n:'SNCM439 僅硬度取自客戶規範 W611，其餘強度數值待確認。'}}
 };
 // 靜態評等（1–5，工程經驗參考，非標準數值）：hdn 淬透性、weld 焊接性、mach 切削性、cost 成本(5=便宜)、risk 調質變形／裂紋風險(5=風險低)、tough 韌性（依狀態）
 const SCORE = {
@@ -978,8 +977,8 @@ const USES = {
 let cmpCols = [];
 let cmpUse = 'pressure';
 
-const stateKeys = id => PERF[id] ? (PERF[id].raw ? ['raw','H'] : ['N','H']) : [];
-const defState = id => PERF[id] ? (PERF[id].raw ? 'raw' : 'H') : null;
+const stateKeys = id => !PERF[id] ? [] : (PERF[id].raw ? ['raw','H'] : ['N','H'].filter(k=>PERF[id][k] && Object.keys(PERF[id][k]).length));
+const defState = id => !PERF[id] ? null : (PERF[id].raw ? 'raw' : (stateKeys(id).includes('H') ? 'H' : stateKeys(id)[0]));
 // 回傳 {none}（無性能資料）、{na}（此狀態不適用）或該狀態數值
 function getPerf(id, st){
   const p = PERF[id]; if(!p) return {none:true};
@@ -1002,7 +1001,7 @@ function scoresOf(c){
   return out;
 }
 const stars = n => n==null ? '—' : '★'.repeat(n)+'☆'.repeat(5-n)+` <span style="color:var(--text-dim)">${n}</span>`;
-const colLabel = c => `${c.id}（${ST_LABEL[c.state]||'—'}）`;
+const colLabel = c => PERF[c.id] ? `${c.id}（${ST_LABEL[c.state]||'—'}）` : c.id;
 
 function weighted(sc, w){
   let sum=0, wt=0, tot=0;
@@ -1012,7 +1011,7 @@ function weighted(sc, w){
 
 function verdictHtml(){
   const u = USES[cmpUse];
-  const rows = cmpCols.map((c,i)=>{
+  const rows = cmpCols.filter(c=>PERF[c.id]).map((c,i)=>{
     const pf = getPerf(c.id, c.state);
     if(pf.na) return {c, i, na:true};
     if(pf.none) return {c, i, none:true};
@@ -1042,7 +1041,6 @@ function verdictHtml(){
   rows.filter(x=>x.na).forEach(x=>{
     html += `<p class="v-warn">⚠ ${colLabel(x.c)}：${x.c.id} 無碳含量規範，不宜調質，已排除評比。若需調質後強度，可改選 S45C（調質）或 SCM 系列。</p>`;
   });
-  rows.filter(x=>x.none).forEach(x=>{ html += `<p class="v-warn">${x.c.id}：尚無狀態別性能資料，未納入評比。</p>`; });
   html += `<p class="v-note">評等為工程經驗之相對參考（強度、硬度由標準下限值換算），最終選材請依圖面需求、尺寸與客戶規範確認。</p></div>`;
   return html;
 }
@@ -1072,76 +1070,76 @@ function setUse(v){ cmpUse = v; renderCompare(); }
 function renderCompare(){
   const cols = cmpCols;
   const dbOf = c => DB.find(d=>d.id===c.id);
-  const th = cols.map((c,i)=>{
-    const keys = stateKeys(c.id);
-    const sel = keys.length
-      ? `<select class="st-sel" onchange="setColState(${i},this.value)">${keys.map(k=>`<option value="${k}"${k===c.state?' selected':''}>${ST_LABEL[k]}</option>`).join('')}</select>`
-      : '<div class="st-none">無狀態資料</div>';
-    return `<th><div class="col-head"><span>${c.id}</span><span>${keys.length&&cols.length<4?`<button class="col-btn" title="加入同材質另一狀態" onclick="dupCol(${i})">＋狀態</button>`:''}<button class="col-btn" title="移除" onclick="delCol(${i})">×</button></span></div>${sel}</th>`;
-  }).join('');
-  const head = `<tr><th>項目</th>${th}</tr>`;
+  const pcols = cols.filter(c=>PERF[c.id]);
+  const noPerf = cols.filter(c=>!PERF[c.id]).map(c=>c.id);
+  const showPerf = pcols.length>=2;
+  const empty = v => v==null || v==='' || v==='—';
+  let body = '';
 
-  const val = (c, key, u) => {
-    const pf = getPerf(c.id, c.state);
-    if(pf.none) return '—';
-    if(pf.na) return '<span style="color:var(--red)">不適用</span>';
-    return fmtR(pf[key], u) || pending;
-  };
-  let perfRows = '';
-  [['ts','抗拉強度','MPa'],['ys','降伏強度','MPa'],['el','伸長率','%'],['hb','硬度 HB','']].forEach(([k,n,u])=>{
-    perfRows += `<tr><td>${n}</td>` + cols.map(c=>`<td>${val(c,k,u)}</td>`).join('') + `</tr>`;
-  });
-  // 同材質不同狀態：與該材質第一欄之差異
-  perfRows += `<tr><td>與同材質前一欄差異</td>` + cols.map((c,i)=>{
-    const j = cols.findIndex((x,idx)=>idx<i && x.id===c.id && x.state!==c.state);
-    if(j<0) return '<td>—</td>';
-    const a = getPerf(cols[j].id, cols[j].state), b = getPerf(c.id, c.state);
-    if(a.na||b.na) return '<td>—</td>';
-    const dl = (k,n,u)=> (a[k]&&b[k]) ? `${n} ${b[k][0]-a[k][0]>=0?'+':''}${b[k][0]-a[k][0]}${u}` : null;
-    const parts = [dl('ts','抗拉','MPa'), dl('ys','降伏','MPa'), dl('hb','HB 下限','')].filter(Boolean);
-    return `<td class="txt">${parts.length ? '相對 '+colLabel(cols[j])+'：<br>'+parts.join('<br>') : '資料不足（待確認）'}</td>`;
-  }).join('') + `</tr>`;
-
-  const scs = cols.map(scoresOf);
-  let scoreRows = '';
-  DIMS.forEach(d=>{
-    scoreRows += `<tr><td>${d.n}</td>` + cols.map((c,i)=>{
-      const pf = getPerf(c.id, c.state);
-      if(pf.na) return '<td>—</td>';
-      return `<td class="star">${scs[i] ? stars(scs[i][d.k]) : '—'}</td>`;
-    }).join('') + `</tr>`;
-  });
-
-  const u = USES[cmpUse];
-  const useSel = `<select class="st-sel" onchange="setUse(this.value)">${Object.keys(USES).map(k=>`<option value="${k}"${k===cmpUse?' selected':''}>${USES[k].n}</option>`).join('')}</select>`;
+  if(showPerf){
+    const th = pcols.map(c=>{
+      const i = cols.indexOf(c), keys = stateKeys(c.id);
+      const sel = keys.length>1
+        ? `<select class="st-sel" onchange="setColState(${i},this.value)">${keys.map(k=>`<option value="${k}"${k===c.state?' selected':''}>${ST_LABEL[k]}</option>`).join('')}</select>`
+        : `<div class="st-none">${ST_LABEL[c.state]||''}</div>`;
+      const dup = keys.length>1 && cols.length<4 ? `<button class="col-btn" title="加入同材質另一狀態" onclick="dupCol(${i})">＋狀態</button>` : '';
+      return `<th><div class="col-head"><span>${c.id}</span><span>${dup}<button class="col-btn" title="移除" onclick="delCol(${i})">×</button></span></div>${sel}</th>`;
+    }).join('');
+    const head = `<tr><th>項目</th>${th}</tr>`;
+    const has = (c,k)=>{ const pf=getPerf(c.id,c.state); return !pf.na && pf[k]; };
+    const cell = (c,k,u)=>{ const pf=getPerf(c.id,c.state); if(pf.na) return '<span style="color:var(--red)">不適用</span>'; return fmtR(pf[k],u)||'—'; };
+    let rows = '';
+    [['ts','抗拉強度','MPa'],['ys','降伏強度','MPa'],['el','伸長率','%'],['hb','硬度 HB','']].forEach(([k,n,u])=>{
+      if(pcols.some(c=>has(c,k))) rows += `<tr><td>${n}</td>` + pcols.map(c=>`<td>${cell(c,k,u)}</td>`).join('') + `</tr>`;
+    });
+    const diffCells = pcols.map(c=>{
+      const i = cols.indexOf(c);
+      const j = cols.findIndex((x,idx)=>idx<i && x.id===c.id && x.state!==c.state);
+      if(j<0) return null;
+      const a = getPerf(cols[j].id, cols[j].state), b = getPerf(c.id, c.state);
+      if(a.na||b.na) return null;
+      const dl = (k,n,u)=> (a[k]&&b[k]) ? `${n} ${b[k][0]-a[k][0]>=0?'+':''}${b[k][0]-a[k][0]}${u}` : null;
+      const parts = [dl('ts','抗拉','MPa'), dl('ys','降伏','MPa'), dl('hb','HB 下限','')].filter(Boolean);
+      return parts.length ? `相對 ${colLabel(cols[j])}：<br>${parts.join('<br>')}` : null;
+    });
+    if(diffCells.some(Boolean)) rows += `<tr><td>與同材質前一欄差異</td>` + diffCells.map(t=>`<td class="txt">${t||'—'}</td>`).join('') + `</tr>`;
+    const scs = pcols.map(scoresOf);
+    DIMS.forEach(d=>{
+      if(scs.some(sc=>sc && sc[d.k]!=null))
+        rows += `<tr><td>${d.n}</td>` + scs.map(sc=>`<td class="star">${sc ? stars(sc[d.k]) : '—'}</td>`).join('') + `</tr>`;
+    });
+    const notes = [...new Set(pcols.map(c=>getPerf(c.id,c.state).n).filter(Boolean))];
+    const useSel = `<select class="st-sel" onchange="setUse(this.value)">${Object.keys(USES).map(k=>`<option value="${k}"${k===cmpUse?' selected':''}>${USES[k].n}</option>`).join('')}</select>`;
+    body += `<div class="use-bar"><span>用途：</span>${useSel}<span class="use-hint">各欄可切換狀態，或按「＋狀態」加入同材質另一狀態</span></div>
+      ${verdictHtml()}
+      <h3 class="cmp-sub">性能與評等</h3>
+      <div class="cmp-scroll"><table class="cmp-table"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+      ${notes.length?`<ul class="ht-warn" style="color:var(--text-dim)">${notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}
+      <p class="ht-note">${PERF_SRC}「—」表示尚無可靠數值。${noPerf.length?`${noPerf.join('、')} 尚無狀態別性能資料，僅列於下方對照表。`:''}</p>
+      <h3 class="cmp-sub">型號、成分與熱處理對照</h3>`;
+  }
 
   const stdKeys = Object.keys(STD_LABELS);
-  let detail = `<tr><td>分類</td>` + cols.map(c=>`<td class="txt">${dbOf(c).category}</td>`).join('') + `</tr>`;
-  stdKeys.forEach(k=>{
-    detail += `<tr><td>${STD_LABELS[k]}</td>` + cols.map(c=>`<td>${dbOf(c).names[k]||'—'}</td>`).join('') + `</tr>`;
-  });
-  detail += `<tr><td>俗稱／其他</td>` + cols.map(c=>`<td class="txt">${(dbOf(c).alias||[]).join('、')||'—'}</td>`).join('') + `</tr>`;
-  detail += `<tr><td>化學成分</td>` + cols.map(c=>`<td class="txt">${dbOf(c).comp}</td>`).join('') + `</tr>`;
-  detail += `<tr><td>特性</td>` + cols.map(c=>`<td class="txt">${dbOf(c).prop}</td>`).join('') + `</tr>`;
-  detail += `<tr><td>熱處理（客戶規範）</td>` + cols.map(c=>`<td class="txt">${htSummary(c.id)}</td>`).join('') + `</tr>`;
-  detail += `<tr><td>用途</td>` + cols.map(c=>`<td class="txt">${dbOf(c).app}</td>`).join('') + `</tr>`;
-
-  const notes = [...new Set(cols.map(c=>{ const p=getPerf(c.id,c.state); return p.n; }).filter(Boolean))];
+  let detail = '';
+  const addRow = (label, cells, cls) => {
+    if(cells.every(empty)) return;
+    detail += `<tr><td>${label}</td>` + cells.map(v=>`<td${cls?` class="${cls}"`:''}>${empty(v)?'—':v}</td>`).join('') + `</tr>`;
+  };
+  addRow('分類', cols.map(c=>dbOf(c).category), 'txt');
+  stdKeys.forEach(k=>addRow(STD_LABELS[k], cols.map(c=>dbOf(c).names[k])));
+  addRow('俗稱／其他', cols.map(c=>(dbOf(c).alias||[]).join('、')), 'txt');
+  addRow('化學成分', cols.map(c=>dbOf(c).comp), 'txt');
+  addRow('特性', cols.map(c=>dbOf(c).prop), 'txt');
+  addRow('熱處理（客戶規範）', cols.map(c=>htSummary(c.id)), 'txt');
+  addRow('用途', cols.map(c=>dbOf(c).app), 'txt');
+  const dhead = `<tr><th>項目</th>${cols.map(c=>`<th>${colLabel(c)}</th>`).join('')}</tr>`;
+  body += `<div class="cmp-scroll"><table class="cmp-table"><thead>${dhead}</thead><tbody>${detail}</tbody></table></div>`;
 
   document.getElementById('compareContent').innerHTML = `
     <div class="modal-head">
-      <h2 style="font-size:19px;">材料綜合比對</h2>
+      <h2 style="font-size:19px;">${showPerf?'材料綜合比對':'材料比對'}</h2>
       <button class="modal-close" onclick="closeCompareModal()">×</button>
-    </div>
-    <div class="use-bar"><span>用途：</span>${useSel}<span class="use-hint">各欄可切換狀態（原材／正火／調質），或按「＋狀態」加入同材質另一狀態</span></div>
-    ${verdictHtml()}
-    <h3 class="cmp-sub">性能與評等</h3>
-    <div class="cmp-scroll"><table class="cmp-table"><thead>${head}</thead><tbody>${perfRows}${scoreRows}</tbody></table></div>
-    ${notes.length?`<ul class="ht-warn" style="color:var(--text-dim)">${notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}
-    <p class="ht-note">${PERF_SRC}「待確認」表示尚未查得可靠數值，不以估計值代替。</p>
-    <h3 class="cmp-sub">型號、成分與熱處理對照</h3>
-    <div class="cmp-scroll"><table class="cmp-table"><thead><tr><th>項目</th>${cols.map(c=>`<th>${colLabel(c)}</th>`).join('')}</tr></thead><tbody>${detail}</tbody></table></div>
-  `;
+    </div>${body}`;
 }
 function closeCompareModal(){ document.getElementById('compareModal').classList.remove('show'); }
 
