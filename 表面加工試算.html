@@ -89,6 +89,10 @@ input[type=number]:disabled{opacity:.35;cursor:not-allowed;}
 .v-price{font-size:18px;font-weight:900;color:var(--green);font-family:'Courier New',monospace;}
 .vendor-card.na .v-price{color:var(--muted);}
 .v-detail{font-size:10px;color:var(--text3);margin-top:4px;}
+.vendor-card.pick{cursor:pointer}
+.vendor-card.sel{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.v-hint{font-size:11px;color:var(--text3);margin-top:6px;}
+
 
 /* 合計 */
 .total-card{background:linear-gradient(135deg,#0e2a4a,#0d1a2e);border:1px solid var(--blue);border-radius:var(--radius);padding:20px;text-align:center;margin-top:4px;}
@@ -178,6 +182,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-t
 </main>
 <footer>勁格科技股份有限公司 · 表面處理試算工具</footer>
 
+<script src="./jinge-pricing.js"></script>
 <script>
 // ── 狀態 ──
 let workType = null; // 'shaft' | 'cylinder'
@@ -187,99 +192,11 @@ let plateMode = null; // 'plate' | 'strip' | 'replate'
 let surfaceSel = null;      // 軸心單選: 'grind'|'polish'
 let cylinderSel = new Set(); // 鋼管複選: 'bore'|'polish'|'epolish'|'eplating'
 
-// ── 常數 ──
-const MM2IN2 = 645;
-function areaIN2(d, l){ return Math.PI * d * l / MM2IN2; }
+// ── 常數與計價公式：共用 jinge-pricing.js（單價有調整只改該檔）──
+const { MM2IN2, areaIN2, grindFee, boreVendors, polishShaft, polishCylinderVendors,
+        CR_SHAFT, CR_CYLINDER, CR_LABELS, plateFee } = JingePricing;
 function nt(n){ return 'NT$ ' + Math.round(n).toLocaleString('zh-TW'); }
 function fee(area, unit, minP){ return Math.max(area * unit, minP); }
-
-// 研磨（外圓）
-function grindFee(d, l, passes){
-  const a = Math.PI * (d/25.4) * (l/25.4);
-  const c1 = a * 2;
-  const c2 = a * 2 * 1.5;
-  const ld = l / d;
-  const isLong = ld > 25;
-  const c1Total = isLong ? c1 * 2 : c1;
-  const c2Total = isLong ? c2 * 2 : c2;
-  const sub = passes===1 ? c1Total : c1Total + c2Total;
-  const total = Math.max(300, sub);
-  return { area: a, c1, c2, c1Total, c2Total, isLong, ld, total, passes };
-}
-
-// 膛孔
-function boreVendors(d, l){
-  const a = areaIN2(d, l);
-  const lf = { name:'利峰', unit:2.5, min:400, outOfRange: false };
-  const yc = { name:'益川', unit:1.2, min:300, outOfRange: d < 20 || d > 160 };
-  return [lf, yc].map(v => ({
-    ...v,
-    area: a,
-    calc: a * v.unit,
-    total: v.outOfRange ? null : Math.max(a * v.unit, v.min)
-  }));
-}
-
-// 拋光（軸心）→ 只有宏光
-function polishShaft(d, l){
-  const a = areaIN2(d, l);
-  return { area: a, unit: 1.725, min: 140, total: Math.max(a * 1.725, 140) };
-}
-
-// 拋光（鋼管）→ 利峰 + 益川 + 宏光
-function polishCylinderVendors(d, l){
-  const a = areaIN2(d, l);
-  const lf = { name:'利峰', unit:2.0, min:400, outOfRange:false };
-  const yc = { name:'益川', unit:1.2, min:300, outOfRange: d < 20 || d > 160 };
-  const hg = { name:'宏光', unit:1.35, min:200, outOfRange: d > 150 && l > 1200 };
-  return [lf, yc, hg].map(v => ({
-    ...v, area: a, calc: a * v.unit,
-    total: v.outOfRange ? null : Math.max(a * v.unit, v.min)
-  }));
-}
-
-// 電鍍查表
-const CR_SHAFT = ['cr4_6','cr6_8','cr15','cr20','cr25'];
-const CR_CYLINDER = ['cr4_6','cr6_8','cr10','cr20'];
-const CR_LABELS = { cr4_6:'CR 4-6條', cr6_8:'CR 6-8條', cr10:'CR 10條', cr15:'CR 15條', cr20:'CR 20條', cr25:'CR 25條' };
-
-function plateFee(type, cr, d, l){
-  if(!type||!cr||!d||!l) return null;
-  const a = areaIN2(d, l);
-  let unit, minP;
-  if(type==='shaft'){
-    if(d>400) return 'estimate';
-    if(cr==='cr4_6'){ unit=d<=250?3.5:d<=400?4.5:null; minP=300; }
-    else if(cr==='cr6_8'){ unit=d<=250?4.2:d<=400?5.2:null; minP=400; }
-    else if(cr==='cr15'){
-      if(d<=80){unit=5.4;minP=500;}
-      else if(d<=120){if(l>3000)return 'estimate';unit=8.4;minP=500;}
-      else if(d<=300){if(l>3000)return 'estimate';unit=11.4;minP=500;}
-      else return 'estimate';
-    }
-    else if(cr==='cr20'){
-      if(d<=80){unit=6.3;minP=1000;}
-      else if(d<=120){if(l>3000)return 'estimate';unit=9.2;minP=1000;}
-      else if(d<=300){if(l>3000)return 'estimate';unit=12.2;minP=1000;}
-      else return 'estimate';
-    }
-    else if(cr==='cr25'){
-      if(d<=80){unit=7.2;minP=1200;}
-      else if(d<=120){if(l>3000)return 'estimate';unit=10;minP=1200;}
-      else if(d<=300){if(l>3000)return 'estimate';unit=13;minP=1200;}
-      else return 'estimate';
-    }
-  }
-  if(type==='cylinder'){
-    if(d>400||l>=3000) return 'estimate';
-    if(cr==='cr4_6'){ unit=d<=300?3.5:d<=400?4.5:null; minP=380; }
-    else if(cr==='cr6_8'){ unit=d<=300?4.2:d<=400?5.2:null; minP=550; }
-    else if(cr==='cr10'){ unit=d<=300?5.7:d<=400?6.7:null; minP=720; }
-    else if(cr==='cr20'){ unit=d<=300?6.3:d<=400?7.3:null; minP=1000; }
-  }
-  if(unit==null) return 'estimate';
-  return { area:a, unit, minP, total: Math.max(a*unit, minP) };
-}
 
 // ── 設定零件類型 ──
 function setType(t){
@@ -426,6 +343,15 @@ function setCR(val){
 }
 
 // ── 主計算 ──
+// 缸筒類多家廠商：由使用者點選要採用的廠商（預設利峰），不自動推薦最低價
+let vendorPick = { bore:'利峰', polish:'利峰', epolish:'利峰', eplating:'利峰' };
+function pickVendor(key, name){ vendorPick[key] = name; calculate(); }
+function chosenVendorTotal(key, vs){
+  const ok = vs.filter(v=>!v.outOfRange);
+  const v = ok.find(x=>x.name===vendorPick[key]) || ok.find(x=>x.name==='利峰') || ok[0];
+  return v ? v.total : 0;
+}
+
 function calculate(){
   if(!workType) return;
   const d = parseFloat(document.getElementById('dia').value)||0;
@@ -470,19 +396,19 @@ function calculate(){
         let html = '';
         if(cylinderSel.has('bore')){
           const vs = boreVendors(d,l);
-          html += `<div class="sec-label" style="margin-top:8px;">膛孔</div>` + renderVendorGrid(vs, false);
+          html += `<div class="sec-label" style="margin-top:8px;">膛孔</div>` + renderVendorGrid(vs, false, 'bore');
         }
         if(cylinderSel.has('polish')){
           const vs = polishCylinderVendors(d,l);
-          html += `<div class="sec-label" style="margin-top:8px;">拋光</div>` + renderVendorGrid(vs, true);
+          html += `<div class="sec-label" style="margin-top:8px;">拋光</div>` + renderVendorGrid(vs, true, 'polish');
         }
         if(cylinderSel.has('epolish')){
           const vs = polishCylinderVendors(d,l).filter(v=>v.name!=='宏光');
-          html += `<div class="sec-label" style="margin-top:8px;">電鍍後拋光</div>` + renderVendorGrid(vs, false);
+          html += `<div class="sec-label" style="margin-top:8px;">電鍍後拋光</div>` + renderVendorGrid(vs, false, 'epolish');
         }
         if(cylinderSel.has('eplating')){
           const vs = boreVendors(d,l);
-          html += `<div class="sec-label" style="margin-top:8px;">電鍍後膛孔</div>` + renderVendorGrid(vs, false);
+          html += `<div class="sec-label" style="margin-top:8px;">電鍍後膛孔</div>` + renderVendorGrid(vs, false, 'bore');
         }
         rs.innerHTML = html;
       }
@@ -560,19 +486,19 @@ function calculate(){
       } else {
         if(cylinderSel.has('bore')){
           const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
-          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+          if(vs.length) total += chosenVendorTotal('bore', vs);
         }
         if(cylinderSel.has('polish')){
           const vs = polishCylinderVendors(d,l).filter(v=>!v.outOfRange);
-          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+          if(vs.length) total += chosenVendorTotal('polish', vs);
         }
         if(cylinderSel.has('epolish')){
           const vs = polishCylinderVendors(d,l).filter(v=>!v.outOfRange && v.name!=='宏光');
-          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+          if(vs.length) total += chosenVendorTotal('epolish', vs);
         }
         if(cylinderSel.has('eplating')){
           const vs = boreVendors(d,l).filter(v=>!v.outOfRange);
-          if(vs.length) total += Math.min(...vs.map(v=>v.total));
+          if(vs.length) total += chosenVendorTotal('eplating', vs);
         }
       }
 
@@ -608,17 +534,22 @@ function calculate(){
 
 }
 
-function renderVendorGrid(vendors, isThree, unused, subLabel){
+function renderVendorGrid(vendors, isThree, key, subLabel){
   const gridClass = isThree ? 'vendor-grid three' : 'vendor-grid';
-  let html = `<div class="${gridClass} anim">`;
+  const ok = vendors.filter(v=>!v.outOfRange);
+  const sel = ok.find(x=>x.name===vendorPick[key]) || ok.find(x=>x.name==='利峰') || ok[0];
+  let html = key ? `<div class="v-hint">點選要採用的廠商，合計依所選廠商計算</div>` : '';
+  html += `<div class="${gridClass} anim">`;
   vendors.forEach(v => {
     const naClass = v.outOfRange ? ' na' : '';
+    const pick = (key && !v.outOfRange) ? ` pick${sel && sel.name===v.name ? ' sel' : ''}` : '';
+    const click = (key && !v.outOfRange) ? ` onclick="pickVendor('${key}','${v.name}')"` : '';
     const badge = v.outOfRange ? `<span class="v-badge badge-na">不適用</span>` : '';
     const priceStr = v.outOfRange ? '—' : nt(v.total);
     let detail = v.outOfRange ? '' : `${v.unit}元/in² · 最低NT$${v.min}`;
     if(v.label2) detail += ` · ${v.label2}`;
     if(v.name==='宏光' && !v.outOfRange) detail += '（Ø≤150 或 L≤1200）';
-    html += `<div class="vendor-card${naClass}">
+    html += `<div class="vendor-card${naClass}${pick}"${click}>
       <div class="v-name">${v.name}${badge}</div>
       <div class="v-price">${priceStr}</div>
       <div class="v-detail">${detail}</div>

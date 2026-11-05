@@ -107,31 +107,11 @@ input[type=number]{-moz-appearance:textfield}
 
 </div>
 
+<script src="./jinge-pricing.js"></script>
 <script>
-const RATES = [
-  {d:3,p:2.50},{d:3.5,p:1.50},{d:4,p:1.00},
-  {d:5,p:0.70},{d:6,p:0.70},{d:7,p:0.70},{d:8,p:0.70},{d:9,p:0.70},{d:10,p:0.70},
-  {d:11,p:0.70},{d:12,p:0.70},{d:13,p:0.70},{d:14,p:0.70},{d:15,p:0.70},{d:16,p:0.70},{d:17,p:0.70},
-  {d:18,p:0.90},{d:19,p:0.90},
-  {d:20,p:1.00},{d:21,p:1.00},{d:22,p:1.00},
-  {d:23,p:1.20},{d:24,p:1.30},{d:25,p:1.30},{d:26,p:1.60},
-  {d:27,p:2.00},{d:28,p:2.00},{d:30,p:2.00},
-  {d:32,p:2.60},{d:35,p:3.80},{d:40,p:5.00},{d:42,p:5.50},
-  {d:45,p:8.00},{d:50,p:11.00},{d:55,p:14.00},
-];
-
-// 加工限制（廷翼官網：CNC鎗鑽圓心專用機）
-// 回傳 {ok:false, msg} 或 {ok:true, maxSingle, maxDouble}
-function getLimit(od, dia) {
-  if(dia > 50) return {ok:false, msg:'孔徑超出加工範圍（最大 φ50）'};
-  if(dia >= od) return {ok:false, msg:'孔徑不可大於或等於工件外徑'};
-  if(od <= 55) {
-    if(dia <= 4)  return {ok:true, maxSingle:600,  maxDouble:600};
-    if(dia <= 32) return {ok:true, maxSingle:1500, maxDouble:3000};
-    return {ok:true, maxSingle:1200, maxDouble:1200};
-  }
-  return {ok:true, maxSingle:1200, maxDouble:1200};
-}
+// 費率與加工限制：共用 jinge-pricing.js
+const RATES = JingePricing.DEEP_RATES;
+const getLimit = JingePricing.deepLimit;
 
 let selDia = null, selPx = null;
 

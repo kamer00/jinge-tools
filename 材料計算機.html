@@ -219,6 +219,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .spec-count{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
 .lookup-btn{background:var(--card2);border:1px solid var(--accent);color:var(--accent);padding:16px 24px;font-family:var(--mono);font-size:20px;font-weight:700;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .15s;display:block;margin-left:auto;margin-right:auto}
 .lookup-btn:hover{background:var(--accent);color:#000}
+
+/* ── 其他製程卡（圓棒／管／硬鉻軸） ── */
+.proc-row{border-bottom:1px solid var(--border);padding:8px 0}
+.proc-row:last-of-type{border-bottom:none}
+.proc-head{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;min-height:34px}
+.proc-head input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.proc-name{flex:1;font-size:14px;color:var(--text)}
+.proc-fee{font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:600;text-align:right}
+.proc-fee.hint{font-size:12px;color:var(--muted);font-weight:400}
+.proc-body{display:none;margin:8px 0 4px 30px}
+.proc-row.on .proc-body{display:block}
+.proc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.proc-grid .full{grid-column:1/-1}
+.proc-grid label{display:block;font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:3px}
+.proc-grid input,.proc-grid select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:var(--mono);font-size:13px;padding:8px 10px;border-radius:2px}
+.proc-note{margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.6}
+.proc-sum{margin-top:12px;padding:12px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.25);border-radius:2px}
+.proc-sum .big{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -2715,5 +2734,180 @@ function applyToQuote(amount, type, spec) {
 }
 </script>
 
+
+<script src="./jinge-pricing.js"></script>
+<script>
+// ══════════════════════════════════════════════════
+// 其他製程：查圓棒／管／硬鉻軸時，順便計算研磨、電鍍、深孔等費用
+// 公式與單價來自 jinge-pricing.js；多家廠商由使用者選擇（預設利峰）
+// 內嵌於報價系統（iframe）時不顯示，維持原行為
+// ══════════════════════════════════════════════════
+(function(){
+  if(window.self !== window.top) return;
+  var P = JingePricing, state = {};
+  var fmt = function(n){ return Math.round(n).toLocaleString('zh-TW'); };
+  var PROCS = {
+    bar_rnd: ['grind','polishS','plateS','hf','deep'],
+    shaft:   ['deep','hf'],
+    pipe:    ['bore','polishC','epolish','eplating','plateC']
+  };
+
+  // 多家廠商：全部列出，由使用者選採用哪一家（預設利峰），不自動推薦最低價
+  function vendorResult(list, v){
+    var note = list.map(function(x){ return x.name + ' ' + (x.total != null ? 'NT$ ' + fmt(x.total) : '（孔徑／長度超出範圍）'); }).join('｜');
+    var pick = list.filter(function(x){ return x.name === v.vendor; })[0];
+    if(!pick) return { hint: '請選擇採用廠商' };
+    if(pick.total == null) return { hint: pick.name + ' 不適用（孔徑／長度超出範圍）', note: note };
+    return { fee: pick.total, note: note + '｜採計：' + pick.name };
+  }
+  function vendorField(names){
+    return { f:'vendor', type:'select', label:'採用廠商', full:true, def:'利峰',
+      options: names.map(function(n){ return [n, n]; }) };
+  }
+  function platingResult(type, v){
+    var j = P.platingJob(type, v.mode, v.cr, v.d, v.l);
+    if(!j) return { hint: '請選擇 CR 條數' };
+    if(j.estimate) return { hint: '需估價（超出報價表範圍）' };
+    var note = '面積 ' + P.areaIN2(v.d, v.l).toFixed(1) + ' in²';
+    if(j.strip != null) note += '｜退電 NT$ ' + fmt(j.strip) + ' + 電鍍 NT$ ' + fmt(j.plate);
+    return { fee: j.total, note: note };
+  }
+  function crSelect(list, label){
+    return { f:'cr', type:'select', label:'CR 條數', full:true, showIf:function(v){ return v.mode !== 'strip'; },
+      options:[['','— 請選擇 CR 條數 —']].concat(list.map(function(k){ return [k, P.CR_LABELS[k]]; })) };
+  }
+  var modeField = { f:'mode', type:'select', label:'工序', full:true, def:'plate',
+    options:[['plate','電鍍'],['strip','純退電'],['replate','退電再電']] };
+
+  var DEF = {
+    grind: { name:'研磨（外圓）', dLabel:'外徑 Ø（mm）', lLabel:'長度 L（mm）',
+      fields:[{ f:'passes', type:'select', label:'研磨次數', full:true, def:'2', options:[['2','二次研磨'],['1','一次研磨']] }],
+      calc:function(v){ var g = P.grindFee(v.d, v.l, +v.passes);
+        return { fee:g.total, note:'面積 ' + g.area.toFixed(1) + ' in²' + (g.isLong ? '｜長徑比 > 25，費用 ×2' : '') + '｜最低 NT$ 300' }; } },
+    polishS: { name:'拋光（軸心）', dLabel:'外徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[],
+      calc:function(v){ var r = P.polishShaft(v.d, v.l); return { fee:r.total, note:'宏光｜' + r.unit + ' 元/in²，最低 NT$ ' + r.min }; } },
+    plateS: { name:'電鍍（軸類）', dLabel:'外徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[modeField, crSelect(P.CR_SHAFT)],
+      calc:function(v){ return platingResult('shaft', v); } },
+    hf: { name:'高週波（圓周面）', dLabel:'外徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[],
+      calc:function(v){ var r = P.inductionCylinder(v.d, v.l);
+        return { fee:r.total, note:'面積 ' + r.area.toFixed(1) + ' in²｜$' + r.rate + '/in²｜最低 $' + r.min }; } },
+    deep: { name:'深孔', dLabel:'工件外徑（mm）', lLabel:'加工深度（mm）',
+      fields:[{ f:'dia', type:'select', label:'孔徑', full:true,
+        options:[['','— 請選擇孔徑 —']].concat(P.DEEP_RATES.map(function(r){ return [String(r.d), 'φ' + r.d + ' mm　' + r.p.toFixed(2) + ' 元/mm' + (r.d > 50 ? '（超出範圍）' : '')]; })) }],
+      calc:function(v){ var r = P.deepHoleFee(v.d, parseFloat(v.dia), v.l);
+        if(r.error) return { hint:r.error };
+        return { fee:r.total, note:r.px.toFixed(2) + ' 元/mm × ' + v.l + ' mm' + (r.isDouble ? '｜需雙頭鑽孔（單邊上限 ' + r.lim.maxSingle + ' mm）' : '') }; } },
+    bore: { name:'膛孔', dLabel:'內徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[vendorField(['利峰','益川'])], calc:function(v){ return vendorResult(P.boreVendors(v.d, v.l), v); } },
+    polishC: { name:'拋光（缸筒）', dLabel:'內徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[vendorField(['利峰','益川','宏光'])], calc:function(v){ return vendorResult(P.polishCylinderVendors(v.d, v.l), v); } },
+    epolish: { name:'電鍍後拋光', dLabel:'內徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[vendorField(['利峰','益川'])],
+      calc:function(v){ return vendorResult(P.polishCylinderVendors(v.d, v.l).filter(function(x){ return x.name !== '宏光'; }), v); } },
+    eplating: { name:'電鍍後膛孔', dLabel:'內徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[vendorField(['利峰','益川'])], calc:function(v){ return vendorResult(P.boreVendors(v.d, v.l), v); } },
+    plateC: { name:'電鍍（缸筒）', dLabel:'內徑 Ø（mm）', lLabel:'長度 L（mm）', fields:[modeField, crSelect(P.CR_CYLINDER)],
+      calc:function(v){ return platingResult('cylinder', v); } }
+  };
+
+  function num(id){ var e = document.getElementById(id); return e ? (parseFloat(e.value) || 0) : 0; }
+
+  // 讀目前輸入的尺寸（od 外徑、id 內徑、l 長度）
+  function readDims(){
+    var sh = currentShape, o = {od:0, id:0, l:0};
+    if(sh === 'bar_rnd'){ o.od = num('dim-D'); o.id = num('dim-ID'); o.l = num('dim-L'); }
+    else if(sh === 'shaft'){
+      var idx = parseInt((document.getElementById('dim-SH_DIA') || {}).value);
+      if(!isNaN(idx) && typeof SHAFT_PRICES !== 'undefined' && SHAFT_PRICES[idx]) o.od = SHAFT_PRICES[idx].dia;
+      o.l = num('dim-L');
+    } else if(sh === 'pipe'){
+      var pm = (document.getElementById('pipe-mat-sel') || {}).value || 'a13';
+      if(pm === 'a13'){
+        var ix = parseInt((document.getElementById('dim-STKM_SPEC') || {}).value);
+        if(!isNaN(ix) && typeof PIPE_SPEC !== 'undefined' && PIPE_SPEC[ix]){ o.od = PIPE_SPEC[ix][0]; o.id = PIPE_SPEC[ix][1]; }
+        o.l = num('dim-L');
+      } else if(pm === 'c13'){ o.od = num('dim-PP-OD'); o.id = num('dim-PP-ID'); o.l = num('dim-L-stkm13c'); }
+      else if(pm === 'sus'){ o.od = num('dim-SUS-OD'); o.id = num('dim-SUS-ID'); o.l = num('dim-L-sus'); }
+      else { o.od = num('dim-AL-OD'); o.id = num('dim-AL-ID'); o.l = num('dim-L-al'); }
+    }
+    return o;
+  }
+
+  function fieldHTML(f, val){
+    var h = '<div' + (f.full ? ' class="full"' : '') + ' data-wrap="' + f.f + '"><label>' + f.label + '</label><select data-f="' + f.f + '">';
+    f.options.forEach(function(op){ h += '<option value="' + op[0] + '"' + (String(op[0]) === String(val) ? ' selected' : '') + '>' + op[1] + '</option>'; });
+    return h + '</select></div>';
+  }
+
+  function buildCard(shape, dm){
+    var keys = PROCS[shape];
+    var rows = keys.map(function(k){
+      var d = DEF[k], st = state[shape + '|' + k] || {};
+      var dv = (shape === 'pipe' ? dm.id : dm.od) || '';
+      var h = '<div class="proc-row' + (st.on ? ' on' : '') + '" data-k="' + k + '">' +
+        '<label class="proc-head"><input type="checkbox" data-f="on"' + (st.on ? ' checked' : '') + '>' +
+        '<span class="proc-name">' + d.name + '</span><span class="proc-fee"></span></label>' +
+        '<div class="proc-body"><div class="proc-grid">' +
+        '<div><label>' + d.dLabel + '</label><input type="number" step="any" inputmode="decimal" data-f="d" value="' + dv + '"></div>' +
+        '<div><label>' + d.lLabel + '</label><input type="number" step="any" inputmode="decimal" data-f="l" value="' + (dm.l || '') + '"></div>';
+      d.fields.forEach(function(f){ h += fieldHTML(f, st[f.f] != null ? st[f.f] : (f.def != null ? f.def : '')); });
+      return h + '</div><div class="proc-note"></div></div></div>';
+    }).join('');
+    return '<div class="res-card" id="proc-card" data-shape="' + shape + '">' +
+      '<div class="res-card-header">其他製程（勾選後計入合計）</div>' +
+      '<div class="res-card-body">' + rows + '<div id="proc-sum"></div></div></div>';
+  }
+
+  function recalc(){
+    var card = document.getElementById('proc-card'); if(!card) return;
+    var shape = card.dataset.shape, mat = parseFloat(card.dataset.mat) || 0;
+    var sum = 0, pending = 0, picked = 0;
+    card.querySelectorAll('.proc-row').forEach(function(row){
+      var k = row.dataset.k, d = DEF[k], v = {};
+      row.querySelectorAll('[data-f]').forEach(function(e){ v[e.dataset.f] = e.type === 'checkbox' ? e.checked : e.value; });
+      v.d = parseFloat(v.d) || 0; v.l = parseFloat(v.l) || 0;
+      state[shape + '|' + k] = v;
+      row.classList.toggle('on', !!v.on);
+      d.fields.forEach(function(f){ var w = row.querySelector('[data-wrap="' + f.f + '"]'); if(w && f.showIf) w.style.display = f.showIf(v) ? '' : 'none'; });
+      var feeEl = row.querySelector('.proc-fee'), noteEl = row.querySelector('.proc-note');
+      var r = (v.d > 0 && v.l > 0) ? d.calc(v) : { hint:'請填入尺寸' };
+      if(r.fee != null){ feeEl.textContent = 'NT$ ' + fmt(r.fee); feeEl.className = 'proc-fee'; noteEl.textContent = r.note || ''; }
+      else { feeEl.textContent = r.hint || ''; feeEl.className = 'proc-fee hint'; noteEl.textContent = ''; }
+      if(v.on){ picked++; if(r.fee != null) sum += Math.round(r.fee); else pending++; }
+    });
+    var box = document.getElementById('proc-sum');
+    if(!picked){ box.innerHTML = ''; return; }
+    var h = '<div class="proc-sum">';
+    if(mat > 0) h += '<div class="res-row"><span class="res-label">材料費（上方結果）</span><span class="res-val">NT$ ' + fmt(mat) + '</span></div>';
+    h += '<div class="res-row"><span class="res-label">所選製程小計（' + picked + ' 項）</span><span class="res-val">NT$ ' + fmt(sum) + '</span></div>';
+    if(pending) h += '<div class="res-row"><span class="res-label" style="color:var(--red)">尚有 ' + pending + ' 項未算出（補條件或詢價），未計入</span><span class="res-val"></span></div>';
+    h += '<div style="margin-top:10px;font-size:11px;color:var(--muted);font-family:var(--mono)">' + (mat > 0 ? '材料＋製程合計' : '製程合計') + '</div>' +
+         '<div class="big">NT$ ' + fmt(mat + sum) + '</div></div>';
+    box.innerHTML = h;
+  }
+
+  function attach(){
+    var res = document.getElementById('result');
+    if(!res || document.getElementById('proc-card')) return;   // 計算被擋下（alert）時沿用原卡片
+    if(!res.querySelector('.res-card') || !PROCS[currentShape]) return;
+    var dm = readDims();
+    if(!(dm.od > 0 || dm.id > 0) || !(dm.l > 0)) return;
+    var wrap = document.createElement('div');
+    wrap.innerHTML = buildCard(currentShape, dm);
+    var card = wrap.firstChild;
+    var priceEl = res.querySelector('.res-card .price-num');
+    var first = res.querySelector('.res-card');
+    var m = (priceEl && first && first.contains(priceEl)) ? priceEl.textContent.replace(/,/g,'').match(/[\d.]+/) : null;
+    card.dataset.mat = m ? m[0] : '0';
+    res.appendChild(card);
+    card.addEventListener('input', recalc);
+    card.addEventListener('change', recalc);
+    recalc();
+  }
+
+  var _calc = window.calculate;
+  window.calculate = function(){
+    var r = _calc.apply(this, arguments);
+    try { attach(); } catch(e) { console.error('其他製程卡載入失敗', e); }
+    return r;
+  };
+})();
+</script>
 </body>
 </html>

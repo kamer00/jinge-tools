@@ -195,8 +195,8 @@ function calcCyl() {
     details.push({ seg: i + 1, d, l, areaSqIn, rate, segCost });
   });
   if (!valid || !details.length) { alert('請確認所有欄位均已填入有效數值'); return; }
-  const minFee = 100;
   details.forEach(s => {
+    const minFee = s.l <= 1000 ? 100 : 300;   // 全長 ≤1000mm 最低 $100；>1000mm 最低 $300
     s.finalSegCost = Math.max(s.segCost, minFee);
     s.minTriggered = s.segCost < minFee;
   });
