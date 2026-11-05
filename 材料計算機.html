@@ -238,6 +238,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .proc-note{margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.6}
 .proc-sum{margin-top:12px;padding:12px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.25);border-radius:2px}
 .proc-sum .big{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
+
+/* ── 精簡版面 ── */
+.panel{padding:14px !important;gap:12px !important}
+.field-row{display:flex;gap:8px;align-items:flex-end}
+.field-row .field{flex:1;min-width:0}
+.density-tag{margin:0 0 0 6px !important;padding:0 6px !important;vertical-align:middle}
+.lookup-btn{margin:0 0 0 auto !important;padding:6px 12px !important;font-size:13px !important;font-weight:600 !important;letter-spacing:0 !important;display:inline-block !important}
+.action-row{display:flex;gap:8px;align-items:stretch}
+.action-row .mode-toggle{display:flex;gap:0;margin:0;flex:none}
+.action-row .mode-btn{padding:0 12px;font-size:13px;letter-spacing:0;border-radius:0}
+.action-row .mode-btn:first-child{border-radius:2px 0 0 2px}
+.action-row .mode-btn:last-child{border-radius:0 2px 2px 0;border-left:none}
+.action-row .calc-btn{padding:11px;font-size:15px;flex:1;width:auto}
+.res-2col{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+.res-card-body{padding:12px !important}
 </style>
 </head>
 <body>
@@ -248,71 +263,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <h1>材料計算機</h1>
     <p>勁格科技股份有限公司 ／ MATERIAL CALCULATOR</p>
   </div>
+  <button class="lookup-btn" onclick="openLookup()">🔍 現貨清單</button>
 </div>
 
 <div class="layout">
   <!-- ── 左側輸入 ── -->
   <div class="panel">
 
-    <button class="lookup-btn" onclick="openLookup()" style="margin-bottom:16px">🔍 查詢現貨規格清單</button>
-
-    <!-- 材質 -->
-    <!-- 形狀 -->
-    <div>
-      <div class="sec-title">01 ／ 形狀</div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-        <button class="shape-btn active" onclick="setShape('plate')" id="btn-plate">
-          <span class="icon" style="font-size:38px">▬</span>板材
-        </button>
-        <button class="shape-btn" onclick="selectBarGroup()" id="btn-bar_group">
-          <span class="icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="3.5" cy="10" rx="2.5" ry="5"/><rect x="3.5" y="5" width="13" height="10"/><ellipse cx="16.5" cy="10" rx="2.5" ry="5" opacity=".7"/></svg></span>棒材
-        </button>
-        <button class="shape-btn" onclick="setShape('pipe')" id="btn-pipe">
-          <span class="icon">◎</span>管
-        </button>
-        <button class="shape-btn" onclick="setShape('shaft')" id="btn-shaft">
-          <span class="icon">⊕</span>硬鉻軸
-        </button>
-      </div>
-      <div class="bar-sub" id="bar-sub-row" style="display:none">
-        <button class="shape-btn" onclick="setShape('bar_rnd')" id="btn-bar_rnd">
-          <span class="icon">●</span>圓棒
-        </button>
-        <button class="shape-btn" onclick="setShape('bar_sq')" id="btn-bar_sq">
-          <span class="icon">■</span>四角棒
-        </button>
-        <button class="shape-btn" onclick="setShape('bar_hex')" id="btn-bar_hex">
-          <span class="icon">⬡</span>六角棒
-        </button>
-      </div>
-    </div>
-
-    <div id="mat-section">
-      <div class="sec-title">02 ／ 材質</div>
-      <div style="margin-top:12px" class="field">
-        <label>選擇材質</label>
-        <select id="mat" onchange="onMatChange()">
+    <div class="field-row">
+      <div class="field" id="shape-field">
+        <label>形狀</label>
+        <select id="shape-sel" onchange="setShape(this.value)">
+          <option value="plate">板材</option>
+          <option value="bar_rnd">圓棒</option>
+          <option value="bar_sq">四角棒</option>
+          <option value="bar_hex">六角棒</option>
+          <option value="pipe">管</option>
+          <option value="shaft">硬鉻軸</option>
         </select>
-        <div id="density-tag" class="density-tag">密度：7.85 g/cm³</div>
       </div>
-    </div>
-
-    <!-- 模式切換 -->
-    <div class="mode-toggle" style="margin-top:16px">
-      <button class="mode-btn active" id="mode-btn-calc" onclick="setMode('calc')">▶ 計算模式</button>
-      <button class="mode-btn" id="mode-btn-reverse" onclick="setMode('reverse')">⇄ 反查模式</button>
+      <div class="field" id="mat-section">
+        <label>材質 <span id="density-tag" class="density-tag">7.85 g/cm³</span></label>
+        <select id="mat" onchange="onMatChange()"></select>
+      </div>
     </div>
 
     <!-- 尺寸 -->
     <div>
-      <div class="sec-title">03 ／ 尺寸（mm）</div>
-      <div style="margin-top:12px" id="dim-area"></div>
+      <div id="dim-area"></div>
     </div>
 
     <!-- 數量 & 單價 -->
     <div>
       
-      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;gap:8px">
         <div id="unit-price-wrap" style="display:none">
           <div class="field">
             <label>單價（元/kg）</label>
@@ -329,7 +313,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       </div>
     </div>
 
-    <button class="calc-btn" id="main-calc-btn" onclick="mainAction()">▶ 計算重量與費用</button>
+    <div class="action-row">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-btn-calc" onclick="setMode('calc')" title="計算模式">計算</button>
+        <button class="mode-btn" id="mode-btn-reverse" onclick="setMode('reverse')" title="反查模式">反查</button>
+      </div>
+      <button class="calc-btn" id="main-calc-btn" onclick="mainAction()">▶ 計算重量與費用</button>
+    </div>
   </div>
 
   <!-- ── 右側結果 ── -->
@@ -1152,7 +1142,7 @@ function showUnitPriceInput() {
 function onMatChange() {
   const val = document.getElementById('mat').value;
   const density = val.split('|')[1];
-  document.getElementById('density-tag').textContent = '密度：'+density+' g/cm³';
+  document.getElementById('density-tag').textContent = density+' g/cm³';
   renderDims();
   autoFillUnitPrice();
 }
@@ -1337,34 +1327,10 @@ function setCopperType(type) {
   });
 }
 
-function selectBarGroup() {
-  const sub = document.getElementById('bar-sub-row');
-  const isVisible = sub.style.display !== 'none';
-  if(isVisible) {
-    sub.style.display = 'none';
-    document.getElementById('btn-bar_group').classList.remove('active');
-  } else {
-    sub.style.display = 'grid';
-    document.getElementById('btn-bar_group').classList.add('active');
-    setShape('bar_rnd');
-  }
-}
-
 function setShape(s) {
   currentShape = s;
-  const isBar = ['bar_rnd','bar_sq','bar_hex'].includes(s);
-  ['plate','pipe','shaft'].forEach(id => {
-    const btn = document.getElementById('btn-'+id);
-    if(btn) btn.classList.toggle('active', id===s);
-  });
-  ['bar_rnd','bar_sq','bar_hex'].forEach(id => {
-    const btn = document.getElementById('btn-'+id);
-    if(btn) btn.classList.toggle('active', id===s);
-  });
-  const grpBtn = document.getElementById('btn-bar_group');
-  if(grpBtn) grpBtn.classList.toggle('active', isBar);
-  const subRow = document.getElementById('bar-sub-row');
-  if(subRow) subRow.style.display = isBar ? 'grid' : 'none';
+  const sel = document.getElementById('shape-sel');
+  if(sel && sel.value !== s) sel.value = s;
   updateMatOptions(s);
   renderDims();
 }
@@ -2190,11 +2156,10 @@ function calculate() {
     const sawNote = autoSawFeeAmt > 0 ? '<div class="res-row"><span class="res-label">切工費</span><span class="res-val" style="color:var(--muted)">含 '+autoSawFeeAmt+' 元</span></div>' : '';
     mainCard = '<div class="res-card"><div class="res-card-header">計算結果 ／ '+matDisplay+'　'+shapeNames[currentShape]+'</div><div class="res-card-body">'+
       '<div class="price-big"><div class="price-label-sm">TOTAL COST</div><div class="price-num">NT$ '+fmtNT(totalCost)+'</div><div class="price-sub">NT$ '+fmtNT(unitCost)+'</div></div>'+
-      '<div style="margin-top:12px">'+
+      '<div class="res-2col" style="margin-top:8px">'+
       '<div class="res-row"><span class="res-label">單價</span><span class="res-val">'+unitPrice.toLocaleString()+' 元/kg</span></div>'+
       '<div class="res-row"><span class="res-label">重量（單件）</span><span class="res-val">'+fmt(kg)+' kg</span></div>'+
       sawNote+
-      '<div class="res-row"><span class="res-label">材質</span><span class="res-val">'+matDisplay+'</span></div>'+
       '</div></div></div>';
     costHTML = ''; // 已整合進 mainCard，不再重複
   } else if(suggestHTML) {
@@ -2202,13 +2167,11 @@ function calculate() {
     mainCard = '<div class="res-card"><div class="res-card-header">計算結果 ／ '+matDisplay+'　'+shapeNames[currentShape]+'</div><div class="res-card-body">'+
       '<div style="margin-top:4px">'+
       '<div class="res-row"><span class="res-label">重量（單件）</span><span class="res-val accent">'+fmt(kg)+' kg</span></div>'+
-      '<div class="res-row"><span class="res-label">材質</span><span class="res-val">'+matDisplay+'</span></div>'+
       '</div></div></div>';
     suggestHTML = suggestHTML; // 建議單價卡保留
   } else {
     // 無單價：只顯示重量（灰色次要），提示輸入單價
     mainCard = '<div class="res-card"><div class="res-card-header">計算結果 ／ '+matDisplay+'　'+shapeNames[currentShape]+'</div><div class="res-card-body">'+
-      '<div class="res-row"><span class="res-label">材質</span><span class="res-val">'+matDisplay+'</span></div>'+
       '<div class="res-row"><span class="res-label">密度</span><span class="res-val">'+density+' g/cm³</span></div>'+
       '<div class="res-row"><span class="res-label">重量（單件）</span><span class="res-val" style="color:var(--muted)">'+fmt(kg)+' kg</span></div>'+
       '<div style="margin-top:10px;padding:10px;background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.3);border-radius:2px;font-family:var(--mono);font-size:11px;color:var(--blue)">💡 請在左側輸入單價（元/kg）後重新計算</div>'+
@@ -2738,20 +2701,14 @@ function applyToQuote(amount, type, spec) {
 <script src="./jinge-pricing.js"></script>
 <script>
 // ══════════════════════════════════════════════════
-// 其他製程：查圓棒／管／硬鉻軸時，順便計算研磨、電鍍、深孔等費用
+// 表面處理與其他製程：一打開就可單獨查價，也會帶入材料尺寸一起算
 // 公式與單價來自 jinge-pricing.js；多家廠商由使用者選擇（預設利峰）
 // 內嵌於報價系統（iframe）時不顯示，維持原行為
 // ══════════════════════════════════════════════════
 (function(){
   if(window.self !== window.top) return;
-  var P = JingePricing, state = {};
+  var P = JingePricing, state = {}, dimState = {}, kindOverride = null;
   var fmt = function(n){ return Math.round(n).toLocaleString('zh-TW'); };
-  var PROCS = {
-    bar_rnd: ['grind','polishS','plateS','hf','deep'],
-    shaft:   ['deep','hf'],
-    pipe:    ['bore','polishC','epolish','eplating','plateC']
-  };
-
   // 多家廠商：全部列出，由使用者選採用哪一家（預設利峰），不自動推薦最低價
   function vendorResult(list, v){
     var note = list.map(function(x){ return x.name + ' ' + (x.total != null ? 'NT$ ' + fmt(x.total) : '（孔徑／長度超出範圍）'); }).join('｜');
@@ -2778,6 +2735,7 @@ function applyToQuote(amount, type, spec) {
   }
   var modeField = { f:'mode', type:'select', label:'工序', full:true, def:'plate',
     options:[['plate','電鍍'],['strip','純退電'],['replate','退電再電']] };
+
 
   var DEF = {
     grind: { name:'研磨（外圓）', dLabel:'外徑 Ø（mm）', lLabel:'長度 L（mm）',
@@ -2835,40 +2793,77 @@ function applyToQuote(amount, type, spec) {
     return h + '</select></div>';
   }
 
-  function buildCard(shape, dm){
-    var keys = PROCS[shape];
+  // 目前工件類型：管 → 缸筒；其餘 → 軸類（可在卡片內手動切換）
+  function kindNow(){ return kindOverride || (currentShape === 'pipe' ? 'cyl' : 'shaft'); }
+  function keysFor(kind){
+    if(kind === 'cyl') return ['bore','polishC','epolish','eplating','plateC'];
+    return currentShape === 'shaft' ? ['deep','hf'] : ['grind','polishS','plateS','hf','deep'];
+  }
+  // 由材料計算機目前輸入的尺寸取得預設的 Ø 與 L
+  function dimsFromMaterial(kind){
+    var dm = readDims();
+    return { d: (kind === 'cyl' ? dm.id : dm.od) || 0, l: dm.l || 0 };
+  }
+
+  function render(){
+    var host = document.getElementById('proc-host'); if(!host) return;
+    var kind = kindNow(), keys = keysFor(kind);
+    var ds = dimsFromMaterial(kind), keep = dimState[kind] || {};
+    var dv = ds.d > 0 ? ds.d : (keep.d || ''), lv = ds.l > 0 ? ds.l : (keep.l || '');
     var rows = keys.map(function(k){
-      var d = DEF[k], st = state[shape + '|' + k] || {};
-      var dv = (shape === 'pipe' ? dm.id : dm.od) || '';
+      var d = DEF[k], st = state[kind + '|' + k] || {};
       var h = '<div class="proc-row' + (st.on ? ' on' : '') + '" data-k="' + k + '">' +
         '<label class="proc-head"><input type="checkbox" data-f="on"' + (st.on ? ' checked' : '') + '>' +
         '<span class="proc-name">' + d.name + '</span><span class="proc-fee"></span></label>' +
-        '<div class="proc-body"><div class="proc-grid">' +
-        '<div><label>' + d.dLabel + '</label><input type="number" step="any" inputmode="decimal" data-f="d" value="' + dv + '"></div>' +
-        '<div><label>' + d.lLabel + '</label><input type="number" step="any" inputmode="decimal" data-f="l" value="' + (dm.l || '') + '"></div>';
+        '<div class="proc-body"><div class="proc-grid">';
       d.fields.forEach(function(f){ h += fieldHTML(f, st[f.f] != null ? st[f.f] : (f.def != null ? f.def : '')); });
       return h + '</div><div class="proc-note"></div></div></div>';
     }).join('');
-    return '<div class="res-card" id="proc-card" data-shape="' + shape + '">' +
-      '<div class="res-card-header">其他製程（勾選後計入合計）</div>' +
-      '<div class="res-card-body">' + rows + '<div id="proc-sum"></div></div></div>';
+    host.innerHTML = '<div class="res-card" id="proc-card" data-kind="' + kind + '">' +
+      '<div class="res-card-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>表面處理與其他製程</span>' +
+        '<select id="proc-kind" style="background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:3px 6px;border-radius:2px">' +
+          '<option value="shaft"' + (kind === 'shaft' ? ' selected' : '') + '>軸類</option>' +
+          '<option value="cyl"' + (kind === 'cyl' ? ' selected' : '') + '>缸筒（管）</option></select></div>' +
+      '<div class="res-card-body">' +
+      '<div class="proc-grid" style="margin-bottom:6px">' +
+        '<div><label>' + (kind === 'cyl' ? '內徑' : '外徑') + ' Ø（mm）</label><input type="number" step="any" inputmode="decimal" id="proc-d" value="' + dv + '"></div>' +
+        '<div><label>長度 L（mm）</label><input type="number" step="any" inputmode="decimal" id="proc-l" value="' + lv + '"></div>' +
+      '</div>' + rows + '<div id="proc-sum"></div></div></div>';
+    var card = document.getElementById('proc-card');
+    card.addEventListener('input', recalc);
+    card.addEventListener('change', recalc);
+    document.getElementById('proc-kind').addEventListener('change', function(){
+      kindOverride = this.value; render();
+    });
+    recalc();
+  }
+
+  // 材料費：取上方結果第一張卡的大字金額（沒有則不顯示材料費）
+  function materialCost(){
+    var res = document.getElementById('result'); if(!res) return 0;
+    var first = res.querySelector('.res-card'), pe = first && first.querySelector('.price-num');
+    var m = pe ? pe.textContent.replace(/,/g,'').match(/[\d.]+/) : null;
+    return m ? parseFloat(m[0]) : 0;
   }
 
   function recalc(){
     var card = document.getElementById('proc-card'); if(!card) return;
-    var shape = card.dataset.shape, mat = parseFloat(card.dataset.mat) || 0;
+    var kind = card.dataset.kind, mat = materialCost();
+    var D = parseFloat(document.getElementById('proc-d').value) || 0;
+    var L = parseFloat(document.getElementById('proc-l').value) || 0;
+    dimState[kind] = { d: D || '', l: L || '' };
     var sum = 0, pending = 0, picked = 0;
     card.querySelectorAll('.proc-row').forEach(function(row){
       var k = row.dataset.k, d = DEF[k], v = {};
       row.querySelectorAll('[data-f]').forEach(function(e){ v[e.dataset.f] = e.type === 'checkbox' ? e.checked : e.value; });
-      v.d = parseFloat(v.d) || 0; v.l = parseFloat(v.l) || 0;
-      state[shape + '|' + k] = v;
+      v.d = D; v.l = L;
+      state[kind + '|' + k] = v;
       row.classList.toggle('on', !!v.on);
       d.fields.forEach(function(f){ var w = row.querySelector('[data-wrap="' + f.f + '"]'); if(w && f.showIf) w.style.display = f.showIf(v) ? '' : 'none'; });
       var feeEl = row.querySelector('.proc-fee'), noteEl = row.querySelector('.proc-note');
-      var r = (v.d > 0 && v.l > 0) ? d.calc(v) : { hint:'請填入尺寸' };
+      var r = (D > 0 && L > 0) ? d.calc(v) : { hint:'請填入尺寸' };
       if(r.fee != null){ feeEl.textContent = 'NT$ ' + fmt(r.fee); feeEl.className = 'proc-fee'; noteEl.textContent = r.note || ''; }
-      else { feeEl.textContent = r.hint || ''; feeEl.className = 'proc-fee hint'; noteEl.textContent = ''; }
+      else { feeEl.textContent = r.hint || ''; feeEl.className = 'proc-fee hint'; noteEl.textContent = r.note || ''; }
       if(v.on){ picked++; if(r.fee != null) sum += Math.round(r.fee); else pending++; }
     });
     var box = document.getElementById('proc-sum');
@@ -2882,29 +2877,41 @@ function applyToQuote(amount, type, spec) {
     box.innerHTML = h;
   }
 
-  function attach(){
-    var res = document.getElementById('result');
-    if(!res || document.getElementById('proc-card')) return;   // 計算被擋下（alert）時沿用原卡片
-    if(!res.querySelector('.res-card') || !PROCS[currentShape]) return;
-    var dm = readDims();
-    if(!(dm.od > 0 || dm.id > 0) || !(dm.l > 0)) return;
+  // 一打開就顯示：掛在結果區下方，不受「計算」清除
+  var res0 = document.getElementById('result');
+  if(res0){
+    // 右欄改成「結果＋製程卡」兩段：外層沿用 .result 版型，原結果區去掉重複的內距與底色
     var wrap = document.createElement('div');
-    wrap.innerHTML = buildCard(currentShape, dm);
-    var card = wrap.firstChild;
-    var priceEl = res.querySelector('.res-card .price-num');
-    var first = res.querySelector('.res-card');
-    var m = (priceEl && first && first.contains(priceEl)) ? priceEl.textContent.replace(/,/g,'').match(/[\d.]+/) : null;
-    card.dataset.mat = m ? m[0] : '0';
-    res.appendChild(card);
-    card.addEventListener('input', recalc);
-    card.addEventListener('change', recalc);
-    recalc();
+    wrap.className = 'result';
+    res0.parentNode.insertBefore(wrap, res0);
+    wrap.appendChild(res0);
+    res0.style.cssText = 'padding:0;background:none;overflow:visible;flex:0 0 auto';
+    var host = document.createElement('div');
+    host.id = 'proc-host';
+    wrap.appendChild(host);
+    render();
   }
 
+  // 換形狀 → 依形狀更新類型與製程清單
+  var _setShape = window.setShape;
+  window.setShape = function(){
+    var r = _setShape.apply(this, arguments);
+    kindOverride = null;
+    try { render(); } catch(e) { console.error(e); }
+    return r;
+  };
+  // 材料計算完成 → 帶入尺寸並更新材料費
   var _calc = window.calculate;
   window.calculate = function(){
     var r = _calc.apply(this, arguments);
-    try { attach(); } catch(e) { console.error('其他製程卡載入失敗', e); }
+    try {
+      var ds = dimsFromMaterial(kindNow());
+      if(ds.d > 0 && ds.l > 0){
+        var di = document.getElementById('proc-d'), li = document.getElementById('proc-l');
+        if(di && li){ di.value = ds.d; li.value = ds.l; }
+      }
+      recalc();
+    } catch(e) { console.error('其他製程卡更新失敗', e); }
     return r;
   };
 })();
